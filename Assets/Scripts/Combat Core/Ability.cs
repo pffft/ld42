@@ -47,10 +47,6 @@ namespace CombatCore
 
 		// Delegate pointing the the method that will run when this ability is used
 		private UseEffect effect;
-		private string effectName;
-
-		private PrereqCheck check;
-		private string checkName;
 
 		// Can this Ability be activated?
 		public bool available;
@@ -80,7 +76,7 @@ namespace CombatCore
 
 		#region INSTANCE_METHODS
 
-		private Ability(string name, string desc, Sprite icon, float cooldownMax, int chargesMax, string effect, string prereq = "")
+		private Ability(string name, string desc, Sprite icon, float cooldownMax, int chargesMax, UseEffect effect)
 		{
 			this.id = -1;
 			this.name = name;
@@ -93,25 +89,12 @@ namespace CombatCore
 			this.chargesMax = chargesMax;
 			_charges = 0;
 
-			effectName = effect;
-			this.effect = (UseEffect)Delegate.CreateDelegate (
-				typeof (UseEffect),
-				this,
-				typeof (Ability).GetMethod (effectName, BindingFlags.NonPublic | BindingFlags.Instance));
-
-			checkName = prereq;
-			if (checkName != "")
-				check = (PrereqCheck)Delegate.CreateDelegate (
-					typeof (PrereqCheck),
-					this,
-					typeof (Ability).GetMethod (checkName, BindingFlags.NonPublic | BindingFlags.Instance));
-			else
-				check = null;
+			this.effect = effect;
 
 			active = false;
 			available = true;
 		}
-		public Ability(Ability a) : this (a.name, a.desc, a.icon, a.cooldownMax, a.chargesMax, a.effectName, a.checkName) { this.id = a.id; }
+		public Ability(Ability a) : this (a.name, a.desc, a.icon, a.cooldownMax, a.chargesMax, a.effect) { this.id = a.id; }
 
 		/* Instance Methods */
 
@@ -150,12 +133,9 @@ namespace CombatCore
 		}
 
 		// Called to use the Ability
-		public bool Use(Entity subject, Vector2 targetPosition, params object[] args)
+		public bool Use(Entity subject, Vector3 targetPosition, params object[] args)
 		{
 			if (!IsReady ())
-				return false;
-
-			if (check != null && !check (subject))
 				return false;
 
 			if (effect (subject, targetPosition, args))
@@ -190,14 +170,13 @@ namespace CombatCore
 				"Icon: " + icon.ToString () + "\n" +
 				"Cooldown: " + cooldownCurr.ToString ("##0.0") + " / " + cooldownMax.ToString ("##0.0") + "\n" +
 				"Charges: " + _charges + " / " + chargesMax + "\n" +
-				"Effect: " + effect.Method.ToString () + "\n" +
-				"Prereq: " + checkName + "\n";
+				"Effect: " + effect.Method.ToString ();
 		}
 
 		// Setting of ID values
 		private Ability AssignID()
 		{
-			id = Ability.latestID++;
+			id = latestID++;
 			return this;
 		}
 
@@ -206,10 +185,7 @@ namespace CombatCore
 		#region INTERNAL_TYPES
 
 		// The effect that will occur when this ability is used
-		private delegate bool UseEffect(Entity subject, Vector2 targetPosition, params object[] args);
-
-		// A secondary boolean check to run before running an effect
-		private delegate bool PrereqCheck(Entity Subject);
+		private delegate bool UseEffect(Entity subject, Vector3 targetPosition, params object[] args);
 		#endregion
 	}
 }
