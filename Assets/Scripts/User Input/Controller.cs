@@ -13,6 +13,22 @@ public class Controller : MonoBehaviour
 		self = GetComponent<CombatCore.Entity> ();
 	}
 
+	public void Start()
+	{
+		self.AddAbility (CombatCore.Ability.Get ("DEBUG"));
+	}
+
+	public void Update()
+	{
+		if (Input.GetKey (KeyCode.Space))
+		{
+			if (self.GetAbility (0).Use (self, Input.mousePosition))
+			{
+				Debug.Log ("y");
+			}
+		}
+	}
+
 	public void FixedUpdate()
 	{
 		if (!physbody.simulated)

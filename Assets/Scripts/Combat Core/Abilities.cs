@@ -18,13 +18,13 @@ namespace CombatCore
 				null,
 				0.1f,
 				0,
-				"Debug")
+				"DebugAbil")
 			);
-
 		}
 
-		private static bool Debug(Entity subject, Vector2 targetPosition, params object[] args)
+		private bool DebugAbil(Entity subject, Vector2 targetPosition, params object[] args)
 		{
+			Debug.Log ("BANG");
 			return true;
 		}
 	}
