@@ -69,6 +69,7 @@ public class Controller : MonoBehaviour
 		self.GetAbility (0).active = false;
 		Vector3 startVelocity = physbody.velocity;
 		physbody.velocity = Vector3.zero;
+		self.SetInvincible (true);
 
 		Vector3 dashDir = (targetPosition - transform.position).normalized;
 		float dist;
@@ -83,6 +84,7 @@ public class Controller : MonoBehaviour
 			yield return null;
 		}
 
+		self.SetInvincible (false);
 		self.GetAbility (0).active = true;
 		dashing = false;
 	}
@@ -124,7 +126,7 @@ public class Controller : MonoBehaviour
 		if (right)
 			movementVector += Vector3.right;
 
-		physbody.AddForce (movementVector.normalized * self.movespeed.Value);
+		physbody.velocity = movementVector.normalized * self.movespeed.Value;
 	}
 
 	private void facePoint(Vector3 point)
