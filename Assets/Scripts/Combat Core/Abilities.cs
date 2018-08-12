@@ -15,7 +15,7 @@ namespace CombatCore
 				"DEBUG",
 				"Does nothing",
 				null,
-				0.1f,
+				0.3f,
 				0,
 				DebugAbil)
 			);
@@ -24,7 +24,7 @@ namespace CombatCore
 				"Dash",
 				"Dashes to a place",
 				null,
-				0.1f,
+				0.3f,
 				0,
 				PlayerDash)
 			);
