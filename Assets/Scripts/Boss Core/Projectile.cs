@@ -16,7 +16,7 @@ public class Projectile : MonoBehaviour
     {
         currentTime += Time.deltaTime;
         if (currentTime >= maxTime) {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
 	}
 
@@ -30,7 +30,8 @@ public class Projectile : MonoBehaviour
         if (body == null) {
             body = newObj.AddComponent<Rigidbody>();
         }
-        body.velocity = startRotation * Vector3.forward;
+        body.velocity = startRotation * (Vector3.right * velocity);
+        body.useGravity = false;
 
         newObj.transform.position = startPosition;
         newObj.transform.rotation = startRotation;
