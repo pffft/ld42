@@ -33,7 +33,7 @@ namespace CombatCore
 				"Shoot",
 				"Shoots a bullet",
 				null,
-				0f,
+				0.5f,
 				0,
 				PlayerShoot)
 			);
@@ -69,13 +69,16 @@ namespace CombatCore
 		private static bool PlayerShoot(Entity subject, Vector3 targetPosition, params object[] args)
 		{
             Debug.Log ("PlayerShoot");
-			CameraController.GetInstance ().Shake (1f, new Vector3 (10f, 10f, 10f), 0.75f);
+			Vector3 dir = targetPosition - subject.transform.position;
+			Quaternion rot = Quaternion.LookRotation (dir, Vector3.up);
+			Projectile.Create (subject.transform.position, rot, (float)ProjectileManager.Speed.VERY_FAST, 2f);
 			return true;
 		}
 
 		private static bool PlayerReflect(Entity subject, Vector3 targetPosition, params object[] args)
 		{
 			Debug.Log ("PlayerReflect");
+			subject.AddStatus (new Status ("Reflecting", "", null, Status.DecayType.communal, 1, 0.5f));
 			return true;
 		}
 		#endregion

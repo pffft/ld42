@@ -12,9 +12,9 @@ public class CameraController : MonoBehaviour
 	[SerializeField]
 	private bool isFollowing;
 	[SerializeField]
-	private bool matchRotation;
+	private Transform[] followTargets;
 	[SerializeField]
-	private Transform followTarget;
+	private float minZoom = 10f;
 
 	private bool shaking;
 
@@ -84,12 +84,56 @@ public class CameraController : MonoBehaviour
 
 	public void LateUpdate()
 	{
-		if (isFollowing && followTarget != null && Vector3.Distance(transform.position, followTarget.position) > followRadius)
+		if (isFollowing && followTargets.Length > 0)
 		{
-			transform.position = Vector3.Lerp (transform.position, followTarget.transform.position, followSpeed * Time.deltaTime);
-			if (matchRotation)
-				transform.rotation = followTarget.transform.rotation;
+			//average postions
+			Vector3 avgPos = Vector3.zero;
+			int addedTargets = 0;
+			for (int i = 0; i < followTargets.Length; i++)
+			{
+				if (followTargets[i] != null)
+				{
+					avgPos += followTargets[i].position;
+					addedTargets++;
+				}
+			}
+			avgPos /= addedTargets;
+
+			//zoom out to fit all targets
+			if (cam != null)
+			{				
+				float atb = Vector3.Distance (followTargets[0].position, followTargets[1].position);
+				float idealDist = atb / (2 * Mathf.Tan (cam.fieldOfView * Mathf.Deg2Rad / 2));	
+
+				Debug.Log (idealDist);
+				Vector3 idealPos = cam.transform.localPosition.normalized * Mathf.Max(idealDist, minZoom);
+				cam.transform.localPosition = Vector3.Lerp (cam.transform.localPosition, idealPos, 100 * Time.unscaledDeltaTime);
+			}
+
+			transform.position = Vector3.Lerp (transform.position, avgPos, followSpeed * Time.unscaledDeltaTime);
 		}
+	}
+	private float sq(float v) { return v * v; }
+
+	private Vector3 GetOutermostTarget(Vector3 avgPos)
+	{
+		Vector3 cameraDir = cam.transform.rotation * Vector3.forward;
+		Vector3 outermost = Vector3.zero;
+		float distance = 0f;
+
+		for (int i = 0; i < followTargets.Length; i++)
+		{
+			if (followTargets[i] == null)
+				continue;
+
+			float dist;
+			if ((dist = Vector3.Distance (avgPos, followTargets[i].position)) > distance)
+			{
+				outermost = followTargets[i].position;
+				distance = dist;
+			}
+		}
+		return outermost;
 	}
 }
 

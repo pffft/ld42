@@ -69,20 +69,31 @@ public class Controller : MonoBehaviour
 		self.GetAbility (0).active = false;
 		Vector3 startVelocity = physbody.velocity;
 		physbody.velocity = Vector3.zero;
+		self.SetInvincible (true);
 
 		Vector3 dashDir = (targetPosition - transform.position).normalized;
 		float dist;
 		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 0f)
 		{
-			if (dist < self.movespeed.Value * 2 * Time.deltaTime)
+			float dashDistance = self.movespeed.Value * 4 * Time.deltaTime;
+			RaycastHit hit;
+			if (Physics.Raycast (transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
+			{
+				transform.position = hit.point;
+				break;
+			}
+
+			if (dist < dashDistance)
 			{
 				transform.position = targetPosition;
 				break;
 			}
-			transform.position += dashDir * (self.movespeed.Value * 2 * Time.deltaTime);
+
+			transform.position += dashDir * (dashDistance);
 			yield return null;
 		}
 
+		self.SetInvincible (false);
 		self.GetAbility (0).active = true;
 		dashing = false;
 	}
@@ -124,7 +135,7 @@ public class Controller : MonoBehaviour
 		if (right)
 			movementVector += Vector3.right;
 
-		physbody.AddForce (movementVector.normalized * self.movespeed.Value);
+		physbody.velocity = movementVector.normalized * self.movespeed.Value;
 	}
 
 	private void facePoint(Vector3 point)

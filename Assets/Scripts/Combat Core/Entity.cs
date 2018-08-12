@@ -59,6 +59,7 @@ namespace CombatCore
 		// The Statuses currently affecting this Entity
 		[SerializeField]
 		private Dictionary<string, Status> statuses;
+		private Queue<Status> statusRemoveQueue;
 
 		// The Abilities that this Entity
 		private Ability[] abilities;
@@ -149,6 +150,7 @@ namespace CombatCore
 			freezeProgress = 0f;
 
 			statuses = new Dictionary<string, Status> ();
+			statusRemoveQueue = new Queue<Status> ();
 			abilities = new Ability[3];
 			abilSize = 0;
 		}
@@ -166,16 +168,14 @@ namespace CombatCore
 		public void Update()
 		{
 			//update all statuses
-			List<string> removeList = new List<string> ();
 			foreach (Status s in statuses.Values)
 			{
-				if (s.UpdateDuration (this, Time.deltaTime))
-					removeList.Add (s.name);
+				s.UpdateDuration (this, Time.deltaTime);
 			}
 
 			//remove statuses that have finished their durations
-			for (int i = 0; i < removeList.Count; i++)
-				statuses.Remove (removeList[i]);
+			while (statusRemoveQueue.Count > 0)
+				statuses.Remove (statusRemoveQueue.Dequeue().name);
 
 			//update all abilities
 			for (int i = 0; i < abilities.Length; i++)
@@ -231,7 +231,7 @@ namespace CombatCore
 		{
 			s.OnRevert (this);
 			s.durationCompleted -= RemoveStatus;
-			statuses.Remove (s.name);
+			statusRemoveQueue.Enqueue (s);
 
 			//notify listeners
 			if (statusRemoved != null)
