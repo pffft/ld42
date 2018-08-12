@@ -30,7 +30,7 @@ public class Projectile : MonoBehaviour
         if (body == null) {
             body = newObj.AddComponent<Rigidbody>();
         }
-        body.velocity = startRotation * (Vector3.right * velocity);
+        body.velocity = startRotation * (Vector3.forward * velocity);
         body.useGravity = false;
 
         newObj.transform.position = startPosition;
