@@ -44,7 +44,7 @@ public class Controller : MonoBehaviour
 		{
 			if (self.GetAbility (1).Use (self, facePos))
 			{
-
+                
 			}
 		}
 		if (Input.GetKey (KeyCode.Mouse1))

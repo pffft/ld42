@@ -68,7 +68,7 @@ namespace CombatCore
 
 		private static bool PlayerShoot(Entity subject, Vector3 targetPosition, params object[] args)
 		{
-			Debug.Log ("PlayerShoot");
+            Debug.Log ("PlayerShoot");
 			CameraController.GetInstance ().Shake (1f, new Vector3 (10f, 10f, 10f), 0.75f);
 			return true;
 		}

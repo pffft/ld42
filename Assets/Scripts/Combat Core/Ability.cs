@@ -76,7 +76,7 @@ namespace CombatCore
 
 		#region INSTANCE_METHODS
 
-		private Ability(string name, string desc, Sprite icon, float cooldownMax, int chargesMax, UseEffect effect)
+		public Ability(string name, string desc, Sprite icon, float cooldownMax, int chargesMax, UseEffect effect)
 		{
 			this.id = -1;
 			this.name = name;
@@ -185,7 +185,7 @@ namespace CombatCore
 		#region INTERNAL_TYPES
 
 		// The effect that will occur when this ability is used
-		private delegate bool UseEffect(Entity subject, Vector3 targetPosition, params object[] args);
+		public delegate bool UseEffect(Entity subject, Vector3 targetPosition, params object[] args);
 		#endregion
 	}
 }
