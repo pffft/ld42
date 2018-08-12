@@ -25,7 +25,14 @@ public class Controller : MonoBehaviour
 		self.AddAbility (CombatCore.Ability.Get ("Shoot"));
 		self.AddAbility (CombatCore.Ability.Get ("Reflect"));
 
+		self.tookDamage += Self_tookDamage;
+
 		dashing = false;
+	}
+
+	private void Self_tookDamage(CombatCore.Entity victim, CombatCore.Entity attacker, float rawDamage, float calcDamage, bool hitShields)
+	{
+		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage, rawDamage, rawDamage), 0.75f);
 	}
 
 	public void Update()
@@ -65,9 +72,9 @@ public class Controller : MonoBehaviour
 
 		Vector3 dashDir = (targetPosition - transform.position).normalized;
 		float dist;
-		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 1f)
+		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 0f)
 		{
-			if (dist < self.movespeed.Value * Time.deltaTime)
+			if (dist < self.movespeed.Value * 2 * Time.deltaTime)
 			{
 				transform.position = targetPosition;
 				break;
@@ -76,7 +83,6 @@ public class Controller : MonoBehaviour
 			yield return null;
 		}
 
-		physbody.velocity = startVelocity;
 		self.GetAbility (0).active = true;
 		dashing = false;
 	}
@@ -93,6 +99,11 @@ public class Controller : MonoBehaviour
 		{
 			facePos = camRay.origin + (dist * camRay.direction);
 			facePos += new Vector3 (0f, 0.5f, 0f);
+			Vector3 dir;
+			if ((dir = (facePos - transform.position)).magnitude > dashRange)
+			{
+				facePos = transform.position + (dir.normalized * dashRange);
+			}
 		}
 		facePoint (facePos);
 
@@ -113,7 +124,7 @@ public class Controller : MonoBehaviour
 		if (right)
 			movementVector += Vector3.right;
 
-		physbody.AddForce (movementVector * self.movespeed.Value);
+		physbody.AddForce (movementVector.normalized * self.movespeed.Value);
 	}
 
 	private void facePoint(Vector3 point)
