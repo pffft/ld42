@@ -60,8 +60,10 @@ public class Controller : MonoBehaviour
 	{
 		dashing = true;
 		self.GetAbility (0).active = false;
-		Vector3 dashDir = (targetPosition - transform.position).normalized;
+		Vector3 startVelocity = physbody.velocity;
+		physbody.velocity = Vector3.zero;
 
+		Vector3 dashDir = (targetPosition - transform.position).normalized;
 		float dist;
 		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 1f)
 		{
@@ -73,6 +75,8 @@ public class Controller : MonoBehaviour
 			transform.position += dashDir * (self.movespeed.Value * 2 * Time.deltaTime);
 			yield return null;
 		}
+
+		physbody.velocity = startVelocity;
 		self.GetAbility (0).active = true;
 		dashing = false;
 	}
