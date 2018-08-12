@@ -384,6 +384,19 @@ namespace CombatCore
 			return abilities[index];
 		}
 
+		public Ability GetAbility(string name)
+		{
+			if (name == null || name == "")
+				return null;
+
+			for (int i = 0; i < abilities.Length; i++)
+			{
+				if (abilities[i] != null && abilities[i].name == name)
+					return abilities[i];
+			}
+			return null;
+		}
+
 		// For externally looping through the ability list
 		public int abilityCount { get { return abilSize; } }
 		public int abilityCap { get { return abilities.Length; } }
