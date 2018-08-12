@@ -101,22 +101,12 @@ public class CameraController : MonoBehaviour
 
 			//zoom out to fit all targets
 			if (cam != null)
-			{
-				/*
-				Vector3 o = cam.transform.localPosition,
-					f = GetOutermostTarget (avgPos);
-
-				Debug.Log (f);
-
-				float idealDist = Mathf.Cos (cam.fieldOfView * Mathf.Deg2Rad / 2f) * Vector3.Distance (o, f);
-				*/
-				
+			{				
 				float atb = Vector3.Distance (followTargets[0].position, followTargets[1].position);
-				float idealDist = atb / (2 * Mathf.Tan (cam.fieldOfView * Mathf.Deg2Rad / 2));
-				
+				float idealDist = atb / (2 * Mathf.Tan (cam.fieldOfView * Mathf.Deg2Rad / 2));	
 
 				Debug.Log (idealDist);
-				Vector3 idealPos = cam.transform.localPosition.normalized * idealDist;
+				Vector3 idealPos = cam.transform.localPosition.normalized * Mathf.Max(idealDist, minZoom);
 				cam.transform.localPosition = Vector3.Lerp (cam.transform.localPosition, idealPos, 100 * Time.unscaledDeltaTime);
 			}
 
