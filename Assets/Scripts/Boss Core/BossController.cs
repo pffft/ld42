@@ -29,52 +29,46 @@ public class BossController : MonoBehaviour
 
 	// Use this for initialization
     void Start () {
-        shoot1 = new Ability("shoot1", "", null, 0.1f, 0, Shoot1);
-        shoot3 = new Ability("shoot3", "", null, 0.1f, 0, Shoot3);
-        shootWave = new Ability("shootWave", "", null, 1.2f, 0, ShootWave);
+        shoot1 = new Ability("shoot1", "", null, 0f, 0, Shoot1);
+        shoot3 = new Ability("shoot3", "", null, 0f, 0, Shoot3);
+        shootWave = new Ability("shootWave", "", null, 0f, 0, ShootWave);
 
-        teleport = new Ability("teleport", "", null, 1.2f, 0, Teleport);
+        teleport = new Ability("teleport", "", null, 0f, 0, Teleport);
 
         self.AddAbility(shoot1);
         self.AddAbility(shoot3);
         self.AddAbility(shootWave);
         self.AddAbility(teleport);
 
+        eventQueue.Add(1.3f, null); // delay at start to wait for cooldowns
+
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
+        eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
+
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
+        eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
+
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
+        eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
+
+        /*
         eventQueue.Add(0f, teleport);
         eventQueue.Add(1.2f, shootWave, 45, 360f, -10f);
         eventQueue.Add(0f, teleport);
         eventQueue.Add(1.2f, shoot3);
         eventQueue.Add(0f, teleport);
         eventQueue.Add(1.2f, shoot1);
+        */
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 playerPos = player.transform.position;
-
-        //if (self.GetAbility(0).Use(self, playerPos)) { }
-
-        //if (Input.GetKey(KeyCode.P)) {
-        //if (self.GetAbility(0).Use(self, playerPos, new object[]{30, 120f})) {}
-
-        /*
-        Vector3 randomArenaPos = new Vector3(Random.Range(-30, 30), 0, Random.Range(-30, 30));
-        self.GetAbility(3).Use(self, randomArenaPos);
-
-        if (flag) {
-            self.GetAbility(2).Use(self, playerPos, 45, 360f, -10f);
-        } else {
-            self.GetAbility(2).Use(self, playerPos, 45, 360f, 10f);
-        }
-        flag = !flag;
-        */
+        //Vector3 playerPos = player.transform.position;
 
         eventQueue.Update();
-
-
-
-
-        //}
 	}
 
     public void Glare() {
@@ -82,13 +76,16 @@ public class BossController : MonoBehaviour
         transform.rotation = lookRotation;
     }
 
+    // Shoots a single bullet in the direction of the player
     private bool Shoot1(Entity subject, Vector3 targetPosition, params object[] args) {
         Glare();
         ProjectileManager.spawn1(transform.position, player.transform.position);
         return true;
     }
 
+    // Shoots a 3 bullets in the direction of the player, and +/- 30 degrees
     public bool Shoot3(Entity subject, Vector3 targetPosition, params object[] args) {
+        Debug.Log("Shoot 3 called!");
         Glare();
         ProjectileManager.spawn1(transform.position, player.transform.position);
         ProjectileManager.spawn1(transform.position, player.transform.position, -30);
@@ -96,7 +93,10 @@ public class BossController : MonoBehaviour
         return true;
     }
 
+    // Shoots an arc of bullets
+    // Params: [amount, arc width (degrees), offset (degrees)]
     public bool ShootWave(Entity subject, Vector3 targetPosition, params object[] args) {
+        Debug.Log("Shoot wave called!");
         Glare();
 
         int amount = (int)args[0];
@@ -123,6 +123,7 @@ public class BossController : MonoBehaviour
     }
 
     public bool Teleport(Entity subject, Vector3 targetPosition, params object[] args) {
+        Debug.Log("Teleport called!");
         Vector3 randomArenaPos = new Vector3(Random.Range(-30, 30), 1.31f, Random.Range(-30, 30));
         transform.position = randomArenaPos;
         Glare();
@@ -162,12 +163,21 @@ public class BossController : MonoBehaviour
 
             if (events.Count == 0) return;
             AIEvent iEvent = events.Peek();
-            Debug.Log("Top event is " + iEvent.ability.name);
+            Debug.Log("Top event is " + (iEvent.ability == null ? "null" : iEvent.ability.name));
 
             if (Time.time >= iEvent.startTime) {
                 // If the event is new, we fire it
                 if (lastEvent != iEvent) {
-                    iEvent.ability.Use(outerReference.self, Vector3.zero, iEvent.parameters);
+                    if (iEvent.parameters != null)
+                    {
+                        foreach (object o in iEvent.parameters) {
+                            Debug.Log("Parameter: " + o);
+                        }
+                    }
+                    if (iEvent.ability != null)
+                    {
+                        iEvent.ability.Use(outerReference.self, Vector3.zero, iEvent.parameters);
+                    }
                     lastEvent = iEvent;
                 }
 
