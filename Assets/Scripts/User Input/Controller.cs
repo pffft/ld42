@@ -75,12 +75,21 @@ public class Controller : MonoBehaviour
 		float dist;
 		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 0f)
 		{
-			if (dist < self.movespeed.Value * 4 * Time.deltaTime)
+			float dashDistance = self.movespeed.Value * 4 * Time.deltaTime;
+			RaycastHit hit;
+			if (Physics.Raycast (transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
+			{
+				transform.position = hit.point;
+				break;
+			}
+
+			if (dist < dashDistance)
 			{
 				transform.position = targetPosition;
 				break;
 			}
-			transform.position += dashDir * (self.movespeed.Value * 4 * Time.deltaTime);
+
+			transform.position += dashDir * (dashDistance);
 			yield return null;
 		}
 
