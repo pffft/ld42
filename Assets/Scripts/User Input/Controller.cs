@@ -37,7 +37,7 @@ public class Controller : MonoBehaviour
 	{
 		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage, rawDamage, rawDamage), 0.75f);
         arena.transform.localScale = new Vector3(self.HealthPerc, self.HealthPerc, self.HealthPerc);
-
+		self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
 	}
 
 	public void Update()
