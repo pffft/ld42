@@ -636,6 +636,11 @@ Prefab:
       propertyPath: dashRange
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 54192551803622862, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+        type: 2}
+      propertyPath: m_Drag
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
   m_IsPrefabAsset: 0
