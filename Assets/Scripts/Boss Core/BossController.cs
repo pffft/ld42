@@ -9,14 +9,22 @@ public class BossController : MonoBehaviour
     private GameObject player;
 
     private Rigidbody physbody;
-    protected CombatCore.Entity self;
+    public CombatCore.Entity self;
 
     private EventQueue eventQueue;
 
-    bool flag = true;
-    int teleportCounter = 0;
+    private ProjectileManager bossProjectileManager;
 
-    Ability shoot1, shoot3, shootWave, teleport;
+    private GameObject arena;
+    /*
+    public static Ability shoot1 = new Ability("shoot1", "", null, 0f, 0, Shoot1);
+    public static Ability shoot3;
+
+    public static Ability shootWave = new Ability("shootWave", "", null, 0f, 0, ShootWave);
+    public static Ability teleport = new Ability("teleport", "", null, 0f, 0, instanceTeleport);
+    */
+
+    public Ability shoot1, shoot3, shootWave, teleport;
 
     private void Awake() {
         player = GameObject.Find("Player");
@@ -24,7 +32,10 @@ public class BossController : MonoBehaviour
         physbody = GetComponent<Rigidbody>();
         self = GetComponent<CombatCore.Entity>();
 
-        eventQueue = new EventQueue(this);
+        eventQueue = new EventQueue(self);
+        bossProjectileManager = new ProjectileManager(self);
+
+        arena = GameObject.Find("Arena");
 	}
 
 	// Use this for initialization
@@ -40,8 +51,18 @@ public class BossController : MonoBehaviour
         self.AddAbility(shootWave);
         self.AddAbility(teleport);
 
-        eventQueue.Add(1.3f, null); // delay at start to wait for cooldowns
+        AISequence.AddSequence("shoot2waves", new AISequence(
+            new AIEvent(0f, teleport),
+            new AIEvent(0f, shootWave, 25, 90f, 2.5f, ProjectileManager.Speed.VERY_FAST),
+            new AIEvent(1f, shootWave, 25, 90f, -2.5f, ProjectileManager.Speed.VERY_FAST)
+        ));
 
+        //eventQueue.Add(1.3f, null); // delay at start to wait for cooldowns
+
+        //eventQueue.AddRepeat(100, 1f, shootWave, 25, 120f, 0f, ProjectileManager.Speed.VERY_FAST);
+        eventQueue.AddSequenceRepeat(50, "shoot2waves");
+
+        /*
         eventQueue.Add(0f, teleport);
         eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
         eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
@@ -53,6 +74,7 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0f, teleport);
         eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
         eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
+        */
 
         /*
         eventQueue.Add(0f, teleport);
@@ -72,14 +94,14 @@ public class BossController : MonoBehaviour
 	}
 
     public void Glare() {
-        Quaternion lookRotation = Quaternion.LookRotation(transform.position - player.transform.position);
+        Quaternion lookRotation = Quaternion.LookRotation(player.transform.position - transform.position);
         transform.rotation = lookRotation;
     }
 
     // Shoots a single bullet in the direction of the player
     private bool Shoot1(Entity subject, Vector3 targetPosition, params object[] args) {
         Glare();
-        ProjectileManager.spawn1(transform.position, player.transform.position);
+        bossProjectileManager.spawn1(transform.position, player.transform.position);
         return true;
     }
 
@@ -87,16 +109,17 @@ public class BossController : MonoBehaviour
     public bool Shoot3(Entity subject, Vector3 targetPosition, params object[] args) {
         Debug.Log("Shoot 3 called!");
         Glare();
-        ProjectileManager.spawn1(transform.position, player.transform.position);
-        ProjectileManager.spawn1(transform.position, player.transform.position, -30);
-        ProjectileManager.spawn1(transform.position, player.transform.position, 30);
+        bossProjectileManager.spawn1(transform.position, player.transform.position);
+        bossProjectileManager.spawn1(transform.position, player.transform.position, -30);
+        bossProjectileManager.spawn1(transform.position, player.transform.position, 30);
         return true;
     }
 
     // Shoots an arc of bullets
-    // Params: [amount, arc width (degrees), offset (degrees)]
+    // Params: [amount, arc width (degrees), offset (degrees), speed]
+    // TODO: add default values
     public bool ShootWave(Entity subject, Vector3 targetPosition, params object[] args) {
-        Debug.Log("Shoot wave called!");
+        //Debug.Log("Shoot wave called! Boss position: " + transform.position);
         Glare();
 
         int amount = (int)args[0];
@@ -108,14 +131,16 @@ public class BossController : MonoBehaviour
 
         float offset = (float)args[2];
 
-        Debug.Log("Shooting wave with " + amount + " projectiles and spread of " + arcWidth);
+        ProjectileManager.Speed speed = (ProjectileManager.Speed)args[3];
+
+        //Debug.Log("Shooting wave with " + amount + " projectiles and spread of " + arcWidth);
 
         for (int i = 0; i < amount; i++) {
-            ProjectileManager.spawn1(
+            bossProjectileManager.spawn1(
                 transform.position,
                 player.transform.position,
                 halfArcWidth + offset + (i * (arcWidth / amount)),
-                ProjectileManager.Speed.SLOW
+                speed
             );
         }
 
@@ -123,83 +148,54 @@ public class BossController : MonoBehaviour
     }
 
     public bool Teleport(Entity subject, Vector3 targetPosition, params object[] args) {
-        Debug.Log("Teleport called!");
-        Vector3 randomArenaPos = new Vector3(Random.Range(-30, 30), 1.31f, Random.Range(-30, 30));
-        transform.position = randomArenaPos;
+
+        float minDistance = 35f;
+        float minAngle = 50f;
+        float maxAngle = 100f;
+
+        Vector3 oldPosVector = transform.position - player.transform.position;
+
+        int count = 0;
+        Vector3 rawPosition;
+        do {
+            count++;
+            float degreeRotation = Random.Range(minAngle, maxAngle) * (Random.Range(0, 2) == 0 ? -1 : 1);
+            float distance = Random.Range(minDistance * arena.transform.localScale.x, 50f * arena.transform.localScale.x);
+
+            if (count == 15)
+            {
+                degreeRotation = Random.Range(0, 359f);
+                distance = Random.Range(15, 49f);
+            }
+
+            Quaternion rot = Quaternion.AngleAxis(degreeRotation, Vector3.up);
+
+            if (count == 15)
+            {
+                rawPosition = rot * (distance * Vector3.forward);
+            }
+            else
+            {
+                rawPosition = (rot * (oldPosVector * (distance / oldPosVector.magnitude))) + player.transform.position;
+            }
+            rawPosition.y = 0f;
+
+        } while (rawPosition.magnitude > 50f);
+
+        rawPosition.y = 1.31f;
+        transform.position = rawPosition;
+        Debug.Log("Took " + count + " iterations.");
+
+        //Debug.Log("Distance: " + distance + " Actual: " + (transform.position - player.transform.position).magnitude);
+
+        //Debug.Log("Distance: " + Vector3.Distance(target, player.transform.position));
+        //Debug.Log("Angle: " + angle);
+        //Debug.Log("Old pos: " + transform.position + " Player: " + player.transform.position + " New pos: " + target + " Angle: " + angle);
+
+        //transform.position = target;
+
         Glare();
         return true;
     }
 
-    class EventQueue {
-
-        private BossController outerReference;
-        private Queue<AIEvent> events;
-        private AIEvent lastEvent;
-        private float lastTime;
-
-        public EventQueue(BossController reference) {
-            outerReference = reference;
-
-            events = new Queue<AIEvent>();
-            lastEvent = null;
-            lastTime = 0;
-        }
-
-        public void Add(float duration, Ability ability, params object[] pars) {
-            float start = 0;
-            if (Time.time > lastTime) {
-                start = Time.time;
-            } else {
-                start = lastTime;
-                lastTime += duration;
-            }
-
-            events.Enqueue(new AIEvent(start, duration, ability, pars));
-        }
-
-        public void Update() {
-
-            // if the player is too aggressive, you can ignore the q here
-
-            if (events.Count == 0) return;
-            AIEvent iEvent = events.Peek();
-            Debug.Log("Top event is " + (iEvent.ability == null ? "null" : iEvent.ability.name));
-
-            if (Time.time >= iEvent.startTime) {
-                // If the event is new, we fire it
-                if (lastEvent != iEvent) {
-                    if (iEvent.parameters != null)
-                    {
-                        foreach (object o in iEvent.parameters) {
-                            Debug.Log("Parameter: " + o);
-                        }
-                    }
-                    if (iEvent.ability != null)
-                    {
-                        iEvent.ability.Use(outerReference.self, Vector3.zero, iEvent.parameters);
-                    }
-                    lastEvent = iEvent;
-                }
-
-                // If the event is stale, remove it from the q
-                if (Time.time >= iEvent.startTime + iEvent.duration) {
-                    events.Dequeue();
-                }
-            }
-        }
-
-        private class AIEvent {
-            public float startTime;
-            public float duration;
-            public Ability ability;
-            public object[] parameters;
-
-            public AIEvent(float start, float duration, Ability ability, params object[] parameters) {
-                this.startTime = start;
-                this.duration = duration;
-                this.ability = ability;
-                this.parameters = parameters;
-            }
-        }
-    }
 }

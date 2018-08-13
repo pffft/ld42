@@ -103,9 +103,19 @@ public class CameraController : MonoBehaviour
 			if (cam != null)
 			{				
 				float atb = Vector3.Distance (followTargets[0].position, followTargets[1].position);
-				float idealDist = atb / (2 * Mathf.Tan (cam.fieldOfView * Mathf.Deg2Rad / 2));	
+				float idealDist = atb / (2 * Mathf.Tan (cam.fieldOfView * Mathf.Deg2Rad / 2));
 
-				Debug.Log (idealDist);
+                // Temporary hacky fuzzing factor; because of camera incline, we tend to
+                // underestimate height on large distances. This roughly compensates for that.
+                //
+                // A better camera would take into account the angle of the camera, and
+                // initial offset from the midpoint.
+                //Debug.Log("ATB: " + atb);
+                if (atb > 10) {
+                    idealDist *= 1.2f;
+                }
+
+				//Debug.Log (idealDist);
 				Vector3 idealPos = cam.transform.localPosition.normalized * Mathf.Max(idealDist, minZoom);
 				cam.transform.localPosition = Vector3.Lerp (cam.transform.localPosition, idealPos, 100 * Time.unscaledDeltaTime);
 			}

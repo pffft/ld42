@@ -13,10 +13,13 @@ public class Controller : MonoBehaviour
 	private Vector3 facePos;
 	private bool dashing;
 
+    private GameObject arena;
+
 	public void Awake()
 	{
 		physbody = GetComponent<Rigidbody> ();
 		self = GetComponent<CombatCore.Entity> ();
+        arena = GameObject.Find("Arena");
 	}
 
 	public void Start()
@@ -33,6 +36,8 @@ public class Controller : MonoBehaviour
 	private void Self_tookDamage(CombatCore.Entity victim, CombatCore.Entity attacker, float rawDamage, float calcDamage, bool hitShields)
 	{
 		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage, rawDamage, rawDamage), 0.75f);
+        arena.transform.localScale = new Vector3(self.HealthPerc, self.HealthPerc, self.HealthPerc);
+
 	}
 
 	public void Update()
