@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Projectiles;
 
 namespace CombatCore
 {
@@ -71,7 +72,7 @@ namespace CombatCore
             Debug.Log ("PlayerShoot");
 			Vector3 dir = targetPosition - subject.transform.position;
 			Quaternion rot = Quaternion.LookRotation (dir, Vector3.up);
-			Projectile.Create (subject, subject.transform.position, rot, (float)ProjectileManager.Speed.VERY_FAST, 2f);
+            Projectile.spawnBasic(subject, subject.transform.position, rot * Vector3.forward, 2f, speed: Speed.VERY_FAST);
 			return true;
 		}
 

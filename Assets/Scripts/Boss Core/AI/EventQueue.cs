@@ -56,10 +56,27 @@ public class EventQueue
     }
 
     /*
+     * Adds a sequence with an additional delay afterwards.
+     */
+    public void AddSequence(float delay, AISequence sequence)
+    {
+        AddSequence(sequence);
+        Add(delay, null);
+    }
+
+    /*
      * Adds a sequence that is in the Sequence dictionary.
      */
     public void AddSequence(string sequenceName) {
         AddSequence(AISequence.GetSequence(sequenceName));
+    }
+
+    /*
+     * Adds a sequence with an additional delay afterwards.
+     */
+    public void AddSequence(float delay, string sequenceName) {
+        AddSequence(AISequence.GetSequence(sequenceName));
+        Add(delay, null);
     }
 
     /*
