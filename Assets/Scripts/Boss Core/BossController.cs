@@ -23,7 +23,8 @@ public class BossController : MonoBehaviour
         shootHexCurve,
         shootDodecaCurve,
         teleport,
-        strafe;
+        strafe,
+        cameraMove;
 
     private void Awake() {
         player = GameObject.Find("Player");
@@ -49,6 +50,8 @@ public class BossController : MonoBehaviour
 
         strafe = new Ability("strafe", "", null, 0f, 0, Strafe);
 
+        cameraMove = new Ability("cameraMove", "", null, 0f, 0, CameraMove);
+
         self.AddAbility(shoot1);
         self.AddAbility(shoot3);
         self.AddAbility(shootWave);
@@ -56,6 +59,7 @@ public class BossController : MonoBehaviour
         self.AddAbility(shootDodecaCurve);
         self.AddAbility(teleport);
         self.AddAbility(strafe);
+        self.AddAbility(cameraMove);
 
         AISequence.AddSequence("shoot2waves", new AISequence(
             new AIEvent(0f, teleport),
@@ -96,6 +100,7 @@ public class BossController : MonoBehaviour
         //eventQueue.Add(0.2f, teleport, new Vector3(0, 1.31f, 45));
         //eventQueue.AddSequenceRepeat(40, "homingStrafe72");
 
+        /*
         eventQueue.Add(0.5f, teleport);
         eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.3f, shoot3), 15));
 
@@ -109,7 +114,7 @@ public class BossController : MonoBehaviour
         eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.05f, shoot3), 20));
         eventQueue.Add(0f, teleport);
         eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.05f, shoot3), 20));
-        eventQueue.Add(0.5f, teleport, Vector3.zero);
+        eventQueue.Add(0.5f, teleport, new Vector3(0, 1.31f, 0));
         eventQueue.Add(0.25f, shootDodecaCurve);
         eventQueue.Add(1f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
         eventQueue.Add(1f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
@@ -125,15 +130,20 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
         eventQueue.Add(1f, shootHexCurve, false);
         eventQueue.Add(2.5f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        */
         eventQueue.Add(0.5f, teleport);
         eventQueue.AddSequenceRepeat(12, "homingStrafe10");
         eventQueue.AddSequenceRepeat(3, "shoot2waves");
 
-        // Zoom camera out to (0, 30, -50) before starting this
+        eventQueue.Add(2f, cameraMove, false, new Vector3(0, 17.5f, -35));
         eventQueue.Add(1f, teleport, new Vector3(0, 1.31f, 45));
         eventQueue.AddSequenceRepeat(30, "homingStrafe72");
         eventQueue.Add(1f, teleport, new Vector3(0, 1.31f, 45));
         eventQueue.AddSequenceRepeat(60, "homingStrafe15");
+        eventQueue.Add(2f, cameraMove, true);
+
+        eventQueue.AddSequenceRepeat(5, "shoot2waves");
+
 	}
 	
 	// Update is called once per frame
@@ -403,6 +413,20 @@ public class BossController : MonoBehaviour
         Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);
 
         StartCoroutine(Dashing(rot * oldPosVector));
+        return true;
+    }
+
+    public bool CameraMove(Entity subject, Vector3 targetPosition, params object[] args)
+    {
+
+        bool isFollow = (bool)args[0];
+        CameraController.GetInstance().IsFollowing = isFollow;
+
+        if (args.Length > 1) {
+            Vector3 target = (Vector3)args[1];
+            CameraController.GetInstance().Goto(target, 1);
+        }
+
         return true;
     }
 
