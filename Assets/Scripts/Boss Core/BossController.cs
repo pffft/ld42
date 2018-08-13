@@ -21,6 +21,7 @@ public class BossController : MonoBehaviour
         shoot3, 
         shootWave,
         shootHexCurve,
+        shootDodecaCurve,
         teleport,
         strafe;
 
@@ -42,6 +43,7 @@ public class BossController : MonoBehaviour
         shoot3 = new Ability("shoot3", "", null, 0f, 0, Shoot3);
         shootWave = new Ability("shootWave", "", null, 0f, 0, ShootWave);
         shootHexCurve = new Ability("shootHexCurve", "", null, 0f, 0, ShootHexCurve);
+        shootDodecaCurve = new Ability("shootDodecaCurve", "", null, 0f, 0, ShootDodecaCurve);
 
         teleport = new Ability("teleport", "", null, 0f, 0, Teleport);
 
@@ -51,6 +53,7 @@ public class BossController : MonoBehaviour
         self.AddAbility(shoot3);
         self.AddAbility(shootWave);
         self.AddAbility(shootHexCurve);
+        self.AddAbility(shootDodecaCurve);
         self.AddAbility(teleport);
         self.AddAbility(strafe);
 
@@ -83,7 +86,6 @@ public class BossController : MonoBehaviour
         //eventQueue.Add(1.3f, null); // delay at start to wait for cooldowns
 
         //eventQueue.AddRepeat(100, 1f, shootWave, 25, 120f, 0f, ProjectileManager.Speed.VERY_FAST);
-        eventQueue.AddSequenceRepeat(20, "shoot2waves");
         //eventQueue.AddSequenceRepeat(10, "homingStrafe");
 
         //eventQueue.Add(2f, null);
@@ -94,21 +96,27 @@ public class BossController : MonoBehaviour
         //eventQueue.Add(0.2f, teleport, new Vector3(0, 1.31f, 45));
         //eventQueue.AddSequenceRepeat(40, "homingStrafe72");
 
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.2f, shoot3);
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.2f, shoot3);
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.1f, shoot3);
+        eventQueue.Add(3f, shootDodecaCurve);
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.3f, shoot3);
+        eventQueue.AddSequenceRepeat(5, "shoot2waves");
         eventQueue.Add(0f, shootHexCurve, true);
-        eventQueue.Add(3f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(2.5f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
         eventQueue.Add(0f, shootHexCurve, false);
-        eventQueue.Add(3f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(2.5f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(0f, shootHexCurve, true);
+        eventQueue.Add(0f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(1f, shootHexCurve, false);
+        eventQueue.Add(2.5f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
         eventQueue.Add(0.5f, teleport);
         eventQueue.AddSequenceRepeat(12, "homingStrafe10");
         eventQueue.AddSequenceRepeat(3, "shoot2waves");
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.5f, shoot3);
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.5f, shoot3);
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.5f, shoot3);
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.5f, shoot3);
 
         /*
         eventQueue.AddSequence("homingStrafe");
@@ -259,6 +267,32 @@ public class BossController : MonoBehaviour
         bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 240, speed);
         bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 300, speed);
 
+        return true;
+    }
+
+    public bool ShootDodecaCurve(Entity subject, Vector3 targetPosition, params object[] args) {
+
+        bool clockwise = args.Length > 0 ? (bool)args[0] : true;
+        float multiplier = clockwise ? 1f : -1f;
+        float antiMultiplier = clockwise ? -1f : 1f;
+        float offset = 15f;
+
+        ProjectileManager.Speed speed = ProjectileManager.Speed.FAST;
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 0, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 60, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 120, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 180, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 240, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 300, speed);
+
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * antiMultiplier * 2f, antiMultiplier * 0 + offset, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * antiMultiplier * 2f, antiMultiplier * 60 + offset, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * antiMultiplier * 2f, antiMultiplier * 120 + offset, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * antiMultiplier * 2f, antiMultiplier * 180 + offset, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * antiMultiplier * 2f, antiMultiplier * 240 + offset, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * antiMultiplier * 2f, antiMultiplier * 300 + offset, speed);
+
+        return true;
         return true;
     }
 
