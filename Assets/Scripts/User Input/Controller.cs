@@ -37,7 +37,7 @@ public class Controller : MonoBehaviour
 	{
 		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage, rawDamage, rawDamage), 0.75f);
         arena.transform.localScale = new Vector3(self.HealthPerc, self.HealthPerc, self.HealthPerc);
-
+		self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
 	}
 
 	public void Update()
@@ -76,6 +76,11 @@ public class Controller : MonoBehaviour
 		physbody.velocity = Vector3.zero;
 		self.SetInvincible (true);
 
+		GameObject dashEffectPref = Resources.Load<GameObject> ("Prefabs/PlayerDashEffect");
+		GameObject effect = Instantiate (dashEffectPref, gameObject.transform, false);
+		effect.transform.localPosition = new Vector3 (0f, 1f);
+		GetComponentInChildren<SkinnedMeshRenderer> ().enabled = false;
+
 		Vector3 dashDir = (targetPosition - transform.position).normalized;
 		float dist;
 		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 0f)
@@ -98,6 +103,11 @@ public class Controller : MonoBehaviour
 			yield return null;
 		}
 
+		GetComponentInChildren<SkinnedMeshRenderer> ().enabled = true;
+		ParticleSystem.EmissionModule em = effect.GetComponentInChildren<ParticleSystem> ().emission;
+		em.enabled = false;
+		Destroy (effect, self.GetAbility (0).cooldownMax);
+
 		self.SetInvincible (false);
 		self.GetAbility (0).active = true;
 		dashing = false;
@@ -114,31 +124,24 @@ public class Controller : MonoBehaviour
 		if (plane.Raycast (camRay, out dist))
 		{
 			facePos = camRay.origin + (dist * camRay.direction);
-			facePos += new Vector3 (0f, 0.5f, 0f);
 			Vector3 dir;
 			if ((dir = (facePos - transform.position)).magnitude > dashRange)
 			{
 				facePos = transform.position + (dir.normalized * dashRange);
 			}
 		}
-		facePoint (facePos);
 
 		//movement
 		Vector3 movementVector = Vector3.zero;
 
-		bool forward = Input.GetKey(KeyCode.W);
-		bool left = Input.GetKey (KeyCode.A);
-		bool backward = Input.GetKey (KeyCode.S);
-		bool right = Input.GetKey (KeyCode.D);
+		float x = Input.GetAxisRaw ("Horizontal");
+		float y = Input.GetAxisRaw ("Vertical");
 
-		if (forward)
-			movementVector += Vector3.forward;
-		if (left)
-			movementVector += Vector3.left;
-		if (backward)
-			movementVector += Vector3.back;
-		if (right)
-			movementVector += Vector3.right;
+		movementVector += (Vector3.forward * y) + (Vector3.right * x);
+		GetComponent<Animator> ().SetFloat ("SpeedPerc", movementVector != Vector3.zero ? 1f : 0f);
+
+		if(movementVector != Vector3.zero)
+			transform.rotation = Quaternion.LookRotation (movementVector, Vector3.up);
 
 		physbody.velocity = movementVector.normalized * self.movespeed.Value;
 	}
@@ -157,7 +160,7 @@ public class Controller : MonoBehaviour
 		UnityEditor.Handles.DrawWireArc (facePos, Vector3.up, Vector3.forward, 360f, 1f);
 
 		UnityEditor.Handles.color = Color.red;
-		UnityEditor.Handles.DrawWireArc (transform.position, Vector3.up, Vector3.forward, 360f, dashRange);
+		UnityEditor.Handles.DrawWireArc (new Vector3(transform.position.x, 0f, transform.position.z), Vector3.up, Vector3.forward, 360f, dashRange);
 	}
 //#endif
 }
