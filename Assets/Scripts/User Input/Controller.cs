@@ -76,6 +76,11 @@ public class Controller : MonoBehaviour
 		physbody.velocity = Vector3.zero;
 		self.SetInvincible (true);
 
+		GameObject dashEffectPref = Resources.Load<GameObject> ("Prefabs/PlayerDashEffect");
+		GameObject effect = Instantiate (dashEffectPref, gameObject.transform, false);
+		effect.transform.localPosition = new Vector3 (0f, 1f);
+		GetComponentInChildren<SkinnedMeshRenderer> ().enabled = false;
+
 		Vector3 dashDir = (targetPosition - transform.position).normalized;
 		float dist;
 		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 0f)
@@ -98,6 +103,11 @@ public class Controller : MonoBehaviour
 			yield return null;
 		}
 
+		GetComponentInChildren<SkinnedMeshRenderer> ().enabled = true;
+		ParticleSystem.EmissionModule em = effect.GetComponentInChildren<ParticleSystem> ().emission;
+		em.enabled = false;
+		Destroy (effect, self.GetAbility (0).cooldownMax);
+
 		self.SetInvincible (false);
 		self.GetAbility (0).active = true;
 		dashing = false;
@@ -114,7 +124,6 @@ public class Controller : MonoBehaviour
 		if (plane.Raycast (camRay, out dist))
 		{
 			facePos = camRay.origin + (dist * camRay.direction);
-			facePos += new Vector3 (0f, 0.5f, 0f);
 			Vector3 dir;
 			if ((dir = (facePos - transform.position)).magnitude > dashRange)
 			{
@@ -151,7 +160,7 @@ public class Controller : MonoBehaviour
 		UnityEditor.Handles.DrawWireArc (facePos, Vector3.up, Vector3.forward, 360f, 1f);
 
 		UnityEditor.Handles.color = Color.red;
-		UnityEditor.Handles.DrawWireArc (transform.position, Vector3.up, Vector3.forward, 360f, dashRange);
+		UnityEditor.Handles.DrawWireArc (new Vector3(transform.position.x, 0f, transform.position.z), Vector3.up, Vector3.forward, 360f, dashRange);
 	}
 //#endif
 }
