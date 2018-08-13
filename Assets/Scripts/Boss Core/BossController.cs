@@ -117,6 +117,11 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0.5f, teleport);
         eventQueue.AddSequenceRepeat(12, "homingStrafe10");
         eventQueue.AddSequenceRepeat(3, "shoot2waves");
+        eventQueue.Add(1f, teleport, new Vector3(0, 1.31f, 45));
+        eventQueue.AddSequenceRepeat(30, "homingStrafe72");
+        eventQueue.Add(1f, teleport, new Vector3(0, 1.31f, 45));
+        eventQueue.AddSequenceRepeat(60, "homingStrafe15");
+
 
         /*
         eventQueue.AddSequence("homingStrafe");
