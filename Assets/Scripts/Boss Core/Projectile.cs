@@ -54,4 +54,30 @@ public class Projectile : MonoBehaviour
 
         return projectile;
     }
+
+    public static Projectile CreateMedium(Entity entity, Vector3 startPosition, Quaternion startRotation, float velocity, float maxTime)
+    {
+
+        // TODO: if things get laggy, then make a static reference to the projectile prefab.
+        GameObject newObj = Instantiate(Resources.Load<GameObject>("Prefabs/ProjectileMedium")) as GameObject;
+        Projectile projectile = newObj.GetComponent<Projectile>();
+
+        Rigidbody body = newObj.GetComponent<Rigidbody>();
+        if (body == null)
+        {
+            body = newObj.AddComponent<Rigidbody>();
+        }
+        body.velocity = startRotation * (Vector3.forward * velocity);
+        body.useGravity = false;
+
+        newObj.transform.position = startPosition;
+        newObj.transform.rotation = startRotation;
+
+        projectile.entity = entity;
+        projectile.currentTime = 0;
+        projectile.maxTime = maxTime;
+        projectile.velocity = velocity;
+
+        return projectile;
+    }
 }
