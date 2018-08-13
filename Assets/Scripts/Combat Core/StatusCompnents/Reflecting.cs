@@ -15,7 +15,7 @@ namespace CombatCore.StatusComponents
 		{
 			if (hitShields)
 			{
-				Projectile.Create (subject.transform.position, subject.transform.rotation, (float)ProjectileManager.Speed.VERY_FAST, 2f);
+				Projectile.Create (subject, subject.transform.position, subject.transform.rotation, (float)ProjectileManager.Speed.VERY_FAST, 2f);
 			}
 		}
 
