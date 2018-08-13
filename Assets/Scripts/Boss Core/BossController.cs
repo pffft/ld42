@@ -96,13 +96,24 @@ public class BossController : MonoBehaviour
         //eventQueue.Add(0.2f, teleport, new Vector3(0, 1.31f, 45));
         //eventQueue.AddSequenceRepeat(40, "homingStrafe72");
 
+        eventQueue.Add(0.5f, teleport);
+        eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.3f, shoot3), 15));
+
         eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.2f, shoot3);
+        eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.2f, shoot3), 25));
         eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.2f, shoot3);
+        eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.1f, shoot3), 45));
         eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.1f, shoot3);
-        eventQueue.Add(3f, shootDodecaCurve);
+        eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.05f, shoot3), 50));
+        eventQueue.Add(0f, teleport);
+        eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.05f, shoot3), 20));
+        eventQueue.Add(0f, teleport);
+        eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.05f, shoot3), 20));
+        eventQueue.Add(0.5f, teleport, Vector3.zero);
+        eventQueue.Add(0.25f, shootDodecaCurve);
+        eventQueue.Add(1f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(1f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(1f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
         eventQueue.Add(0f, teleport);
         eventQueue.Add(0.3f, shoot3);
         eventQueue.AddSequenceRepeat(5, "shoot2waves");
@@ -117,44 +128,12 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0.5f, teleport);
         eventQueue.AddSequenceRepeat(12, "homingStrafe10");
         eventQueue.AddSequenceRepeat(3, "shoot2waves");
+
+        // Zoom camera out to (0, 30, -50) before starting this
         eventQueue.Add(1f, teleport, new Vector3(0, 1.31f, 45));
         eventQueue.AddSequenceRepeat(30, "homingStrafe72");
         eventQueue.Add(1f, teleport, new Vector3(0, 1.31f, 45));
         eventQueue.AddSequenceRepeat(60, "homingStrafe15");
-
-
-        /*
-        eventQueue.AddSequence("homingStrafe");
-        eventQueue.AddSequence("homingStrafe");
-        eventQueue.AddSequence("shoot2waves");
-        eventQueue.AddSequence("homingStrafe");
-        eventQueue.AddSequence("shoot2waves");
-        */
-
-        //eventQueue.AddRepeat(1000, 0.2f, shoot1);
-
-        /*
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
-        eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
-
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
-        eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
-
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(0.1f, shootWave, 25, 120f, -5f);
-        eventQueue.Add(0.8f, shootWave, 25, 120f, 5f);
-        */
-
-        /*
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(1.2f, shootWave, 45, 360f, -10f);
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(1.2f, shoot3);
-        eventQueue.Add(0f, teleport);
-        eventQueue.Add(1.2f, shoot1);
-        */
 	}
 	
 	// Update is called once per frame
