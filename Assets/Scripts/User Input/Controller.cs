@@ -121,24 +121,18 @@ public class Controller : MonoBehaviour
 				facePos = transform.position + (dir.normalized * dashRange);
 			}
 		}
-		facePoint (facePos);
 
 		//movement
 		Vector3 movementVector = Vector3.zero;
 
-		bool forward = Input.GetKey(KeyCode.W);
-		bool left = Input.GetKey (KeyCode.A);
-		bool backward = Input.GetKey (KeyCode.S);
-		bool right = Input.GetKey (KeyCode.D);
+		float x = Input.GetAxisRaw ("Horizontal");
+		float y = Input.GetAxisRaw ("Vertical");
 
-		if (forward)
-			movementVector += Vector3.forward;
-		if (left)
-			movementVector += Vector3.left;
-		if (backward)
-			movementVector += Vector3.back;
-		if (right)
-			movementVector += Vector3.right;
+		movementVector += (Vector3.forward * y) + (Vector3.right * x);
+		GetComponent<Animator> ().SetFloat ("SpeedPerc", movementVector != Vector3.zero ? 1f : 0f);
+
+		if(movementVector != Vector3.zero)
+			transform.rotation = Quaternion.LookRotation (movementVector, Vector3.up);
 
 		physbody.velocity = movementVector.normalized * self.movespeed.Value;
 	}
