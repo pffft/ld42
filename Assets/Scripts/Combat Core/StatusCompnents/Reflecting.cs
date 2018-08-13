@@ -1,4 +1,4 @@
-﻿
+﻿using Projectiles;
 
 namespace CombatCore.StatusComponents
 {
@@ -15,7 +15,7 @@ namespace CombatCore.StatusComponents
 		{
 			if (hitShields)
 			{
-				Projectile.Create (subject, subject.transform.position, subject.transform.rotation, (float)ProjectileManager.Speed.VERY_FAST, 2f);
+                Projectile.spawnBasic(subject, subject.transform.position, subject.transform.rotation * UnityEngine.Vector3.forward, 2f, speed: Speed.VERY_FAST);
 			}
 		}
 
