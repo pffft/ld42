@@ -11,6 +11,9 @@ public class EventQueue
     private AIEvent lastEvent;
     private float lastTime;
 
+    private float internalTime;
+    private bool paused;
+
     public EventQueue(Entity reference)
     {
         this.entity = reference;
@@ -18,6 +21,8 @@ public class EventQueue
         events = new Queue<AIEvent>();
         lastEvent = null;
         lastTime = 0;
+        internalTime = 0;
+        paused = false;
     }
 
     /*
@@ -26,9 +31,9 @@ public class EventQueue
     public void Add(float duration, Ability ability, params object[] pars)
     {
         float start = 0;
-        if (Time.time > lastTime)
+        if (internalTime > lastTime)
         {
-            start = Time.time;
+            start = internalTime;
         }
         else
         {
@@ -94,6 +99,10 @@ public class EventQueue
      */
     public void Update()
     {
+        if (paused) {
+            return;
+        }
+        internalTime += Time.deltaTime;
 
         // if the player is too aggressive, you can ignore the q here
 
@@ -101,7 +110,7 @@ public class EventQueue
         AIEvent iEvent = events.Peek();
         //Debug.Log("Top event is " + (iEvent.ability == null ? "null" : iEvent.ability.name));
 
-        if (Time.time >= iEvent.startTime)
+        if (internalTime >= iEvent.startTime)
         {
             // If the event is new, we fire it
             if (lastEvent != iEvent)
@@ -121,10 +130,20 @@ public class EventQueue
             }
 
             // If the event is stale, remove it from the q
-            if (Time.time >= iEvent.startTime + iEvent.duration)
+            if (internalTime >= iEvent.startTime + iEvent.duration)
             {
                 events.Dequeue();
             }
         }
+    }
+
+    public void Pause()
+    {
+        paused = true;
+    }
+
+    public void Unpause()
+    {
+        paused = false;
     }
 }
