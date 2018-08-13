@@ -73,7 +73,7 @@ public class Controller : MonoBehaviour
 		dashing = true;
 		self.GetAbility (0).active = false;
 		Vector3 startVelocity = physbody.velocity;
-		physbody.velocity = Vector3.zero;
+		physbody.velocity = new Vector3 (0f, physbody.velocity.y, 0f);
 		self.SetInvincible (true);
 
 		GameObject dashEffectPref = Resources.Load<GameObject> ("Prefabs/PlayerDashEffect");
@@ -132,15 +132,15 @@ public class Controller : MonoBehaviour
 		}
 
 		//movement
-		Vector3 movementVector = Vector3.zero;
+		Vector3 movementVector = new Vector3(0f, physbody.velocity.y, 0f);
 
 		float x = Input.GetAxisRaw ("Horizontal");
 		float y = Input.GetAxisRaw ("Vertical");
 
 		movementVector += (Vector3.forward * y) + (Vector3.right * x);
-		GetComponent<Animator> ().SetFloat ("SpeedPerc", movementVector != Vector3.zero ? 1f : 0f);
+		GetComponent<Animator> ().SetFloat ("SpeedPerc", x < 1f || y < 1f ? 1f : 0f);
 
-		if(movementVector != Vector3.zero)
+		if(x < 1f || y < 1f)
 			transform.rotation = Quaternion.LookRotation (movementVector, Vector3.up);
 
 		physbody.velocity = movementVector.normalized * self.movespeed.Value;
