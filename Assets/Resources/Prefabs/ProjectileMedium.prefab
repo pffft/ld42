@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33568052008698818}
   - component: {fileID: 23708541419949922}
   - component: {fileID: 135298931331851482}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ProjectileMedium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ SphereCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1008441667352886}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5

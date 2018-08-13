@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33733801825485152}
   - component: {fileID: 23407115245900718}
   - component: {fileID: 135503715538866084}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ProjectileTiny
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ SphereCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1905725074326092}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5

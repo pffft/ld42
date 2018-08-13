@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33332449774710828}
   - component: {fileID: 23786817829372904}
   - component: {fileID: 135736371866815066}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ProjectileLarge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ SphereCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1907448524588518}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
