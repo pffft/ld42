@@ -19,7 +19,8 @@ public class BossController : MonoBehaviour
 
     public Ability shoot1,
         shoot3, 
-        shootWave, 
+        shootWave,
+        shootHexCurve,
         teleport,
         strafe;
 
@@ -40,6 +41,7 @@ public class BossController : MonoBehaviour
         shoot1 = new Ability("shoot1", "", null, 0f, 0, Shoot1);
         shoot3 = new Ability("shoot3", "", null, 0f, 0, Shoot3);
         shootWave = new Ability("shootWave", "", null, 0f, 0, ShootWave);
+        shootHexCurve = new Ability("shootHexCurve", "", null, 0f, 0, ShootHexCurve);
 
         teleport = new Ability("teleport", "", null, 0f, 0, Teleport);
 
@@ -48,6 +50,7 @@ public class BossController : MonoBehaviour
         self.AddAbility(shoot1);
         self.AddAbility(shoot3);
         self.AddAbility(shootWave);
+        self.AddAbility(shootHexCurve);
         self.AddAbility(teleport);
         self.AddAbility(strafe);
 
@@ -59,37 +62,53 @@ public class BossController : MonoBehaviour
 
         AISequence.AddSequence("homingStrafe5", new AISequence(
             new AIEvent(0f, strafe, true, 5f, 100),
-            new AIEvent(0f, shoot1)
+            new AIEvent(0f, shoot1, 1)
         ));
 
         AISequence.AddSequence("homingStrafe10", new AISequence(
             new AIEvent(0f, strafe, true, 10f, 50),
-            new AIEvent(0f, shoot1)
+            new AIEvent(0f, shoot1, 1)
         ));
 
         AISequence.AddSequence("homingStrafe15", new AISequence(
             new AIEvent(0f, strafe, true, 15f, 30),
-            new AIEvent(0f, shoot1)
+            new AIEvent(0f, shoot1, 1)
         ));
 
         AISequence.AddSequence("homingStrafe72", new AISequence(
             new AIEvent(0f, strafe, true, 65f, 30),
-            new AIEvent(0f, shoot1)
+            new AIEvent(0f, shoot1, 1)
         ));
 
         //eventQueue.Add(1.3f, null); // delay at start to wait for cooldowns
 
         //eventQueue.AddRepeat(100, 1f, shootWave, 25, 120f, 0f, ProjectileManager.Speed.VERY_FAST);
-        //eventQueue.AddSequenceRepeat(50, "shoot2waves");
+        eventQueue.AddSequenceRepeat(20, "shoot2waves");
         //eventQueue.AddSequenceRepeat(10, "homingStrafe");
 
         //eventQueue.Add(2f, null);
         //eventQueue.Add(1f, strafe);
-        //eventQueue.AddRepeat(10, 0.0f, shoot1);
+        //eventQueue.AddRepeat(10, 0.5f, shoot1, 2);
         //eventQueue.AddSequence("shoot2waves");
         //eventQueue.Add(0.2f, teleport);
-        eventQueue.Add(0.2f, teleport, new Vector3(0, 1.31f, 45));
-        eventQueue.AddSequenceRepeat(40, "homingStrafe72");
+        //eventQueue.Add(0.2f, teleport, new Vector3(0, 1.31f, 45));
+        //eventQueue.AddSequenceRepeat(40, "homingStrafe72");
+
+        eventQueue.Add(0f, shootHexCurve, true);
+        eventQueue.Add(3f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(0f, shootHexCurve, false);
+        eventQueue.Add(3f, shootWave, 50, 360f, 0f, ProjectileManager.Speed.MEDIUM);
+        eventQueue.Add(0.5f, teleport);
+        eventQueue.AddSequenceRepeat(12, "homingStrafe10");
+        eventQueue.AddSequenceRepeat(3, "shoot2waves");
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.5f, shoot3);
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.5f, shoot3);
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.5f, shoot3);
+        eventQueue.Add(0f, teleport);
+        eventQueue.Add(0.5f, shoot3);
 
         /*
         eventQueue.AddSequence("homingStrafe");
@@ -140,17 +159,59 @@ public class BossController : MonoBehaviour
     // Shoots a single bullet in the direction of the player
     private bool Shoot1(Entity subject, Vector3 targetPosition, params object[] args) {
         Glare();
-        bossProjectileManager.spawnHoming(transform.position, player.transform.position);
+
+        int switchValue = 0;
+        if (args.Length > 0)
+        {
+            switchValue = (int)args[0];
+        }
+
+        switch(switchValue) {
+            case 0:
+                bossProjectileManager.spawn1(transform.position, player.transform.position);
+                break;
+            case 1:
+                bossProjectileManager.spawnHoming(transform.position, player.transform.position);
+                break;
+            case 2:
+                ProjectileManager.Speed speed = ProjectileManager.Speed.FAST;
+                bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * 2f, 0, speed);
+                break;
+            default: 
+                bossProjectileManager.spawn1(transform.position, player.transform.position);
+                break;
+        }
+
         return true;
     }
 
     // Shoots a 3 bullets in the direction of the player, and +/- 30 degrees
     public bool Shoot3(Entity subject, Vector3 targetPosition, params object[] args) {
-        Debug.Log("Shoot 3 called!");
         Glare();
-        bossProjectileManager.spawn1(transform.position, player.transform.position);
-        bossProjectileManager.spawn1(transform.position, player.transform.position, -30);
-        bossProjectileManager.spawn1(transform.position, player.transform.position, 30);
+
+        int switchValue = 0;
+        if (args.Length > 0) {
+            switchValue = (int)args[0];
+        }
+
+        switch (switchValue)
+        {
+            case 0:
+                bossProjectileManager.spawn1(transform.position, player.transform.position);
+                bossProjectileManager.spawn1(transform.position, player.transform.position, -30);
+                bossProjectileManager.spawn1(transform.position, player.transform.position, 30);
+                break;
+            case 1:
+                bossProjectileManager.spawnHoming(transform.position, player.transform.position);
+                bossProjectileManager.spawnHoming(transform.position, player.transform.position, -30);
+                bossProjectileManager.spawnHoming(transform.position, player.transform.position, 30);
+                break;
+            default:
+                bossProjectileManager.spawn1(transform.position, player.transform.position);
+                bossProjectileManager.spawn1(transform.position, player.transform.position, -30);
+                bossProjectileManager.spawn1(transform.position, player.transform.position, 30);
+                break;
+        }
         return true;
     }
 
@@ -158,7 +219,6 @@ public class BossController : MonoBehaviour
     // Params: [amount, arc width (degrees), offset (degrees), speed]
     // TODO: add default values
     public bool ShootWave(Entity subject, Vector3 targetPosition, params object[] args) {
-        //Debug.Log("Shoot wave called! Boss position: " + transform.position);
         Glare();
 
         int amount = (int)args[0];
@@ -175,13 +235,29 @@ public class BossController : MonoBehaviour
         //Debug.Log("Shooting wave with " + amount + " projectiles and spread of " + arcWidth);
 
         for (int i = 0; i < amount; i++) {
-            bossProjectileManager.spawn1(
+            bossProjectileManager.spawnMedium(
                 transform.position,
                 player.transform.position,
                 halfArcWidth + offset + (i * (arcWidth / amount)),
                 speed
             );
         }
+
+        return true;
+    }
+
+    public bool ShootHexCurve(Entity subject, Vector3 targetPosition, params object[] args) {
+        
+        bool clockwise = args.Length > 0 ? (bool)args[0] : true;
+        float multiplier = clockwise ? 1f : -1f;
+
+        ProjectileManager.Speed speed = ProjectileManager.Speed.FAST;
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 0, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 60, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 120, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 180, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 240, speed);
+        bossProjectileManager.spawnCurving(transform.position, player.transform.position, (float)speed * multiplier * 2f, multiplier * 300, speed);
 
         return true;
     }
