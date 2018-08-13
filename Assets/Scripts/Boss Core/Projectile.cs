@@ -15,7 +15,7 @@ public class Projectile : MonoBehaviour
 	void Update()
     {
         currentTime += Time.deltaTime;
-        if (currentTime >= maxTime) {
+        if (currentTime >= maxTime || transform.position.magnitude > 50f) {
             Destroy(this.gameObject);
         }
 	}

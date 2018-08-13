@@ -21,6 +21,17 @@ public class ProjectileManager {
         Projectile.Create(this.entity, spawn, offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn), (float)speed, 10f);
     }
 
+    public void spawnHoming(Vector3 spawn, Vector3 target, float angleOffset = 0, Speed speed = Speed.MEDIUM) {
+        Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+
+        // We want to ignore any verticality
+        Vector3 topDownSpawn = new Vector3(spawn.x, 0, spawn.z);
+        Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+
+        ProjectileHoming.Create(this.entity, spawn, offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn), (float)speed, 10f);
+        
+    }
+
     public enum Speed
     {
         SNAIL = 10,
