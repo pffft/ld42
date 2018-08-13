@@ -78,7 +78,9 @@ namespace CombatCore
 		private static bool PlayerReflect(Entity subject, Vector3 targetPosition, params object[] args)
 		{
 			Debug.Log ("PlayerReflect");
-			subject.AddStatus (new Status ("Reflecting", "", null, Status.DecayType.communal, 1, 0.5f));
+			//subject.AddStatus (new Status ("Reflecting", "", null, Status.DecayType.communal, 1, 0.5f));
+			CameraController.GetInstance ().IsFollowing = false;
+			CameraController.GetInstance ().Goto (Vector3.zero, 5f);
 			return true;
 		}
 		#endregion

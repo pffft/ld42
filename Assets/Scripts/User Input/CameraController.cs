@@ -16,6 +16,8 @@ public class CameraController : MonoBehaviour
 	[SerializeField]
 	private float minZoom = 10f;
 
+	public bool IsFollowing { get { return IsFollowing; } set { isFollowing = value; } }
+
 	private bool shaking;
 
 	private Camera cam;
@@ -54,6 +56,25 @@ public class CameraController : MonoBehaviour
 	{
 		if(!shaking)
 			StartCoroutine (DoShake (duration, intensity, decay));
+	}
+
+	public void Goto(Vector3 position, float zoom)
+	{
+		if (!isFollowing)
+		{
+			StartCoroutine (GotoPostion (position, zoom));
+		}
+	}
+
+	private IEnumerator GotoPostion(Vector3 position, float zoom)
+	{
+		while (Vector3.Distance (transform.position, position) > 0.001f && Mathf.Abs (cam.transform.localPosition.magnitude - zoom) > 0.001f)
+		{
+			transform.position = Vector3.Lerp (transform.position, position, followSpeed * Time.unscaledDeltaTime);
+			Vector3 idealPos = cam.transform.localPosition.normalized * Mathf.Max (zoom, minZoom);
+			cam.transform.localPosition = Vector3.Lerp (cam.transform.localPosition, idealPos, 100 * Time.unscaledDeltaTime);
+			yield return null;
+		}
 	}
 
 	private IEnumerator DoShake(float duration, Vector3 intensity, float decay)
