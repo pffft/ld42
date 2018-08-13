@@ -33,7 +33,7 @@ namespace CombatCore
 				"Shoot",
 				"Shoots a bullet",
 				null,
-				0.5f,
+				0.05f,
 				0,
 				PlayerShoot)
 			);
