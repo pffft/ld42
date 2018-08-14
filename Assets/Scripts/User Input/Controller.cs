@@ -35,7 +35,7 @@ public class Controller : MonoBehaviour
 
 	private void Self_tookDamage(CombatCore.Entity victim, CombatCore.Entity attacker, float rawDamage, float calcDamage, bool hitShields)
 	{
-		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage, rawDamage, rawDamage), 0.75f);
+		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage * 10f, rawDamage * 10f, rawDamage * 10f), 0.75f);
         arena.transform.localScale = new Vector3(self.HealthPerc, self.HealthPerc, self.HealthPerc);
 		self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
 	}
