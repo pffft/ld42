@@ -47,6 +47,7 @@ namespace CombatCore
 
 		// Delegate pointing the the method that will run when this ability is used
 		private UseEffect effect;
+		public UseEffect Effect { get { return effect; } set { effect = value; } }
 
 		// Can this Ability be activated?
 		public bool available;
