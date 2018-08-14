@@ -165,7 +165,7 @@ public class BossController : MonoBehaviour
         eventQueue.Add(2f, cameraMove, true);
 
         // 12 curve + waves
-        eventQueue.Add(0.5f, teleport, new Vector3(0, 1.31f, 0));
+        eventQueue.Add(1.5f, teleport, new Vector3(0, 1.31f, 0));
         eventQueue.Add(0f, shootHexCurve, true, 0f);
         eventQueue.Add(0.5f, shootWave, 50, 360f, 0f, Speed.MEDIUM);
         eventQueue.Add(0.5f, shootHexCurve, true, 30f);
@@ -261,17 +261,15 @@ public class BossController : MonoBehaviour
         return true;
     }
 
-    delegate bool sampleDel(Entity subject, Vector3 targetPosition, params object[] args);
-
     private Ability Shoot1Generator(Type type, Size size) {
-        sampleDel deleg = (sub, pos, args) =>
+        Ability.UseEffect deleg = (sub, pos, args) =>
         {
             Type t = type;
             Size s = size;
             return true;
         };
         Ability newAbility = new Ability(shoot1);
-        //newAbility.UseEffect = deleg;
+        newAbility.Effect = deleg;
         return newAbility;
     }
 
@@ -341,13 +339,15 @@ public class BossController : MonoBehaviour
 
         float offset = args.Length > 1 ? (float)args[1] : 0;
 
+        Vector3 target = new Vector3(0, 1.31f, -1f);
+
         Speed speed = Speed.FAST;
-        Projectile.spawnCurving(self, transform.position, player.transform.position, (float)speed * multiplier * 2f, 3f, offset + (0 * multiplier), speed);
-        Projectile.spawnCurving(self, transform.position, player.transform.position, (float)speed * multiplier * 2f, 3f, offset + (60 * multiplier), speed);
-        Projectile.spawnCurving(self, transform.position, player.transform.position, (float)speed * multiplier * 2f, 3f, offset + (120 * multiplier), speed);
-        Projectile.spawnCurving(self, transform.position, player.transform.position, (float)speed * multiplier * 2f, 3f, offset + (180 * multiplier), speed);
-        Projectile.spawnCurving(self, transform.position, player.transform.position, (float)speed * multiplier * 2f, 3f, offset + (240 * multiplier), speed);
-        Projectile.spawnCurving(self, transform.position, player.transform.position, (float)speed * multiplier * 2f, 3f, offset + (300 * multiplier), speed);
+        Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (0 * multiplier), speed);
+        Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (60 * multiplier), speed);
+        Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (120 * multiplier), speed);
+        Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (180 * multiplier), speed);
+        Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (240 * multiplier), speed);
+        Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (300 * multiplier), speed);
 
         return true;
     }
