@@ -134,10 +134,11 @@ public class BossController : MonoBehaviour
 
         // Again
         eventQueue.Add(0f, teleport);
+        eventQueue.Add(0f, shootWave, 150, 360f, 0f, Speed.MEDIUM);
         eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.1f, shoot3), 20));
-        eventQueue.Add(0f, shootWave, 50, 360f, 0f, Speed.MEDIUM);
+        eventQueue.Add(0f, shootWave, 150, 360f, 0f, Speed.MEDIUM);
         eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.1f, shoot3), 20));
-        eventQueue.Add(0f, shootWave, 50, 360f, 0f, Speed.MEDIUM);
+        eventQueue.Add(0f, shootWave, 150, 360f, 0f, Speed.MEDIUM);
 
         // Hex curve introduction
         eventQueue.Add(0f, teleport);
@@ -183,6 +184,7 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0.5f, teleport, new Vector3(-30f, 1.31f, 0));
 
         // Circle of waves
+        eventQueue.AddSequenceRepeat(6, "slowWaveCircle");
         eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
         eventQueue.Add(0f, shootLine, 50, 75f, Speed.SLOW, Vector3.left);
         eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
@@ -257,6 +259,20 @@ public class BossController : MonoBehaviour
         }
 
         return true;
+    }
+
+    delegate bool sampleDel(Entity subject, Vector3 targetPosition, params object[] args);
+
+    private Ability Shoot1Generator(Type type, Size size) {
+        sampleDel deleg = (sub, pos, args) =>
+        {
+            Type t = type;
+            Size s = size;
+            return true;
+        };
+        Ability newAbility = new Ability(shoot1);
+        //newAbility.UseEffect = deleg;
+        return newAbility;
     }
 
     // Shoots a 3 bullets in the direction of the player, and +/- 30 degrees
