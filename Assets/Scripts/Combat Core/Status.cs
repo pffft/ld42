@@ -152,6 +152,11 @@ namespace CombatCore
 			return false;
 		}
 
+		public void End()
+		{
+			duration = 0f;
+		}
+
 		public float DurationPercentage { get { return duration / initDuration; } }
 
 		// Get a StatusComponent on this Status of type T
@@ -187,17 +192,17 @@ namespace CombatCore
 		}
 
 		// Called whenever the subject takes damage
-		public void OnDamageTaken(Entity subject, Entity attacker, float rawDamage, float calcDamage, bool hitShields)
+		public void OnDamageTaken(Entity subject, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 		{
 			foreach (StatusComponent sc in components)
-				sc.OnDamageTaken (subject, attacker, rawDamage, calcDamage, hitShields);
+				sc.OnDamageTaken (subject, attacker, rawDamage, calcDamage, damageApplied, hitShields);
 		}
 
 		// Called whenever the subject deals damage
-		public void OnDamageDealt(Entity subject, Entity victim, float rawDamage, float calcDamage, bool hitShields)
+		public void OnDamageDealt(Entity subject, Entity victim, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 		{
 			foreach (StatusComponent sc in components)
-				sc.OnDamageDealt (subject, victim, rawDamage, calcDamage, hitShields);
+				sc.OnDamageDealt (subject, victim, rawDamage, calcDamage, damageApplied, hitShields);
 		}
 
 		// Called when the subject dies

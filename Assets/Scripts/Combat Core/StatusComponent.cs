@@ -39,10 +39,10 @@
 		public virtual void OnUpdate(Entity subject, float time) { }
 
 		// Called whenever the subject takes damage
-		public virtual void OnDamageTaken(Entity subject, Entity attacker, float rawDamage, float calcDamage, bool hitShields) { }
+		public virtual void OnDamageTaken(Entity subject, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields) { }
 
 		// Called whenever the subject deals damage
-		public virtual void OnDamageDealt(Entity subject, Entity victim, float rawDamage, float calcDamage, bool hitShields) { }
+		public virtual void OnDamageDealt(Entity subject, Entity victim, float rawDamage, float calcDamage, bool damageApplied, bool hitShields) { }
 
 		// Called when the subject dies
 		public virtual void OnDeath(Entity subject) { }
