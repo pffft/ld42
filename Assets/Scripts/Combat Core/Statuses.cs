@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CombatCore.StatusComponents;
 
 namespace CombatCore
 {
@@ -16,6 +17,15 @@ namespace CombatCore
 				DecayType.serial,
 				1,
 				float.PositiveInfinity));
+
+			Put (new Status (
+				"Exhausted",
+				"Cannot use abilities and staggered on hit",
+				null,
+				DecayType.communal,
+				1,
+				float.PositiveInfinity,
+				new Exhausted ()));
 		}
 	}
 }

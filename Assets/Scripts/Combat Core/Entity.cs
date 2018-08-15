@@ -59,7 +59,6 @@ namespace CombatCore
 		// The Statuses currently affecting this Entity
 		[SerializeField]
 		private Dictionary<string, Status> statuses;
-		private Queue<Status> statusRemoveQueue;
 
 		// The Abilities that this Entity
 		private Ability[] abilities;
@@ -79,40 +78,41 @@ namespace CombatCore
 			if (damage < 0)
 				damage = 0;
 
-			//victim is invincible, do nothing
-			if (victim.IsInvincible ())
-				return;
-
 			//the actual damage value that will be subtracted from health/shields
 			float calcDamage = damage;
+			bool hitShields = false;
 
-			bool hitShields = victim.shields > 0f && !ignoreShields;
-			if (hitShields)
+			//victim is invincible, do no damage
+			if (!victim.IsInvincible ())
 			{
-				//deal damage to the shields
-				victim.shields -= calcDamage;
-				if (victim.shields <= 0f)
+				hitShields = victim.shields > 0f && !ignoreShields;
+				if (hitShields)
 				{
-					victim.shields = 0f;
-					victim.OnShieldsDown ();
-					victim.shieldDelay = victim.shieldDelayMax;
+					//deal damage to the shields
+					victim.shields -= calcDamage;
+					if (victim.shields <= 0f)
+					{
+						victim.shields = 0f;
+						victim.OnShieldsDown ();
+						victim.shieldDelay = victim.shieldDelayMax;
+					}
 				}
-			}
-			else
-			{
-				//deal damage to health
-				victim.health -= calcDamage;
-				if (victim.health <= 0f)
+				else
 				{
-					victim.health = 0f;
-					victim.OnDeath ();
+					//deal damage to health
+					victim.health -= calcDamage;
+					if (victim.health <= 0f)
+					{
+						victim.health = 0f;
+						victim.OnDeath ();
+					}
 				}
 			}
 
 			//combat event hooks
-			victim.OnDamageTaken (attacker, damage, calcDamage, hitShields);
+			victim.OnDamageTaken (attacker, damage, calcDamage, !victim.IsInvincible (), hitShields);
 			if (attacker != null)
-				attacker.OnDamageDealt (victim, damage, calcDamage, hitShields);
+				attacker.OnDamageDealt (victim, damage, calcDamage, !victim.IsInvincible (), hitShields);
 		}
 
 		public static void HealEntity(Entity e, float healAmount)
@@ -150,7 +150,6 @@ namespace CombatCore
 			freezeProgress = 0f;
 
 			statuses = new Dictionary<string, Status> ();
-			statusRemoveQueue = new Queue<Status> ();
 			abilities = new Ability[3];
 			abilSize = 0;
 		}
@@ -168,14 +167,16 @@ namespace CombatCore
 		public void Update()
 		{
 			//update all statuses
+			Queue<Status> removeQueue = new Queue<Status> ();
 			foreach (Status s in statuses.Values)
 			{
-				s.UpdateDuration (this, Time.deltaTime);
+				if (s.UpdateDuration (this, Time.deltaTime))
+					removeQueue.Enqueue (s);
 			}
 
 			//remove statuses that have finished their durations
-			while (statusRemoveQueue.Count > 0)
-				statuses.Remove (statusRemoveQueue.Dequeue().name);
+			while (removeQueue.Count > 0)
+				RemoveStatus (removeQueue.Dequeue ());
 
 			//update all abilities
 			for (int i = 0; i < abilities.Length; i++)
@@ -218,7 +219,6 @@ namespace CombatCore
 
 			//this status is new to this Entity
 			statuses.Add (s.name, s);
-			s.durationCompleted += RemoveStatus;
 			s.OnApply (this);
 
 			//notify listeners
@@ -230,8 +230,7 @@ namespace CombatCore
 		public void RemoveStatus(Status s)
 		{
 			s.OnRevert (this);
-			s.durationCompleted -= RemoveStatus;
-			statusRemoveQueue.Enqueue (s);
+			statuses.Remove (s.name);
 
 			//notify listeners
 			if (statusRemoved != null)
@@ -471,23 +470,23 @@ namespace CombatCore
 		#region HOOKS
 
 		// This Entity took damage
-		private void OnDamageTaken(Entity attacker, float rawDamage, float calcDamage, bool hitShields)
+		private void OnDamageTaken(Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 		{
 			foreach (Status s in statuses.Values)
-				s.OnDamageTaken (this, attacker, rawDamage, calcDamage, hitShields);
+				s.OnDamageTaken (this, attacker, rawDamage, calcDamage, damageApplied, hitShields);
 
 			if (tookDamage != null)
-				tookDamage (this, attacker, rawDamage, calcDamage, hitShields);
+				tookDamage (this, attacker, rawDamage, calcDamage, damageApplied, hitShields);
 		}
 
 		// This Entity dealt damage
-		private void OnDamageDealt(Entity victim, float rawDamage, float calcDamage, bool hitShields)
+		private void OnDamageDealt(Entity victim, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 		{
 			foreach (Status s in statuses.Values)
-				s.OnDamageDealt (this, victim, rawDamage, calcDamage, hitShields);
+				s.OnDamageDealt (this, victim, rawDamage, calcDamage, damageApplied, hitShields);
 
-			if (tookDamage != null)
-				dealtDamage (victim, this, rawDamage, calcDamage, hitShields);
+			if (dealtDamage != null)
+				dealtDamage (victim, this, rawDamage, calcDamage, damageApplied, hitShields);
 		}
 
 		// This Entity has died
@@ -537,7 +536,7 @@ namespace CombatCore
 		public delegate void AbilitySwap(Ability a, Ability old, int index);
 		public event AbilitySwap abilitySwapped;
 
-		public delegate void EntityAttacked(Entity victim, Entity attacker, float rawDamage, float calcDamage, bool hitShields);
+		public delegate void EntityAttacked(Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields);
 		public event EntityAttacked tookDamage;
 		public event EntityAttacked dealtDamage;
 

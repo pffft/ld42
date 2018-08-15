@@ -31,10 +31,10 @@ namespace CombatCore
 			);
 
 			Put (new Ability (
-				"Shoot",
-				"Shoots a bullet",
+				"Shield Throw",
+				"Throws a shield",
 				null,
-				0.05f,
+				0.5f,
 				0,
 				PlayerShoot)
 			);
@@ -73,15 +73,16 @@ namespace CombatCore
 			Vector3 dir = targetPosition - subject.transform.position;
 			Quaternion rot = Quaternion.LookRotation (dir, Vector3.up);
             Projectile.spawnBasic(subject, subject.transform.position, rot * Vector3.forward, 2f, speed: Speed.VERY_FAST);
+
+			//TODO throw shield, player abilities disabled while shield is thrown
+
 			return true;
 		}
 
 		private static bool PlayerReflect(Entity subject, Vector3 targetPosition, params object[] args)
 		{
 			Debug.Log ("PlayerReflect");
-			//subject.AddStatus (new Status ("Reflecting", "", null, Status.DecayType.communal, 1, 0.5f));
-			CameraController.GetInstance ().IsFollowing = false;
-			CameraController.GetInstance ().Goto (Vector3.zero, 5f);
+			subject.AddStatus (new Status ("Reflecting", "", null, Status.DecayType.communal, 1, 0.25f, new StatusComponents.Reflecting()));
 			return true;
 		}
 		#endregion

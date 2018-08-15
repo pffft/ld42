@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
+	private const string ABILITY_1 = "Dash", ABILITY_2 = "Shield Throw", ABILITY_3 = "Reflect";
+
 	[SerializeField]
 	private float dashRange;
 
@@ -20,48 +22,51 @@ public class Controller : MonoBehaviour
 		physbody = GetComponent<Rigidbody> ();
 		self = GetComponent<CombatCore.Entity> ();
         arena = GameObject.Find("Arena");
-	}
-
-	public void Start()
-	{
-		self.AddAbility (CombatCore.Ability.Get ("Dash"));
-		self.AddAbility (CombatCore.Ability.Get ("Shoot"));
-		self.AddAbility (CombatCore.Ability.Get ("Reflect"));
-
-		self.tookDamage += Self_tookDamage;
 
 		dashing = false;
 	}
 
-	private void Self_tookDamage(CombatCore.Entity victim, CombatCore.Entity attacker, float rawDamage, float calcDamage, bool hitShields)
+	public void Start()
 	{
-		CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage * 10f, rawDamage * 10f, rawDamage * 10f), 0.75f);
-        arena.transform.localScale = new Vector3(self.HealthPerc, self.HealthPerc, self.HealthPerc);
-		self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
+		self.AddAbility (CombatCore.Ability.Get (ABILITY_1));
+		self.AddAbility (CombatCore.Ability.Get (ABILITY_2));
+		self.AddAbility (CombatCore.Ability.Get (ABILITY_3));
+
+		self.tookDamage += Self_tookDamage;
+	}
+
+	private void Self_tookDamage(CombatCore.Entity victim, CombatCore.Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
+	{
+		if (damageApplied)
+		{
+			CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage * 10f, rawDamage * 10f, rawDamage * 10f), 0.75f);
+			arena.transform.localScale = new Vector3 (self.HealthPerc, self.HealthPerc, self.HealthPerc);
+			self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
+		}
 	}
 
 	public void Update()
 	{
-		if (dashing)
+		if (dashing || self.IsRooted())
 			return;
 
 		if (Input.GetKey (KeyCode.Space))
 		{
-			if (self.GetAbility (0).Use (self, facePos, dashRange))
+			if (self.GetAbility (ABILITY_1).Use (self, facePos, dashRange))
 			{
 				
 			}
 		}
 		if (Input.GetKey (KeyCode.Mouse0))
 		{
-			if (self.GetAbility (1).Use (self, facePos))
+			if (self.GetAbility (ABILITY_2).Use (self, facePos))
 			{
                 
 			}
 		}
 		if (Input.GetKey (KeyCode.Mouse1))
 		{
-			if (self.GetAbility (2).Use (self, facePos))
+			if (self.GetAbility (ABILITY_3).Use (self, facePos))
 			{
 
 			}
@@ -110,7 +115,7 @@ public class Controller : MonoBehaviour
 
 	public void FixedUpdate()
 	{
-		if (dashing)
+		if (dashing || self.IsRooted())
 			return;
 
 		Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
@@ -133,9 +138,9 @@ public class Controller : MonoBehaviour
 		float y = Input.GetAxisRaw ("Vertical");
 
 		movementVector += (Vector3.forward * y) + (Vector3.right * x);
-		GetComponent<Animator> ().SetFloat ("SpeedPerc", x < 1f || y < 1f ? 1f : 0f);
+		GetComponent<Animator> ().SetFloat ("SpeedPerc", x > 0f || y > 0f ? 1f : 0f);
 
-		if(x < 1f || y < 1f)
+		if(x > 0f || y > 0f)
 			transform.rotation = Quaternion.LookRotation (movementVector, Vector3.up);
 
 		physbody.velocity = movementVector.normalized * self.movespeed.Value;
@@ -148,7 +153,6 @@ public class Controller : MonoBehaviour
 		transform.rotation = Quaternion.Euler (0f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
 	}
 
-//#if UNITY_EDITOR
 	public void OnDrawGizmos()
 	{
 		UnityEditor.Handles.color = Color.green;
@@ -157,5 +161,4 @@ public class Controller : MonoBehaviour
 		UnityEditor.Handles.color = Color.red;
 		UnityEditor.Handles.DrawWireArc (new Vector3(transform.position.x, 0f, transform.position.z), Vector3.up, Vector3.forward, 360f, dashRange);
 	}
-//#endif
 }
