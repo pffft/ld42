@@ -71,9 +71,8 @@ public class Controller : MonoBehaviour
 	public IEnumerator Dashing(Vector3 targetPosition)
 	{
 		dashing = true;
+		physbody.velocity = Vector3.zero;
 		self.GetAbility (0).active = false;
-		Vector3 startVelocity = physbody.velocity;
-		physbody.velocity = new Vector3 (0f, physbody.velocity.y, 0f);
 		self.SetInvincible (true);
 
 		GameObject dashEffectPref = Resources.Load<GameObject> ("Prefabs/PlayerDashEffect");
@@ -82,10 +81,10 @@ public class Controller : MonoBehaviour
 		GetComponentInChildren<SkinnedMeshRenderer> ().enabled = false;
 
 		Vector3 dashDir = (targetPosition - transform.position).normalized;
-		float dist;
-		while ((dist = Vector3.Distance (targetPosition, transform.position)) > 0f)
+		float accDist = 0f, maxDist = Vector3.Distance(targetPosition, transform.position);
+		while (accDist < maxDist)
 		{
-			float dashDistance = self.movespeed.Value * 4 * Time.deltaTime;
+			float dashDistance = Mathf.Min(self.movespeed.Value * 4 * Time.deltaTime, maxDist - accDist);
 			RaycastHit hit;
 			if (Physics.Raycast (transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
 			{
@@ -93,13 +92,8 @@ public class Controller : MonoBehaviour
 				break;
 			}
 
-			if (dist < dashDistance)
-			{
-				transform.position = targetPosition;
-				break;
-			}
-
 			transform.position += dashDir * (dashDistance);
+			accDist += dashDistance;
 			yield return null;
 		}
 
@@ -110,6 +104,7 @@ public class Controller : MonoBehaviour
 
 		self.SetInvincible (false);
 		self.GetAbility (0).active = true;
+		physbody.velocity = Vector3.zero;
 		dashing = false;
 	}
 
