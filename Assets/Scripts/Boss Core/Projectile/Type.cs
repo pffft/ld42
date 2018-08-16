@@ -8,6 +8,7 @@ namespace Projectiles
         BASIC,
         INDESTRUCTIBLE,
         HOMING,
-        CURVING
+        CURVING,
+        DEATHHEX
     }
 }

@@ -26,14 +26,14 @@ namespace Projectiles
 
             if (currentTime >= maxTime)
             {
-                Destroy(this.gameObject);
                 OnDestroyTimeout();
+                Destroy(this.gameObject);
             }
 
             if (transform.position.magnitude > 100f)
             {
-                Destroy(this.gameObject);
                 OnDestroyOutOfBounds();
+                Destroy(this.gameObject);
             }
 
             CustomUpdate();
@@ -138,6 +138,10 @@ namespace Projectiles
                     projectile = newObj.AddComponent<ProjectileCurving>();
                     newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/GreenTransparent");
                     break;
+                case Type.DEATHHEX:
+                    projectile = newObj.AddComponent<ProjectileDeathHex>();
+                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/GreenTransparent");
+                    break;
                 default:
                     projectile = newObj.AddComponent<Projectile>();
                     break;
@@ -190,7 +194,7 @@ namespace Projectiles
         }
 
         public static void spawnCurving(Entity entity, Vector3 spawn, Vector3 target, float curveSpeed, float maxTime = 10f, float angleOffset = 0,
-                                Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
+                                Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, bool leavesTrail = true)
         {
             
             Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
@@ -200,7 +204,20 @@ namespace Projectiles
 
             Projectile.CreateGeneric(entity, spawn,
                                      offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn),
-                                     maxTime, speed, size, Type.CURVING, curveSpeed);
+                                     maxTime, speed, size, Type.CURVING, curveSpeed, leavesTrail);
+        }
+
+        public static void spawnDeathHex(Entity entity, Vector3 spawn, Vector3 target, float maxTime = 1f, float angleOffset = 0,
+                                         Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
+        {
+            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+
+            Vector3 topDownSpawn = new Vector3(spawn.x, 0, spawn.z);
+            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+
+            Projectile.CreateGeneric(entity, spawn,
+                                     offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn),
+                                     maxTime, speed, size, Type.DEATHHEX);
         }
     }
 }

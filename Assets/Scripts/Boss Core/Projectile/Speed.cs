@@ -9,6 +9,7 @@ namespace Projectiles
         FROZEN = 0,
         SNAIL = 10,
         SLOW = 15,
+        MEDIUM_SLOW = 20,
         MEDIUM = 25,
         FAST = 35,
         VERY_FAST = 45,

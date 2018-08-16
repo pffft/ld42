@@ -82,7 +82,7 @@ public class EventQueue
     /*
      * Adds a single action "times" times to the queue.
      */
-    public void AddRepeat(int times, float duration, Ability ability, params object[] pars)
+    public void AddRepeat(float duration, Ability ability, int times, params object[] pars)
     {
         for (int i = 0; i < times; i++)
         {
@@ -141,7 +141,7 @@ public class EventQueue
                 }
                 if (iEvent.ability != null)
                 {
-                    iEvent.ability.Use(entity, Vector3.zero, iEvent.parameters);
+                    bool result = iEvent.ability.Use(entity, Vector3.zero, iEvent.parameters);
                 }
                 lastEvent = iEvent;
             }
