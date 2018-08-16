@@ -4,6 +4,8 @@ using CombatCore;
 using UnityEngine;
 using Projectiles;
 
+using UnityEngine.Profiling;
+
 public class BossController : MonoBehaviour
 {
 
@@ -17,6 +19,17 @@ public class BossController : MonoBehaviour
     private GameObject arena;
 
     public static Vector3 playerLockPosition;
+
+    public static BossController instance = null;
+    public static BossController GetInstance()
+    {
+        if (instance == null)
+        {
+            instance = new BossController();
+        }
+        return instance;
+    }
+    private BossController() { }
 
     public Ability shoot1,
         shoot3,
@@ -45,6 +58,7 @@ public class BossController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Profiler.BeginSample("Initialize event queue");   
         shoot1 = new Ability("shoot1", "", null, 0f, 0, null);
         shoot3 = new Ability("shoot3", "", null, 0f, 0, null);
         shootWave = new Ability("shootWave", "", null, 0f, 0, null);
@@ -161,7 +175,6 @@ public class BossController : MonoBehaviour
         eventQueue.AddRepeat(0.05f, Shoot3(), 10);
         */
 
-        /*
         // Basic attacks with wave at start, middle, and end
         eventQueue.Add(0.5f, Teleport());
         eventQueue.Add(0f, ShootWave(50, 360f, 0f));
@@ -202,8 +215,6 @@ public class BossController : MonoBehaviour
         eventQueue.AddSequenceRepeat(45, "homingStrafe15");
         eventQueue.Add(2f, CameraMove(true));
 
-        eventQueue.AddRepeat(1f, ShootDeathHex(1.5f), 10);
-
         // 12 curve + waves
         eventQueue.Add(1.5f, Teleport(new Vector3(0, 1.31f, 0)));
         eventQueue.Add(0f, ShootHexCurve(true, 0f));
@@ -237,6 +248,10 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
         eventQueue.Add(0.75f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
         eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
+
+        // Death hex! Best way is to reflect.
+        eventQueue.Add(1f, ShootDeathHex(2f));
+        eventQueue.Add(5f, ShootDeathHex(1f));
 
         // Next 3 are homing strafes with a wave-gap-wave fire after
         eventQueue.Add(0.25f, Teleport());
@@ -272,7 +287,6 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0f, ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.left));
         eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
         eventQueue.Add(0f, ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.right));
-        */
 
         /*
         // Jump rope warmup
@@ -323,6 +337,8 @@ public class BossController : MonoBehaviour
         eventQueue.Add(0f, Teleport(new Vector3(-45f, 1.31f, 0)));
         eventQueue.AddSequenceRepeat(6, "lineStrafe30");
         eventQueue.AddSequenceRepeat(6, "lineWaveStrafe30");
+
+        Profiler.EndSample();
     }
 
     // Update is called once per frame
@@ -339,7 +355,7 @@ public class BossController : MonoBehaviour
         transform.rotation = lookRotation;
     }
 
-    private Ability Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
+    public Ability Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
     {
         Ability.UseEffect deleg = (sub, pos, args) =>
         {
@@ -379,7 +395,7 @@ public class BossController : MonoBehaviour
         return newAbility;
     }
 
-    private Ability Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
+    public Ability Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
     {
         Ability.UseEffect deleg = (sub, pos, args) =>
         {
@@ -410,7 +426,7 @@ public class BossController : MonoBehaviour
     }
 
     // Shoots an arc of bullets
-    private Ability ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, bool reverseDirection = false)
+    public Ability ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, bool reverseDirection = false)
     {
         Ability.UseEffect deleg = (sub, pos, args) =>
         {
@@ -460,13 +476,13 @@ public class BossController : MonoBehaviour
         return newAbility;
     }
 
-    private Ability ShootHexCurve(bool clockwise = true, float offset = 0f)
+    public Ability ShootHexCurve(bool clockwise = true, float offset = 0f)
     {
         return ShootHexCurve(clockwise, offset, new Vector3(0, 1.31f, -1f));
     }
 
     // Shoots a hexagonal pattern of curving projectiles.
-    private Ability ShootHexCurve(bool clockwise, float offset, Vector3 target) {
+    public Ability ShootHexCurve(bool clockwise, float offset, Vector3 target) {
         Ability.UseEffect deleg = (sub, pos, args) =>
         {
             float multiplier = clockwise ? 1f : -1f;
@@ -530,7 +546,10 @@ public class BossController : MonoBehaviour
     {
         Ability.UseEffect deleg = (sub, pos, args) =>
         {
-            Projectile.spawnDeathHex(self, transform.position, player.transform.position, maxTime1);
+            for (int i = 0; i < 6; i++)
+            {
+                Projectile.spawnDeathHex(self, transform.position, player.transform.position, maxTime1, i * 60f);
+            }
             return true;
         };
         Ability newAbility = new Ability(shootDeathHex);
@@ -597,7 +616,7 @@ public class BossController : MonoBehaviour
         return newAbility;
     }
 
-    private IEnumerator Dashing(Vector3 targetPosition) {
+    public IEnumerator Dashing(Vector3 targetPosition) {
 
         eventQueue.Pause();
         physbody.velocity = Vector3.zero;

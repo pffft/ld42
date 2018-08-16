@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CombatCore;
 
-public class AISequence
+public partial class AISequence
 {
     public AIEvent[] events;
 
@@ -31,6 +31,21 @@ public class AISequence
         AIEvent[] events = new AIEvent[times];
         for (int i = 0; i < times; i++) {
             events[i] = iEvent;
+        }
+        AISequence sequence = new AISequence();
+        sequence.events = events;
+        return sequence;
+    }
+
+    public static AISequence Repeat(AISequence seq, int times)
+    {
+        AIEvent[] events = new AIEvent[seq.events.Length * times];
+        for (int i = 0; i < seq.events.Length; i++)
+        {
+            for (int j = 0; j < times; j++)
+            {
+                events[(i * times) + j] = seq.events[i];
+            }
         }
         AISequence sequence = new AISequence();
         sequence.events = events;
