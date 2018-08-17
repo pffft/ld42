@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using CombatCore;
 using UnityEngine;
 using Projectiles;
+using AI;
 
 using UnityEngine.Profiling;
 
+/*
+ * TODO: refactor shoot1, shoot3 as calls to shootWave, and add a "target" param
+ */
 public class BossController : MonoBehaviour
 {
 
@@ -20,6 +23,7 @@ public class BossController : MonoBehaviour
 
     public static Vector3 playerLockPosition;
 
+    #region Singleton stuff
     public static BossController instance = null;
     public static BossController GetInstance()
     {
@@ -30,18 +34,7 @@ public class BossController : MonoBehaviour
         return instance;
     }
     private BossController() { }
-
-    public Ability shoot1,
-        shoot3,
-        shootWave,
-        shootHexCurve,
-        shootLine,
-        shootSweep,
-        shootDeathHex,
-        teleport,
-        strafe,
-        cameraMove,
-        playerLock;
+    #endregion
 
     private void Awake()
     {
@@ -58,32 +51,7 @@ public class BossController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Profiler.BeginSample("Initialize event queue");   
-        shoot1 = new Ability("shoot1", "", null, 0f, 0, null);
-        shoot3 = new Ability("shoot3", "", null, 0f, 0, null);
-        shootWave = new Ability("shootWave", "", null, 0f, 0, null);
-        shootHexCurve = new Ability("shootHexCurve", "", null, 0f, 0, null);
-        shootLine = new Ability("shootLine", "", null, 0f, 0, null);
-        shootSweep = new Ability("shootSweep", "", null, 0f, 0, null);
-        shootDeathHex = new Ability("shootDeathHex", "", null, 0f, 0, null);
-
-        teleport = new Ability("teleport", "", null, 0f, 0, null);
-
-        strafe = new Ability("strafe", "", null, 0f, 0, null);
-
-        cameraMove = new Ability("cameraMove", "", null, 0f, 0, null);
-        playerLock = new Ability("playerLock", "", null, 0f, 0, null);
-
-        self.AddAbility(shoot1);
-        self.AddAbility(shoot3);
-        self.AddAbility(shootWave);
-        self.AddAbility(shootHexCurve);
-        self.AddAbility(shootLine);
-        self.AddAbility(shootSweep);
-        self.AddAbility(shootDeathHex);
-        self.AddAbility(teleport);
-        self.AddAbility(strafe);
-        self.AddAbility(cameraMove);
+        Profiler.BeginSample("Initialize event queue"); 
 
         AISequence.AddSequence("shoot2waves", new AISequence(
             new AIEvent(0f, Teleport()),
@@ -355,9 +323,9 @@ public class BossController : MonoBehaviour
         transform.rotation = lookRotation;
     }
 
-    public Ability Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
+    public AIEvent.Action Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             Type t = type;
             Size s = size;
@@ -386,18 +354,12 @@ public class BossController : MonoBehaviour
                     Projectile.spawnBasic(self, transform.position, targetPos, size: size, angleOffset: angleOffset);
                     break;
             }
-
-            return true;
         };
-        Ability newAbility = new Ability(shoot1);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
-    public Ability Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
+    public AIEvent.Action Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             switch (type)
             {
@@ -417,18 +379,13 @@ public class BossController : MonoBehaviour
                     Projectile.spawnBasic(self, transform.position, player.transform.position, angleOffset: 30, size: size);
                     break;
             }
-            return true;
         };
-        Ability newAbility = new Ability(shoot3);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
     // Shoots an arc of bullets
-    public Ability ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, bool reverseDirection = false)
+    public AIEvent.Action ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, bool reverseDirection = false)
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             Glare();
 
@@ -467,23 +424,17 @@ public class BossController : MonoBehaviour
                         break;
                 }
             }
-
-            return true;
         };
-        Ability newAbility = new Ability(shootWave);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
-    public Ability ShootHexCurve(bool clockwise = true, float offset = 0f)
+    public AIEvent.Action ShootHexCurve(bool clockwise = true, float offset = 0f)
     {
         return ShootHexCurve(clockwise, offset, new Vector3(0, 1.31f, -1f));
     }
 
     // Shoots a hexagonal pattern of curving projectiles.
-    public Ability ShootHexCurve(bool clockwise, float offset, Vector3 target) {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+    public AIEvent.Action ShootHexCurve(bool clockwise, float offset, Vector3 target) {
+        return () =>
         {
             float multiplier = clockwise ? 1f : -1f;
 
@@ -494,17 +445,11 @@ public class BossController : MonoBehaviour
             Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (180 * multiplier), speed);
             Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (240 * multiplier), speed);
             Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (300 * multiplier), speed);
-
-            return true;
         };
-        Ability newAbility = new Ability(shootWave);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
-    public Ability ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+    public AIEvent.Action ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
+        return () =>
         {
             Vector3 targetPos = target.HasValue ? target.Value - transform.position : player.transform.position - transform.position;
             Vector3 leftDirection = (Quaternion.AngleAxis(90, Vector3.up) * targetPos).normalized;
@@ -520,15 +465,11 @@ public class BossController : MonoBehaviour
                     size: Size.MEDIUM
                 );
             }
-
-            return true;
         };
-        Ability newAbility = new Ability(shootWave);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
+    // TODO: refactor this to function as an AIEvent.Action. Or else 
+    // make it simply a sequence (i.e., by adding a target param to shoot1)
     public AISequence ShootSweep(int amount = 15, bool clockwise = true, float startOffset = -30f, 
                                  float degrees = 90f, Speed speed = Speed.MEDIUM, Size size = Size.SMALL, Type type = Type.BASIC)
     {
@@ -542,31 +483,26 @@ public class BossController : MonoBehaviour
         return new AISequence(sweepEvents);
     }
 
-    public Ability ShootDeathHex(float maxTime1 = 1f)
+    public AIEvent.Action ShootDeathHex(float maxTime1 = 1f)
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             for (int i = 0; i < 6; i++)
             {
                 Projectile.spawnDeathHex(self, transform.position, player.transform.position, maxTime1, i * 60f);
             }
-            return true;
         };
-        Ability newAbility = new Ability(shootDeathHex);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
-    public Ability Teleport(Vector3? target = null, int speed = 100) {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+    public AIEvent.Action Teleport(Vector3? target = null, int speed = 100) {
+        return () =>
         {
             if (target.HasValue)
             {
                 self.movespeed.SetBase(speed);
                 StartCoroutine(Dashing(target.Value));
                 Glare();
-                return true;
+                return;
             }
 
             float minDistance = 35f;
@@ -608,12 +544,7 @@ public class BossController : MonoBehaviour
             StartCoroutine(Dashing(rawPosition));
 
             Glare();
-            return true;
         };
-        Ability newAbility = new Ability(teleport);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
     public IEnumerator Dashing(Vector3 targetPosition) {
@@ -641,9 +572,9 @@ public class BossController : MonoBehaviour
         eventQueue.Unpause();
     }
 
-    public Ability Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
+    public AIEvent.Action Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             self.movespeed.SetBase(speed);
 
@@ -651,17 +582,12 @@ public class BossController : MonoBehaviour
             Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);
 
             StartCoroutine(Dashing(rot * oldPosVector));
-            return true;
         };
-        Ability newAbility = new Ability(strafe);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
-    public Ability CameraMove(bool isFollow = false, Vector3? targetPosition = null)
+    public AIEvent.Action CameraMove(bool isFollow = false, Vector3? targetPosition = null)
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             CameraController.GetInstance().IsFollowing = isFollow;
 
@@ -670,28 +596,18 @@ public class BossController : MonoBehaviour
                 CameraController.GetInstance().Goto(targetPosition.Value, 1);
             }
 
-            return true;
         };
-        Ability newAbility = new Ability(strafe);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
-    public Ability PlayerLock(bool enableLock = true)
+    public AIEvent.Action PlayerLock(bool enableLock = true)
     {
-        Ability.UseEffect deleg = (sub, pos, args) =>
+        return () =>
         {
             if (enableLock)
             {
                 playerLockPosition = player.transform.position;
             }
-            return true;
         };
-        Ability newAbility = new Ability(strafe);
-        newAbility.Effect = deleg;
-        self.AddAbility(newAbility);
-        return newAbility;
     }
 
 }
