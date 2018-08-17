@@ -35,14 +35,39 @@ namespace AI
          */
         public AISequence Times(int times)
         {
+            if (times == 0)
+            {
+                times = 1;
+                Debug.LogError("Cannot repeat event 0 times");
+            }
+                
             AIEvent[] events = new AIEvent[times];
             for (int i = 0; i < times; i++)
             {
                 events[i] = this;
             }
-            AISequence sequence = new AISequence();
-            sequence.events = events;
+            AISequence sequence = new AISequence(events);
             return sequence;
         }
+
+        /*
+         * Returns this event, with a specified delay afterwards.
+         * Equivalent to new AIEvent(duration, this.action, this.parameters).
+         */
+        public AIEvent Wait(float duration)
+        {
+            this.duration = duration;
+            return this;
+        }
+
+        /*
+         * Returns a new AISequence representing this event, followed by the
+         * specified next event.
+         */
+        public AISequence Then(AIEvent nextEvent)
+        {
+            return new AISequence(this, nextEvent);
+        }
+            
     }
 }

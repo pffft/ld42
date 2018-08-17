@@ -7,37 +7,75 @@ using AI;
 using UnityEngine.Profiling;
 
 /*
- * TODO: refactor shoot1, shoot3 as calls to shootWave, and add a "target" param
+ * TODO: refactor the shootXXX methods to have similar parameters.
+ * "target" should be a nullable; if null and locked, then use old position;
+ * if null and unlocked, use current player position; if not null, use specified target.
+ * 
+ * Next, add Speed/Size/Type parameters to all; angle offsets.
+ * 
+ * Find some way to add the code currently in Start via sequences; i.e., parameters
+ * that increase in step by a certain amount, for a specified number of times.
  */
 public class BossController : MonoBehaviour
 {
+    // A reference to the player object (for position tracking)
+    private static GameObject player;
 
-    private GameObject player;
+    // A reference to our physics body (for self movement and dashing)
+    private static Rigidbody physbody;
 
-    private Rigidbody physbody;
-    public CombatCore.Entity self;
+    // A reference to the game arena.
+    private static GameObject arena;
 
-    private EventQueue eventQueue;
+    // The event queue. This is filled with sequences representing future actions.
+    private static EventQueue eventQueue;
 
-    private GameObject arena;
+    #region Arena Location constants
+    public static float BOSS_HEIGHT = 1.31f;
+    private static float FAR = 45f;
+    private static float MED = 30f;
+    private static float CLOSE = 15f;
 
+    public static Vector3 CENTER = new Vector3(0, BOSS_HEIGHT, 0);
+
+    public static Vector3 NORTH_FAR = new Vector3(0f, BOSS_HEIGHT, 45f);
+    public static Vector3 SOUTH_FAR = new Vector3(0f, BOSS_HEIGHT, -45f);
+    public static Vector3 EAST_FAR = new Vector3(45f, BOSS_HEIGHT, 0);
+    public static Vector3 WEST_FAR = new Vector3(-45f, BOSS_HEIGHT, 0);
+
+    public static Vector3 NORTH_MED = new Vector3(0f, BOSS_HEIGHT, 30f);
+    public static Vector3 SOUTH_MED = new Vector3(0f, BOSS_HEIGHT, -30f);
+    public static Vector3 EAST_MED = new Vector3(30f, BOSS_HEIGHT, 0);
+    public static Vector3 WEST_MED = new Vector3(-30f, BOSS_HEIGHT, 0);
+
+    public static Vector3 NORTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, 15f);
+    public static Vector3 SOUTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, -15f);
+    public static Vector3 EAST_CLOSE = new Vector3(15f, BOSS_HEIGHT, 0);
+    public static Vector3 WEST_CLOSE = new Vector3(-15f, BOSS_HEIGHT, 0);
+    #endregion
+
+    // The Entity representing this faction. Assigned to projectiles we create.
+    public static CombatCore.Entity self;
+
+    // Used for the "CameraLock" action. Keeps track of the current player position
+    // for events and sequences that need a slightly out of date version.
     public static Vector3 playerLockPosition;
+    public static bool isPlayerLocked = false;
 
     #region Singleton stuff
     public static BossController instance = null;
-    public static BossController GetInstance()
-    {
-        if (instance == null)
-        {
-            instance = new BossController();
-        }
-        return instance;
-    }
-    private BossController() { }
     #endregion
 
     private void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Debug.LogError("Looks like you have two BossControllers here. Stop that.");
+        }
         player = GameObject.Find("Player");
 
         physbody = GetComponent<Rigidbody>();
@@ -51,260 +89,81 @@ public class BossController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Profiler.BeginSample("Initialize event queue"); 
+        Profiler.BeginSample("Initialize event queue");
 
-        AISequence.AddSequence("shoot2waves", new AISequence(
-            new AIEvent(0f, Teleport()),
-            new AIEvent(0f, ShootWave(25, 90f, 2.5f, speed: Speed.VERY_FAST)),
-            new AIEvent(1f, ShootWave(25, 90f, -2.5f, speed: Speed.VERY_FAST))
-        ));
+        // 4 way sweep, with waves and homing bullets; then a reversal and speedup
+        // TODO: Find a way to turn this into an AISequence using a method!!!
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                eventQueue.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
+            }
+            eventQueue.Add(Shoot1(Type.HOMING, Size.LARGE));
+            for (int j = 7; j < 15; j++)
+            {
+                eventQueue.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
+            }
+            eventQueue.AddSequence(AISequence.SHOOT_360);
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                eventQueue.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
+            }
+            eventQueue.Add(Shoot1(Type.HOMING, Size.LARGE));
+            for (int j = 5; j < 10; j++)
+            {
+                eventQueue.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
+            }
+            eventQueue.Add(Shoot1(Type.HOMING, Size.LARGE));
+            for (int j = 10; j < 15; j++)
+            {
+                eventQueue.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
+            }
+            eventQueue.AddSequence(AISequence.SHOOT_360);
+        }
 
-        AISequence.AddSequence("shootWaveMiddleGap", new AISequence(
-            new AIEvent(0f, ShootWave(25, 60f, -45f, speed: Speed.VERY_FAST)),
-            new AIEvent(0f, ShootWave(25, 60f, 45f, speed: Speed.VERY_FAST))
-        ));
+        eventQueue.Add(Teleport(CENTER).Wait(2f));
 
-        AISequence.AddSequence("homingStrafe5", new AISequence(
-            new AIEvent(0f, Strafe(true, 5f, 100)),
-            new AIEvent(0f, Shoot1(Type.HOMING, Size.MEDIUM))
-        ));
-
-        AISequence.AddSequence("homingStrafe10", new AISequence(
-            new AIEvent(0f, Strafe(true, 10f, 50)),
-            new AIEvent(0f, Shoot1(Type.HOMING, Size.MEDIUM))
-        ));
-
-        AISequence.AddSequence("homingStrafe15", new AISequence(
-            new AIEvent(0f, Strafe(true, 15f, 30)),
-           new AIEvent(0f, Shoot1(Type.HOMING, Size.MEDIUM))
-        ));
-
-        AISequence.AddSequence("homingStrafe72", new AISequence(
-            new AIEvent(0f, Strafe(true, 65f, 50)),
-            new AIEvent(0f, Shoot1(Type.HOMING, Size.MEDIUM))
-        ));
-
-        AISequence.AddSequence("lineStrafe30", new AISequence(
-            new AIEvent(0.2f, ShootLine(50, 75f, Speed.SNIPE)),
-            new AIEvent(0f, Strafe(true, 60f, 50))
-        ));
-
-        AISequence.AddSequence("slowWaveCircle", new AISequence(
-            new AIEvent(0f, ShootWave(75, 360f, 0f, speed: Speed.MEDIUM_SLOW, size: Size.LARGE)),
-            new AIEvent(0.5f, Strafe(true, 60f, 50))
-        ));
-
-        AISequence.AddSequence("lineWaveStrafe30", new AISequence(
-            new AIEvent(0.1f, ShootWave(75, 360f, 0f, speed: Speed.SLOW, size: Size.LARGE)),
-            new AIEvent(0.3f, Strafe(true, 30f, 50)),
-            new AIEvent(0.2f, ShootLine(50, 100f, Speed.VERY_FAST, Vector3.zero)),
-            new AIEvent(0f, Strafe(true, 30f, 50))
-        ));
-
-
-        //eventQueue.Add(0f, shootHexCurve);
-
-        // Basic attack
-        //eventQueue.Add(0.5f, Teleport());
-        //eventQueue.AddSequence(AISequence.Repeat(new AIEvent(0.3f, Shoot3(Type.BASIC, Size.SMALL)), 10));
-        //eventQueue.Add(100f, Shoot3(Type.HOMING, Size.HUGE));
-
-        //eventQueue.AddRepeat(1f, ShootWave(50, 360, 0, type: Type.HOMING, speed: Speed.FAST), 10);
-
-        //eventQueue.Add(2f, ShootWave(20, 360f, 0f, reverseDirection: true));
-        //eventQueue.AddRepeat(0.5f, ShootDeathHex(2f), 10);
+        // Experimental sweep
+        // TODO: Find a way to turn this into an AISequence using a method!!!
+        eventQueue.Add(PlayerLock(true));
+        for (int i = -30; i < 90; i += 5)
+        {
+            eventQueue.Add(Shoot1(angleOffset: i).Wait(0.01f));
+        }
+        for (int i = 30; i >= -90; i -= 5)
+        {
+            eventQueue.Add(Shoot1(angleOffset: i).Wait(0.01f));
+        }
+        eventQueue.Add(PlayerLock(false));
 
         /*
-        eventQueue.Add(2f, PlayerLock(true));
-        eventQueue.AddSequence(1f, ShootSweep());
-        eventQueue.AddSequence(1f, ShootSweep(clockwise: false, startOffset: 30f));
-        eventQueue.Add(0f, PlayerLock(false));
+        eventQueue.AddSequence(AISequence.SHOOT3_WAVE3);
+        eventQueue.AddSequence(AISequence.SHOOT3_WAVE3);
 
-        eventQueue.Add(2f, Teleport());
-        eventQueue.AddSequence(1f, ShootSweep());
-        eventQueue.AddSequence(1f, ShootSweep(clockwise: false, startOffset: 30f));
+        eventQueue.AddSequence(AISequence.SHOOT_2_WAVES.Times(5));
+
+        eventQueue.AddSequence(AISequence.HEX_CURVE_INTRO);
+
+        eventQueue.AddSequence(AISequence.BIG_HOMING_STRAFE);
+
+        eventQueue.AddSequence(AISequence.DOUBLE_HEX_CURVE);
+
+        eventQueue.AddSequence(AISequence.HOMING_STRAFE_WAVE_SHOOT.Times(2));
+
+        eventQueue.AddSequence(AISequence.DEATH_HEX);
+
+        eventQueue.AddSequence(AISequence.WAVE_CIRCLE);
+
+        eventQueue.AddSequence(AISequence.JUMP_ROPE_FAST);
+
+        eventQueue.AddSequence(AISequence.DOUBLE_HEX_CURVE_HARD);
+
+        eventQueue.AddSequence(AISequence.JUMP_ROPE_SLOW_CIRCLES);
         */
-
-        // Warmup with basic attacks
-        /*
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.2f, Shoot3(), 20);
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.1f, Shoot3(), 35);
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.05f, Shoot3(), 50);
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.05f, Shoot3(), 10);
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.05f, Shoot3(), 10);
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.05f, Shoot3(), 10);
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddRepeat(0.05f, Shoot3(), 10);
-        */
-
-        // Basic attacks with wave at start, middle, and end
-        eventQueue.Add(0.5f, Teleport());
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.AddRepeat(0.1f, Shoot3(), 20);
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.AddRepeat(0.1f, Shoot3(), 20);
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-
-        // Again
-        eventQueue.Add(0f, Teleport());
-        eventQueue.Add(0f, ShootWave(150, 360f, 0f));
-        eventQueue.AddRepeat(0.1f, Shoot3(), 20);
-        eventQueue.Add(0f, ShootWave(150, 360f, 0f));
-        eventQueue.AddRepeat(0.1f, Shoot3(), 20);
-        eventQueue.Add(0f, ShootWave(150, 360f, 0f));
-
-        // Hex curve introduction
-        eventQueue.Add(0f, Teleport());
-        eventQueue.AddSequenceRepeat(5, "shoot2waves");
-        eventQueue.Add(0f, ShootHexCurve(true));
-        eventQueue.Add(2.5f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(0f, ShootHexCurve(false));
-        eventQueue.Add(2.5f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(0f, ShootHexCurve(true));
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(1f, ShootHexCurve(false));
-        eventQueue.Add(1f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(1.5f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(0.5f, Teleport());
-        eventQueue.AddSequenceRepeat(12, "homingStrafe10");
-        eventQueue.AddSequenceRepeat(3, "shoot2waves");
-
-        // Homing strafe (big and small jumps)
-        eventQueue.Add(1f, CameraMove(false, new Vector3(0, 17.5f, -35)));
-        eventQueue.Add(1f, Teleport(new Vector3(0, 1.31f, 45)));
-        eventQueue.AddSequenceRepeat(10, "homingStrafe72");
-        eventQueue.Add(1f, Teleport(new Vector3(0, 1.31f, 45)));
-        eventQueue.AddSequenceRepeat(45, "homingStrafe15");
-        eventQueue.Add(2f, CameraMove(true));
-
-        // 12 curve + waves
-        eventQueue.Add(1.5f, Teleport(new Vector3(0, 1.31f, 0)));
-        eventQueue.Add(0f, ShootHexCurve(true, 0f));
-        eventQueue.Add(0.5f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(0.5f, ShootHexCurve(true, 30f));
-        eventQueue.Add(1f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(1f, ShootWave(50, 360f, 0f));
-
-        // Homing strafes + wave shooting
-        eventQueue.AddSequenceRepeat(5, "shoot2waves");
-        eventQueue.Add(0.2f, Teleport());
-        eventQueue.AddSequenceRepeat(15, "homingStrafe15");
-        eventQueue.AddSequenceRepeat(2, "shoot2waves");
-        eventQueue.Add(0.2f, Teleport());
-        eventQueue.AddSequenceRepeat(15, "homingStrafe15");
-        eventQueue.AddSequenceRepeat(2, "shoot2waves");
-
-        // Sequence of partial waves, some with gaps
-        eventQueue.Add(0.25f, Teleport(new Vector3(0f, 1.31f, 0f)));
-        eventQueue.Add(0.75f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.5f, ShootWave(8, 120f, -10f, Speed.VERY_FAST, Size.LARGE)); // "toothy" wave
-        eventQueue.Add(0.5f, ShootWave(8, 120f, 10f, Speed.VERY_FAST, Size.LARGE));
-        eventQueue.AddSequence(0.5f, "shootWaveMiddleGap");
-        eventQueue.AddSequence(0.5f, "shootWaveMiddleGap");
-        eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.75f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
-        eventQueue.AddSequence(0.5f, "shootWaveMiddleGap");
-        eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.75f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-        eventQueue.Add(0.75f, ShootWave(75, 360f, 0f, Speed.VERY_FAST));
-
-        // Death hex! Best way is to reflect.
-        eventQueue.Add(1f, ShootDeathHex(2f));
-        eventQueue.Add(5f, ShootDeathHex(1f));
-
-        // Next 3 are homing strafes with a wave-gap-wave fire after
-        eventQueue.Add(0.25f, Teleport());
-        eventQueue.AddSequenceRepeat(12, "homingStrafe5");
-        eventQueue.Add(0.25f, Teleport(speed: 200));
-        eventQueue.Add(0.5f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-        eventQueue.AddSequence(0.5f, "shootWaveMiddleGap");
-        eventQueue.Add(0.25f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-
-        eventQueue.Add(0.25f, Teleport());
-        eventQueue.AddSequenceRepeat(12, "homingStrafe5");
-        eventQueue.Add(0.25f, Teleport(speed: 200));
-        eventQueue.Add(0.5f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-        eventQueue.AddSequence(0.5f, "shootWaveMiddleGap");
-        eventQueue.Add(0.25f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-
-        eventQueue.Add(0.25f, Teleport());
-        eventQueue.AddSequenceRepeat(12, "homingStrafe5");
-        eventQueue.Add(0.25f, Teleport(speed: 200));
-        eventQueue.Add(0.5f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-        eventQueue.AddSequence(0.5f, "shootWaveMiddleGap");
-        eventQueue.Add(0.25f, ShootWave(25, 90f, 0f, Speed.VERY_FAST));
-
-
-        // Circle of waves
-        eventQueue.Add(0.5f, Teleport(new Vector3(-30f, 1.31f, 0)));
-        eventQueue.AddSequenceRepeat(6, "slowWaveCircle");
-        eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
-        eventQueue.Add(0f, ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.left));
-        eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
-        eventQueue.Add(0f, ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.right));
-        eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
-        eventQueue.Add(0f, ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.left));
-        eventQueue.AddSequenceRepeat(3, "slowWaveCircle");
-        eventQueue.Add(0f, ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.right));
-
-        /*
-        // Jump rope warmup
-        // Kind of easy and boring?
-        eventQueue.Add(2f, Teleport(new Vector3(-45f, 1.31f, 0)));
-        eventQueue.Add(1f, ShootLine(speed: Speed.FAST));
-        eventQueue.Add(0.5f, Teleport(new Vector3(45f, 1.31f, 0)));
-        eventQueue.Add(1f, ShootLine(speed: Speed.FAST));
-        eventQueue.Add(0f, Teleport(new Vector3(-45f, 1.31f, 0)));
-        eventQueue.Add(1f, ShootLine(speed: Speed.FAST));
-        eventQueue.Add(0f, Teleport(new Vector3(45f, 1.31f, 0)));
-        eventQueue.Add(1f, ShootLine(speed: Speed.FAST));
-        */
-
-        // Jump rope fast
-        eventQueue.Add(1f, CameraMove(false, new Vector3(0, 17.5f, -35)));
-        eventQueue.Add(0f, Teleport(new Vector3(-45f, 1.31f, 0), 200));
-        eventQueue.Add(0f, ShootLine(50, 100f, Speed.SNIPE));
-        eventQueue.Add(0f, Teleport(new Vector3(45f, 1.31f, 0), 200));
-        eventQueue.Add(0f, ShootLine(50, 100f, Speed.SNIPE));
-        eventQueue.Add(0f, Teleport(new Vector3(-45f, 1.31f, 0), 200));
-        eventQueue.Add(0f, ShootLine(50, 100f, Speed.SNIPE));
-        eventQueue.Add(0f, Teleport(new Vector3(45f, 1.31f, 0), 200));
-        eventQueue.Add(0f, ShootLine(50, 100f, Speed.SNIPE));
-        eventQueue.Add(0f, CameraMove(true));
-
-        // A very painful double hex curve, with 360 waves and targeted shooting
-        eventQueue.Add(1f, Teleport(Vector3.zero));
-        eventQueue.Add(0.5f, ShootHexCurve(true, 0f));
-        eventQueue.Add(0.5f, ShootHexCurve(true, 30f));
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.AddRepeat(0.05f, Shoot3(Type.BASIC, Size.MEDIUM), 20);
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.AddRepeat(0.05f, Shoot3(Type.BASIC, Size.MEDIUM), 20);
-        eventQueue.Add(0f, PlayerLock());
-        eventQueue.AddSequence(ShootSweep(clockwise: false, size: Size.MEDIUM));
-        eventQueue.Add(0f, ShootHexCurve(false, 0f));
-        eventQueue.Add(0f, ShootHexCurve(false, 30f));
-        eventQueue.AddRepeat(0.1f, Shoot3(Type.HOMING, Size.MEDIUM), 10);
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.AddRepeat(0.1f, Shoot3(Type.HOMING, Size.MEDIUM), 5);
-        eventQueue.Add(0f, ShootWave(50, 360f, 0f));
-        eventQueue.AddRepeat(0.1f, Shoot3(Type.HOMING, Size.MEDIUM), 5);
-        eventQueue.Add(0.5f, ShootWave(50, 360f, 0f));
-        eventQueue.Add(0.5f, ShootWave(50, 360f, 0f));
-
-        // Jump rope circle with wave circles (hard to dodge both at once)
-        eventQueue.Add(0f, Teleport(new Vector3(-45f, 1.31f, 0)));
-        eventQueue.AddSequenceRepeat(6, "lineStrafe30");
-        eventQueue.AddSequenceRepeat(6, "lineWaveStrafe30");
 
         Profiler.EndSample();
     }
@@ -317,22 +176,23 @@ public class BossController : MonoBehaviour
         eventQueue.Update();
     }
 
-    public void Glare()
+    public static void Glare()
     {
-        Quaternion lookRotation = Quaternion.LookRotation(player.transform.position - transform.position);
-        transform.rotation = lookRotation;
+        Quaternion lookRotation = Quaternion.LookRotation(player.transform.position - instance.transform.position);
+        instance.transform.rotation = lookRotation;
     }
 
-    public AIEvent.Action Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
+    public static AIEvent Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
     {
-        return () =>
+        return new AIEvent(0f, () =>
         {
-            Type t = type;
-            Size s = size;
-
             Glare();
 
             Vector3 targetPos = player.transform.position;
+            if (isPlayerLocked)
+            {
+                targetPos = playerLockPosition;
+            }
             if (target.HasValue)
             {
                 targetPos = target.Value;
@@ -341,51 +201,51 @@ public class BossController : MonoBehaviour
             switch (type)
             {
                 case Type.BASIC:
-                    Projectile.spawnBasic(self, transform.position, targetPos, size: size, angleOffset: angleOffset);
+                    Projectile.spawnBasic(self, instance.transform.position, targetPos, size: size, angleOffset: angleOffset);
                     break;
                 case Type.HOMING:
-                    Projectile.spawnHoming(self, transform.position, targetPos, size: size, angleOffset: angleOffset);
+                    Projectile.spawnHoming(self, instance.transform.position, targetPos, size: size, angleOffset: angleOffset);
                     break;
                 case Type.CURVING:
                     Speed speed = Speed.FAST;
-                    Projectile.spawnCurving(self, transform.position, targetPos, (float)speed * 2f, 0, speed: speed, size: size, angleOffset: angleOffset);
+                    Projectile.spawnCurving(self, instance.transform.position, targetPos, (float)speed * 2f, 0, speed: speed, size: size, angleOffset: angleOffset);
                     break;
                 default:
-                    Projectile.spawnBasic(self, transform.position, targetPos, size: size, angleOffset: angleOffset);
+                    Projectile.spawnBasic(self, instance.transform.position, targetPos, size: size, angleOffset: angleOffset);
                     break;
             }
-        };
+        });
     }
 
-    public AIEvent.Action Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
+    public static AIEvent Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
     {
-        return () =>
+        return new AIEvent(0f, () =>
         {
             switch (type)
             {
                 case Type.BASIC:
-                    Projectile.spawnBasic(self, transform.position, player.transform.position, size: size);
-                    Projectile.spawnBasic(self, transform.position, player.transform.position, angleOffset: -30, size: size);
-                    Projectile.spawnBasic(self, transform.position, player.transform.position, angleOffset: 30, size: size);
+                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, size: size);
+                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: -30, size: size);
+                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: 30, size: size);
                     break;
                 case Type.HOMING:
-                    Projectile.spawnHoming(self, transform.position, player.transform.position, size: size);
-                    Projectile.spawnHoming(self, transform.position, player.transform.position, angleOffset: -30, size: size);
-                    Projectile.spawnHoming(self, transform.position, player.transform.position, angleOffset: 30, size: size);
+                    Projectile.spawnHoming(self, instance.transform.position, player.transform.position, size: size);
+                    Projectile.spawnHoming(self, instance.transform.position, player.transform.position, angleOffset: -30, size: size);
+                    Projectile.spawnHoming(self, instance.transform.position, player.transform.position, angleOffset: 30, size: size);
                     break;
                 default:
-                    Projectile.spawnBasic(self, transform.position, player.transform.position, size: size);
-                    Projectile.spawnBasic(self, transform.position, player.transform.position, angleOffset: -30, size: size);
-                    Projectile.spawnBasic(self, transform.position, player.transform.position, angleOffset: 30, size: size);
+                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, size: size);
+                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: -30, size: size);
+                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: 30, size: size);
                     break;
             }
-        };
+        });
     }
 
     // Shoots an arc of bullets
-    public AIEvent.Action ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, bool reverseDirection = false)
+    public static AIEvent ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, Vector3? target = null)
     {
-        return () =>
+        return new AIEvent(0f, () =>
         {
             Glare();
 
@@ -394,9 +254,9 @@ public class BossController : MonoBehaviour
             for (int i = 0; i < amount; i++)
             {
                 
-                Vector3 source = reverseDirection ? player.transform.position + new Vector3(0, 1.31f, 0) : transform.position;
-                Vector3 sink = player.transform.position;
-                Vector3 direction = transform.position - player.transform.position;
+                Vector3 source = instance.transform.position;
+                Vector3 sink = target.HasValue ? target.Value : player.transform.position;
+                Vector3 direction = instance.transform.position - player.transform.position;
 
                 float angleOffset = halfArcWidth + offset + (i * (arcWidth / amount));
 
@@ -407,7 +267,7 @@ public class BossController : MonoBehaviour
                             self,
                             source,// + Quaternion.AngleAxis(angleOffset, Vector3.up) * (10 * direction.normalized),
                             sink,
-                            angleOffset: reverseDirection ? 0 : angleOffset,
+                            angleOffset: angleOffset,
                             speed: speed,
                             size: size
                         );
@@ -424,39 +284,40 @@ public class BossController : MonoBehaviour
                         break;
                 }
             }
-        };
+        });
     }
 
-    public AIEvent.Action ShootHexCurve(bool clockwise = true, float offset = 0f)
+    public static AIEvent ShootHexCurve(bool clockwise = true, float offset = 0f)
     {
         return ShootHexCurve(clockwise, offset, new Vector3(0, 1.31f, -1f));
     }
 
     // Shoots a hexagonal pattern of curving projectiles.
-    public AIEvent.Action ShootHexCurve(bool clockwise, float offset, Vector3 target) {
-        return () =>
+    public static AIEvent ShootHexCurve(bool clockwise, float offset, Vector3 target) {
+        return new AIEvent(0f, () =>
         {
             float multiplier = clockwise ? 1f : -1f;
 
             Speed speed = Speed.FAST;
-            Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (0 * multiplier), speed);
-            Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (60 * multiplier), speed);
-            Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (120 * multiplier), speed);
-            Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (180 * multiplier), speed);
-            Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (240 * multiplier), speed);
-            Projectile.spawnCurving(self, transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (300 * multiplier), speed);
-        };
+            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (0 * multiplier), speed);
+            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (60 * multiplier), speed);
+            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (120 * multiplier), speed);
+            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (180 * multiplier), speed);
+            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (240 * multiplier), speed);
+            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (300 * multiplier), speed);
+        });
     }
 
-    public AIEvent.Action ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
-        return () =>
+    public static AIEvent ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
+        return new AIEvent(0f, () =>
         {
-            Vector3 targetPos = target.HasValue ? target.Value - transform.position : player.transform.position - transform.position;
+
+            Vector3 targetPos = target.HasValue ? target.Value - instance.transform.position : player.transform.position - instance.transform.position;
             Vector3 leftDirection = (Quaternion.AngleAxis(90, Vector3.up) * targetPos).normalized;
 
             for (int i = 0; i < amount; i++)
             {
-                Vector3 spawn = transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
+                Vector3 spawn = instance.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
                 Projectile.spawnBasic(
                     self,
                     spawn,
@@ -465,42 +326,29 @@ public class BossController : MonoBehaviour
                     size: Size.MEDIUM
                 );
             }
-        };
+        });
     }
 
-    // TODO: refactor this to function as an AIEvent.Action. Or else 
-    // make it simply a sequence (i.e., by adding a target param to shoot1)
-    public AISequence ShootSweep(int amount = 15, bool clockwise = true, float startOffset = -30f, 
-                                 float degrees = 90f, Speed speed = Speed.MEDIUM, Size size = Size.SMALL, Type type = Type.BASIC)
+    public static AIEvent ShootDeathHex(float maxTime1 = 1f)
     {
-        AIEvent[] sweepEvents = new AIEvent[amount];
-        Vector3 initialPlayerPosition = BossController.playerLockPosition;
-        for (int i = 0; i < amount; i++)
+        return new AIEvent(0f, () =>
         {
-            float offset = startOffset + ((clockwise ? 1f : -1f) * i * (degrees / amount));
-            sweepEvents[i] = new AIEvent(0f, Shoot1(target: initialPlayerPosition, angleOffset: offset));
-        }
-        return new AISequence(sweepEvents);
-    }
 
-    public AIEvent.Action ShootDeathHex(float maxTime1 = 1f)
-    {
-        return () =>
-        {
             for (int i = 0; i < 6; i++)
             {
-                Projectile.spawnDeathHex(self, transform.position, player.transform.position, maxTime1, i * 60f);
+                Projectile.spawnDeathHex(self, instance.transform.position, player.transform.position, maxTime1, i * 60f);
             }
-        };
+        });
     }
 
-    public AIEvent.Action Teleport(Vector3? target = null, int speed = 100) {
-        return () =>
+    public static AIEvent Teleport(Vector3? target = null, int speed = 100) {
+        return new AIEvent(0f, () =>
         {
+
             if (target.HasValue)
             {
                 self.movespeed.SetBase(speed);
-                StartCoroutine(Dashing(target.Value));
+                instance.StartCoroutine(Dashing(target.Value));
                 Glare();
                 return;
             }
@@ -509,7 +357,7 @@ public class BossController : MonoBehaviour
             float minAngle = 50f;
             float maxAngle = 100f;
 
-            Vector3 oldPosVector = transform.position - player.transform.position;
+            Vector3 oldPosVector = instance.transform.position - player.transform.position;
 
             int count = 0;
             Vector3 rawPosition;
@@ -540,31 +388,31 @@ public class BossController : MonoBehaviour
             } while (rawPosition.magnitude > 50f);
 
             rawPosition.y = 1.31f;
-            //transform.position = rawPosition;
-            StartCoroutine(Dashing(rawPosition));
+            instance.StartCoroutine(Dashing(rawPosition));
 
             Glare();
-        };
+        });
     }
 
-    public IEnumerator Dashing(Vector3 targetPosition) {
+    public static IEnumerator Dashing(Vector3 targetPosition) {
 
         eventQueue.Pause();
+
         physbody.velocity = Vector3.zero;
 
-        Vector3 dashDir = (targetPosition - transform.position).normalized;
+        Vector3 dashDir = (targetPosition - instance.transform.position).normalized;
         float dist;
-        while ((dist = Vector3.Distance(targetPosition, transform.position)) > 0f) {
+        while ((dist = Vector3.Distance(targetPosition, instance.transform.position)) > 0f) {
             
             float dashDistance = self.movespeed.Value * 4 * Time.deltaTime;
 
             if (dist < dashDistance)
             {
-                transform.position = targetPosition;
+                instance.transform.position = targetPosition;
                 break;
             }
 
-            transform.position += dashDir * (dashDistance);
+            instance.transform.position += dashDir * (dashDistance);
             yield return null;
         }
 
@@ -572,22 +420,22 @@ public class BossController : MonoBehaviour
         eventQueue.Unpause();
     }
 
-    public AIEvent.Action Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
+    public static AIEvent Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
     {
-        return () =>
+        return new AIEvent(0f, () =>
         {
             self.movespeed.SetBase(speed);
 
-            Vector3 oldPosVector = transform.position - center;
+            Vector3 oldPosVector = instance.transform.position - center;
             Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);
 
-            StartCoroutine(Dashing(rot * oldPosVector));
-        };
+            instance.StartCoroutine(Dashing(rot * oldPosVector));
+        });
     }
 
-    public AIEvent.Action CameraMove(bool isFollow = false, Vector3? targetPosition = null)
+    public static AIEvent CameraMove(bool isFollow = false, Vector3? targetPosition = null)
     {
-        return () =>
+        return new AIEvent(0f, () =>
         {
             CameraController.GetInstance().IsFollowing = isFollow;
 
@@ -595,19 +443,19 @@ public class BossController : MonoBehaviour
             {
                 CameraController.GetInstance().Goto(targetPosition.Value, 1);
             }
-
-        };
+        });
     }
 
-    public AIEvent.Action PlayerLock(bool enableLock = true)
+    public static AIEvent PlayerLock(bool enableLock = true)
     {
-        return () =>
+        return new AIEvent(0f, () =>
         {
             if (enableLock)
             {
                 playerLockPosition = player.transform.position;
             }
-        };
+            isPlayerLocked = enableLock;
+        });
     }
 
 }

@@ -46,13 +46,29 @@ namespace AI
             events.Enqueue(new AIEvent(start, duration, action, pars));
         }
 
+        public void Add(AIEvent e)
+        {
+            Add(e.duration, e.action, e.parameters);
+        }
+
         /*
          * Adds a list of events in a sequence.
          */
         public void AddSequence(AISequence sequence)
         {
+            if (sequence.events == null)
+            {
+                Debug.LogError("Sequence had null events!");
+                return;
+            }
+
             foreach (AIEvent e in sequence.events)
             {
+                if (e == null)
+                {
+                    Debug.LogError("Found null event!");
+                    continue;
+                }
                 Add(e.duration, e.action, e.parameters);
             }
         }
