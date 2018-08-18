@@ -93,6 +93,7 @@ public class BossController : MonoBehaviour
 
         // 4 way sweep, with waves and homing bullets; then a reversal and speedup
         // TODO: Find a way to turn this into an AISequence using a method!!!
+        /*
         for (int i = 0; i < 4; i++)
         {
             for (int j = 0; j < 7; j++)
@@ -139,6 +140,7 @@ public class BossController : MonoBehaviour
             eventQueue.Add(Shoot1(angleOffset: i).Wait(0.01f));
         }
         eventQueue.Add(PlayerLock(false));
+        */
 
         /*
         eventQueue.AddSequence(AISequence.SHOOT3_WAVE3);
