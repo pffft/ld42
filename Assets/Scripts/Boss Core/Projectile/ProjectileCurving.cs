@@ -7,7 +7,6 @@ namespace Projectiles
 {
     public class ProjectileCurving : Projectile
     {
-
         public Rigidbody body;
         public float curveAmount;
 
@@ -15,6 +14,10 @@ namespace Projectiles
         public float numSpawners = 30f;
 
         public bool leavesTrail;
+
+        public override void GetCustomMaterial() {
+            return Resources.Load<Material>("Art/Materials/GreenTransparent");
+        }
 
 		public override void CustomUpdate()
         {

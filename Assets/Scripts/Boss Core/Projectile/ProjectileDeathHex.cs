@@ -7,6 +7,10 @@ namespace Projectiles
     public class ProjectileDeathHex : Projectile
     {
 
+        public override void GetCustomMaterial() {
+            return Resources.Load<Material>("Art/Materials/GreenTransparent");
+        }
+
 		public override void OnDestroyTimeout()
 		{
             Rigidbody body = GetComponent<Rigidbody>();
