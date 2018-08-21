@@ -115,7 +115,7 @@ public class Controller : MonoBehaviour
 
 	public void FixedUpdate()
 	{
-		if (dashing || self.IsRooted())
+		if (dashing || self.IsRooted ())
 			return;
 
 		Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
@@ -132,15 +132,15 @@ public class Controller : MonoBehaviour
 		}
 
 		//movement
-		Vector3 movementVector = new Vector3(0f, physbody.velocity.y, 0f);
+		Vector3 movementVector = new Vector3 (0f, physbody.velocity.y, 0f);
 
 		float x = Input.GetAxisRaw ("Horizontal");
 		float y = Input.GetAxisRaw ("Vertical");
 
 		movementVector += (Vector3.forward * y) + (Vector3.right * x);
-		GetComponent<Animator> ().SetFloat ("SpeedPerc", x > 0f || y > 0f ? 1f : 0f);
+		GetComponent<Animator> ().SetFloat ("SpeedPerc", Mathf.Abs (x) > 0f || Mathf.Abs (y) > 0f ? 1f : 0f);
 
-		if(x > 0f || y > 0f)
+		if (Mathf.Abs (x) > 0f || Mathf.Abs (y) > 0f)
 			transform.rotation = Quaternion.LookRotation (movementVector, Vector3.up);
 
 		physbody.velocity = movementVector.normalized * self.movespeed.Value;
