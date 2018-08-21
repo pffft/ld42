@@ -9,6 +9,10 @@ namespace Projectiles
     {
         public Entity entity;
 
+        public Speed speed;
+        public Size size;
+        public Type type;
+
         public float currentTime;
         public float maxTime;
 
@@ -73,8 +77,8 @@ namespace Projectiles
                 {
                     Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, this.entity, damage);
-                    Destroy(this.gameObject);
                     OnDestroyCollision();
+                    Destroy(this.gameObject);
                 }
             }
         }
@@ -85,6 +89,15 @@ namespace Projectiles
         public virtual void Initialize(params object[] args) { }
 
         /*
+         * Get the preferred material for this projectile.
+         * The standard only sets material based on size; if you want your projectile
+         * to have its own material, return it here.
+         *
+         * If you want to use the standard projectile logic, simply return null here.
+         */
+        public virtual Material GetCustomMaterial() { return null; }
+
+        /*
          * Creates a new Projectile of the specified speed/size/type.
          */
         private static Projectile CreateGeneric(Entity entity, Vector3 start,
@@ -92,6 +105,8 @@ namespace Projectiles
         {
             
             GameObject newObj;
+
+            // Assign a default material based on the size; normally, small = blue, med = orange, large = red.
             switch (size)
             {
                 case Size.TINY:
@@ -124,29 +139,16 @@ namespace Projectiles
             newObj.transform.rotation = startRotation;
 
             Projectile projectile;
-            switch (type)
-            {
-                case Type.BASIC:
-                    goto default;
-                case Type.INDESTRUCTIBLE:
-                    goto default;
-                case Type.HOMING:
-                    projectile = newObj.AddComponent<ProjectileHoming>();
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/PurpleTransparent");
-                    break;
-                case Type.CURVING:
-                    projectile = newObj.AddComponent<ProjectileCurving>();
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/GreenTransparent");
-                    break;
-                case Type.DEATHHEX:
-                    projectile = newObj.AddComponent<ProjectileDeathHex>();
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/GreenTransparent");
-                    break;
-                default:
-                    projectile = newObj.AddComponent<Projectile>();
-                    break;
+
+            // Look up the subclass we should add based on the type
+            System.Type projType;
+            if (TypeClassLookup.TryGetValue(type, out projType)) {
+                projectile = newObj.AddComponent<projType>();
+            } else {
+                projectile = newObj.AddComponent<Projectile>();
             }
 
+            // Assign and init the RigidBody (or create one if it doesn't exist)
             Rigidbody body = newObj.GetComponent<Rigidbody>();
             if (body == null)
             {
@@ -155,12 +157,24 @@ namespace Projectiles
             body.velocity = startRotation * (Vector3.forward * (float)speed);
             body.useGravity = false;
 
+            projectile.speed = speed;
+            projectile.size = size;
+            projectile.type = type;
+
             projectile.entity = entity;
             projectile.currentTime = 0;
             projectile.maxTime = maxTime;
             projectile.velocity = (float)speed;
             projectile.damage = 5f;
-            projectile.Initialize(args); // Subclasses' init goes here
+
+            // Assign a different, custom material (if applicable)
+            Material customMaterial = GetCustomMaterial();
+            if (customMaterial != null) {
+                newObj.GetComponent<MeshRenderer>().material = customMaterial;
+            }
+
+            // Custom initialization for subclasses
+            projectile.Initialize(args);
 
             return projectile;
         }

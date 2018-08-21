@@ -21,6 +21,10 @@ namespace Projectiles
         // Was this projectile once close to the player?
         public bool wasClose;
 
+        public override void GetCustomMaterial() {
+            return Resources.Load<Material>("Art/Materials/PurpleTransparent");
+        }
+
         public override void CustomUpdate() {
             Vector3 idealVelocity = velocity * (player.transform.position - transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, body.velocity, Vector3.up);
