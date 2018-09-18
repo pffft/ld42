@@ -7,7 +7,7 @@ namespace Projectiles
     public class ProjectileDeathHex : Projectile
     {
 
-        public override void GetCustomMaterial() {
+        public override Material GetCustomMaterial() {
             return Resources.Load<Material>("Art/Materials/GreenTransparent");
         }
 

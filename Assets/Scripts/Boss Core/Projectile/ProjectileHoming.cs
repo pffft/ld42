@@ -21,7 +21,7 @@ namespace Projectiles
         // Was this projectile once close to the player?
         public bool wasClose;
 
-        public override void GetCustomMaterial() {
+        public override Material GetCustomMaterial() {
             return Resources.Load<Material>("Art/Materials/PurpleTransparent");
         }
 

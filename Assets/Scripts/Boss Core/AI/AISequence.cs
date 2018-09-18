@@ -9,24 +9,44 @@ namespace AI
     {
         public AIEvent[] events;
 
+        /*
+         * A relative difficulty parameter. 
+         * 
+         * This is from a scale of 0 - 10, where a "10" is the point where any person
+         * would call the move "actual bullshit". That means that the move may guarantee
+         * damage, might not have safespots, might be too fast, or all of the above.
+         * 
+         * Most moves that make it to the game should be at most an 8.
+         * 
+         * This can go above 10, but that's for testing purposes (or masochism).
+         */
+        public float difficulty;
+
         private static Dictionary<string, AISequence> sequenceDictionary = new Dictionary<string, AISequence>();
 
         public AISequence() { }
 
+        public AISequence(AIEvent[] events) : this(-1, events) { }
+
         /*
          * Takes an arbitrary length list of AIEvents and combines them into an AISequence.
          */
-        public AISequence(AIEvent[] events)
+        public AISequence(float difficulty, AIEvent[] events)
         {
+            this.difficulty = difficulty;
             this.events = events;
         }
+
+        public AISequence(params object[] objects) : this(-1, objects) { }
 
         /*
          * Takes an arbitrary length list of AIEvents and AISequences, and makes one
          * large list containing all elements.
          */
-        public AISequence(params object[] objects)
+        public AISequence(float difficulty, params object[] objects)
         {
+            this.difficulty = difficulty;
+
             Debug.Log("AISequence constructor called. Is events null?: " + (objects == null));
 
             List<AIEvent> eventsList = new List<AIEvent>();
