@@ -239,6 +239,74 @@ namespace AI
             LINE_CIRCLE_STRAFE_60.Times(6)
         );
 
+        public static AISequence FOUR_WAY_SWEEP_WITH_HOMING = new AISequence(6, () =>
+        {
+            List<AISequence> sequences = new List<AISequence>();
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                }
+                sequences.Add(Shoot1(Type.HOMING, Size.LARGE).AsSequence());
+                for (int j = 7; j < 15; j++)
+                {
+                    sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                }
+                sequences.Add(AISequence.SHOOT_360);
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                }
+                sequences.Add(Shoot1(Type.HOMING, Size.LARGE).AsSequence());
+                for (int j = 5; j < 10; j++)
+                {
+                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                }
+                sequences.Add(Shoot1(Type.HOMING, Size.LARGE).AsSequence());
+                for (int j = 10; j < 15; j++)
+                {
+                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                }
+                sequences.Add(AISequence.SHOOT_360);
+            }
+            return sequences.ToArray();
+        });
+
+        /*
+         * Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.
+         * This doesn't lock onto the player's old position, so it will follow the player.
+         */
+        public static AISequence SWEEP = new AISequence(2, () =>
+        {
+            List<AISequence> sequences = new List<AISequence>();
+            for (int i = -30; i < 90; i += 5)
+            {
+                sequences.Add(new AISequence(-1, new AIEvent[] { Shoot1(angleOffset: i).Wait(0.01f) }));
+            }
+            return sequences.ToArray();
+        });
+
+        public static AISequence SWEEP_BACK_AND_FORTH = new AISequence(3, () =>
+        {
+            List<AISequence> sequences = new List<AISequence>();
+            for (int i = -30; i < 90; i += 5)
+            {
+                sequences.Add(new AISequence(-1, new AIEvent[] { Shoot1(angleOffset: i).Wait(0.01f) }));
+            }
+            sequences.Add(Pause(0.75f));
+            for (int i = 30; i > -90; i -= 5)
+            {
+                sequences.Add(new AISequence(-1, new AIEvent[] { Shoot1(angleOffset: i).Wait(0.01f) }));
+            }
+            return sequences.ToArray();
+        });
+
+
+
 
 
         #endregion

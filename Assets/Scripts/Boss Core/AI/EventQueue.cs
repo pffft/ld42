@@ -46,6 +46,9 @@ namespace AI
             events.Enqueue(new AIEvent(start, duration, action, pars));
         }
 
+        /*
+         * Add a single event to the queue as soon as possible.
+         */
         public void Add(AIEvent e)
         {
             Add(e.duration, e.action, e.parameters);
@@ -120,7 +123,6 @@ namespace AI
                 AddSequence(sequence);
             }
         }
-
 
         /*
          * Adds a sequence that is in the Sequence dictionary, "times" times.

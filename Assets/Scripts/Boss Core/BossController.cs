@@ -95,62 +95,12 @@ public class BossController : MonoBehaviour
 
         // 4 way sweep, with waves and homing bullets; then a reversal and speedup
         // TODO: Find a way to turn this into an AISequence using a method!!!
-        /*
-        for (int i = 0; i < 4; i++)
-        {
-            for (int j = 0; j < 7; j++)
-            {
-                eventQueue.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
-            }
-            eventQueue.Add(Shoot1(Type.HOMING, Size.LARGE));
-            for (int j = 7; j < 15; j++)
-            {
-                eventQueue.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
-            }
-            eventQueue.AddSequence(AISequence.SHOOT_360);
-        }
-        for (int i = 0; i < 4; i++)
-        {
-            for (int j = 0; j < 5; j++)
-            {
-                eventQueue.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
-            }
-            eventQueue.Add(Shoot1(Type.HOMING, Size.LARGE));
-            for (int j = 5; j < 10; j++)
-            {
-                eventQueue.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
-            }
-            eventQueue.Add(Shoot1(Type.HOMING, Size.LARGE));
-            for (int j = 10; j < 15; j++)
-            {
-                eventQueue.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
-            }
-            eventQueue.AddSequence(AISequence.SHOOT_360);
-        }
 
-        eventQueue.Add(Teleport(CENTER).Wait(2f));
-
-        // Experimental sweep
-        // TODO: Find a way to turn this into an AISequence using a method!!!
-        eventQueue.Add(PlayerLock(true));
-        for (int i = -30; i < 90; i += 5)
-        {
-            eventQueue.Add(Shoot1(angleOffset: i).Wait(0.01f));
-        }
-        for (int i = 30; i >= -90; i -= 5)
-        {
-            eventQueue.Add(Shoot1(angleOffset: i).Wait(0.01f));
-        }
-        eventQueue.Add(PlayerLock(false));
-        */
-
-        /*
+        //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
         phase = AIPhase.PHASE1;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             eventQueue.AddSequence(phase.GetNext());
         }
-        */
-
 
         Profiler.EndSample();
     }

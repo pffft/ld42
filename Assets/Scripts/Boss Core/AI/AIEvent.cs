@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace AI
 {
+    /*
+     * TODO: merge this into AISequence. This is just a specific kind of AISequence
+     * with only one event in it.
+     */
     public class AIEvent
     {
         public float startTime;
@@ -27,6 +31,10 @@ namespace AI
             this.duration = duration;
             this.action = action;
             this.parameters = parameters;
+        }
+
+        public AISequence AsSequence() {
+            return new AISequence(this);
         }
 
         /*

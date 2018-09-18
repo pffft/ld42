@@ -5,6 +5,13 @@ using CombatCore;
 
 namespace AI
 {
+    /*
+     * Some delegates used to generate a sequence of events that need more dynamic
+     * information. This allows for for loops over sequences and events.
+     */
+    public delegate AISequence[] GenerateSequences();
+    public delegate AIEvent[] GenerateEvents();
+
     public partial class AISequence
     {
         public AIEvent[] events;
@@ -70,6 +77,13 @@ namespace AI
 
             events = eventsList.ToArray();
         }
+
+        /*
+         * "Explodes" the generation function and adds all the elements to a single AISequence.
+         */
+        public AISequence(float difficulty, GenerateSequences genFunction) : this(difficulty, genFunction()) {}
+
+        public AISequence(float difficulty, GenerateEvents genFunction) : this(difficulty, genFunction()) {}
 
         /*
          * Remembers the provided AISequence by the given name.
@@ -144,6 +158,14 @@ namespace AI
             newEvents[this.events.Length] = new AIEvent(duration, () => { });
             return new AISequence(newEvents);
 
+        }
+
+        /*
+         * Returns a new AISequence that just consists of waiting for the
+         * duration.
+         */
+        public static AISequence Pause(float duration) {
+            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) });
         }
 
         /*
