@@ -15,7 +15,7 @@ namespace Projectiles
 
         public bool leavesTrail;
 
-        public override void GetCustomMaterial() {
+        public override Material GetCustomMaterial() {
             return Resources.Load<Material>("Art/Materials/GreenTransparent");
         }
 

@@ -184,5 +184,9 @@ namespace AI
         {
             paused = false;
         }
+
+        public bool Empty() {
+            return this.events.Count == 0;
+        }
     }
 }

@@ -123,7 +123,7 @@ namespace AI
         /*
          * 40 basic bullets, with a 360 wave at the start, middle, and end.
          */
-        public static AISequence SHOOT3_WAVE3 = new AISequence(
+        public static AISequence SHOOT3_WAVE3 = new AISequence(3, 
             Teleport().Wait(0.5f),
             SHOOT_360,
             Shoot3().Wait(0.1f).Times(20),
@@ -132,7 +132,7 @@ namespace AI
             SHOOT_360
         );
 
-        public static AISequence HEX_CURVE_INTRO = new AISequence(
+        public static AISequence HEX_CURVE_INTRO = new AISequence(4, 
             ShootHexCurve(true),
             ShootWave(50, 360f, 0).Wait(2.5f),
             ShootHexCurve(false),
@@ -165,9 +165,9 @@ namespace AI
             SHOOT_360.Wait(1f)
         );
 
-        public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(
+        public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(6.5,
             Teleport().Wait(0.2f),
-            HOMING_STRAFE_15.Times(15),//.Wait(0.3f) // This is very hard; adding wait is reasonable
+            HOMING_STRAFE_15.Times(15),//.Wait(0.3f) // This is hard; adding wait is reasonable
             SHOOT_2_WAVES.Times(2)
         );
 
@@ -175,7 +175,7 @@ namespace AI
          * A really intricate pattern. 6 projectiles that explode into 6 more projectiles,
          * repeated twice to forme a lattice.
          */
-        public static AISequence DEATH_HEX = new AISequence(
+        public static AISequence DEATH_HEX = new AISequence(9, 
             Teleport(CENTER).Wait(0.5f),
             ShootDeathHex(2f).Wait(1f),
             ShootDeathHex(1f).Wait(5f)
@@ -185,7 +185,7 @@ namespace AI
          * Fires six slow circles around the arena in a circular pattern.
          * Then repeats twice, with lines appearing on the left and right sides.
          */
-        public static AISequence WAVE_CIRCLE = new AISequence(
+        public static AISequence WAVE_CIRCLE = new AISequence(5, 
             Teleport(WEST_MED),
             SLOW_WAVE_CIRCLE.Times(6),
             SLOW_WAVE_CIRCLE.Times(3),
@@ -198,7 +198,7 @@ namespace AI
             ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.right)
         );
 
-        public static AISequence JUMP_ROPE_FAST = new AISequence(
+        public static AISequence JUMP_ROPE_FAST = new AISequence(4, 
             CameraMove(false, new Vector3(0, 17.5f, -35)).Wait(1f),
             Teleport(WEST_FAR, 200),
             ShootLine(50, 100f, Speed.SNIPE),
@@ -211,7 +211,7 @@ namespace AI
             CameraMove(true)
         );
 
-        public static AISequence DOUBLE_HEX_CURVE_HARD = new AISequence(
+        public static AISequence DOUBLE_HEX_CURVE_HARD = new AISequence(10, 
             Teleport(CENTER).Wait(1f),
             ShootHexCurve(true, 0f).Wait(0.5f),
             ShootHexCurve(true, 30f).Wait(0.5f),
@@ -233,7 +233,7 @@ namespace AI
             LINE_CIRCLE_STRAFE_60.Times(6)
         );
 
-        public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(
+        public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5, 
             Teleport(WEST_FAR),
             LINE_STRAFE_60.Times(6),
             LINE_CIRCLE_STRAFE_60.Times(6)

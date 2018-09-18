@@ -24,6 +24,14 @@ namespace Projectiles
         public static Material greenMaterial;
         public static Material purpleMaterial;
 
+        // Please make sure you add a link between new Projectile.Type and
+        // System.Type (that extends Projectile) here, if you modify Type!
+        public static readonly Dictionary<Type, System.Type> TypeClassLookup = new Dictionary<Type, System.Type> {
+            {Type.HOMING, typeof(ProjectileHoming)},
+            {Type.CURVING, typeof(ProjectileCurving)},
+            {Type.DEATHHEX, typeof(ProjectileDeathHex)}
+        };
+
         void Update()
         {
             currentTime += Time.deltaTime;
@@ -143,7 +151,7 @@ namespace Projectiles
             // Look up the subclass we should add based on the type
             System.Type projType;
             if (TypeClassLookup.TryGetValue(type, out projType)) {
-                projectile = newObj.AddComponent<projType>();
+                projectile = (Projectile) newObj.AddComponent(projType);
             } else {
                 projectile = newObj.AddComponent<Projectile>();
             }
@@ -168,7 +176,7 @@ namespace Projectiles
             projectile.damage = 5f;
 
             // Assign a different, custom material (if applicable)
-            Material customMaterial = GetCustomMaterial();
+            Material customMaterial = projectile.GetCustomMaterial();
             if (customMaterial != null) {
                 newObj.GetComponent<MeshRenderer>().material = customMaterial;
             }

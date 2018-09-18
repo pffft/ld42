@@ -66,6 +66,8 @@ public class BossController : MonoBehaviour
     public static BossController instance = null;
     #endregion
 
+    private static AIPhase phase;
+
     private void Awake()
     {
         if (instance == null)
@@ -143,29 +145,12 @@ public class BossController : MonoBehaviour
         */
 
         /*
-        eventQueue.AddSequence(AISequence.SHOOT3_WAVE3);
-        eventQueue.AddSequence(AISequence.SHOOT3_WAVE3);
-
-        eventQueue.AddSequence(AISequence.SHOOT_2_WAVES.Times(5));
-
-        eventQueue.AddSequence(AISequence.HEX_CURVE_INTRO);
-
-        eventQueue.AddSequence(AISequence.BIG_HOMING_STRAFE);
-
-        eventQueue.AddSequence(AISequence.DOUBLE_HEX_CURVE);
-
-        eventQueue.AddSequence(AISequence.HOMING_STRAFE_WAVE_SHOOT.Times(2));
-
-        eventQueue.AddSequence(AISequence.DEATH_HEX);
-
-        eventQueue.AddSequence(AISequence.WAVE_CIRCLE);
-
-        eventQueue.AddSequence(AISequence.JUMP_ROPE_FAST);
-
-        eventQueue.AddSequence(AISequence.DOUBLE_HEX_CURVE_HARD);
-
-        eventQueue.AddSequence(AISequence.JUMP_ROPE_SLOW_CIRCLES);
+        phase = AIPhase.PHASE1;
+        for (int i = 0; i < 10; i++) {
+            eventQueue.AddSequence(phase.GetNext());
+        }
         */
+
 
         Profiler.EndSample();
     }
