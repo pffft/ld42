@@ -15,11 +15,12 @@ namespace Projectiles
 
         public bool leavesTrail;
 
-        public override Material GetCustomMaterial() {
+        public override Material GetCustomMaterial()
+        {
             return Resources.Load<Material>("Art/Materials/GreenTransparent");
         }
 
-		public override void CustomUpdate()
+        public override void CustomUpdate()
         {
             Quaternion rot = Quaternion.AngleAxis(Time.deltaTime * curveAmount, Vector3.up);
             body.velocity = rot * body.velocity;
@@ -29,16 +30,26 @@ namespace Projectiles
                 if (currentTime > count / numSpawners)
                 {
                     count++;
-                    Projectile.spawnBasic(entity, transform.position, Vector3.zero, maxTime - currentTime, size: Size.SMALL, speed: Speed.FROZEN);
+                    Projectile.Create(entity,
+                                      start: transform.position,
+                                      maxTime: maxTime - currentTime,
+                                      size: Size.SMALL,
+                                      speed: Speed.FROZEN);
                 }
             }
-		}
-
-		public override void Initialize(params object[] args)
-		{
-            body = GetComponent<Rigidbody>();
-            curveAmount = args.Length > 0 ? (float)args[0] : 0f;
-            leavesTrail = args.Length > 1 ? (bool)args[1] : true;
-		}
+        }
 	}
+
+    public static class ProjectileCurvingHelper {
+        public static ProjectileCurving Curving(this Projectile projectile, float curveAmount, bool leavesTrail)
+        {
+            ProjectileCurving curving = projectile.CastTo<ProjectileCurving>();
+
+            curving.body = projectile.GetComponent<Rigidbody>();
+            curving.curveAmount = curveAmount;
+            curving.leavesTrail = leavesTrail;
+
+            return curving;
+        }
+    }
 }
