@@ -56,6 +56,7 @@ public class BossController : MonoBehaviour
 
     // The Entity representing this faction. Assigned to projectiles we create.
     public static CombatCore.Entity self;
+    public static string BOSS_NAME = "Boss";
 
     // Used for the "CameraLock" action. Keeps track of the current player position
     // for events and sequences that need a slightly out of date version.
@@ -82,6 +83,7 @@ public class BossController : MonoBehaviour
 
         physbody = GetComponent<Rigidbody>();
         self = GetComponent<CombatCore.Entity>();
+        self.name = BOSS_NAME;
 
         eventQueue = new EventQueue(self);
 
@@ -97,10 +99,15 @@ public class BossController : MonoBehaviour
         // TODO: Find a way to turn this into an AISequence using a method!!!
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
-        phase = AIPhase.HARD_PHASE;
+        /*
+        phase = AIPhase.PHASE1;
         for (int i = 0; i < 100; i++) {
             eventQueue.Add(phase.GetNext());
         }
+        */
+        eventQueue.Add(AISequence.SHOOT_360.Wait(0.5f));
+        eventQueue.Add(AISequence.SHOOT_WAVE_MIDDLE_GAP.Wait(0.5f));
+        eventQueue.Add(AISequence.SHOOT_360);
 
         Profiler.EndSample();
     }
@@ -119,135 +126,126 @@ public class BossController : MonoBehaviour
         instance.transform.rotation = lookRotation;
     }
 
-    public static AISequence Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
+    public static AISequence Shoot1(Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.SMALL, Type type=Type.BASIC) {
+        return new AISequence(0f, () =>
+        {
+            Glare();
+
+            Projectile basicProjectile = Projectile.Create(self, start: instance.transform.position, target: target, angleOffset: angleOffset, maxTime: maxTime, speed: speed, size: size);
+            switch(type) {
+                case Type.HOMING: basicProjectile.Homing(); break;
+                case Type.CURVING: basicProjectile.Curving((float)speed * 2f, false); break;
+                default: break;
+            }
+        });
+    }
+
+    public static AISequence Shoot3(Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size = Size.SMALL, Type type = Type.BASIC)
     {
         return new AISequence(0f, () =>
         {
             Glare();
 
-            Vector3 targetPos = player.transform.position;
-            if (isPlayerLocked)
-            {
-                targetPos = playerLockPosition;
-            }
-            if (target.HasValue)
-            {
-                targetPos = target.Value;
+            Projectile[] projectiles = new Projectile[3];
+            for (int i = 0; i < 3; i++) {
+                float offset = -30 + (30 * i) + angleOffset;
+                projectiles[i] = Projectile.Create(self, start: instance.transform.position, target: target, angleOffset: offset, maxTime: maxTime, speed: speed, size: size);
             }
 
             switch (type)
             {
-                case Type.BASIC:
-                    Projectile.spawnBasic(self, instance.transform.position, targetPos, size: size, angleOffset: angleOffset);
-                    break;
-                case Type.HOMING:
-                    Projectile.spawnHoming(self, instance.transform.position, targetPos, size: size, angleOffset: angleOffset);
-                    break;
-                case Type.CURVING:
-                    Speed speed = Speed.FAST;
-                    Projectile.spawnCurving(self, instance.transform.position, targetPos, (float)speed * 2f, 0, speed: speed, size: size, angleOffset: angleOffset);
-                    break;
-                default:
-                    Projectile.spawnBasic(self, instance.transform.position, targetPos, size: size, angleOffset: angleOffset);
-                    break;
+                case Type.HOMING: foreach (Projectile p in projectiles) { p.Homing(); } break;
+                default: break;
             }
         });
     }
 
-    public static AISequence Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
-    {
-        return new AISequence(0f, () =>
-        {
-            switch (type)
-            {
-                case Type.BASIC:
-                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, size: size);
-                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: -30, size: size);
-                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: 30, size: size);
-                    break;
-                case Type.HOMING:
-                    Projectile.spawnHoming(self, instance.transform.position, player.transform.position, size: size);
-                    Projectile.spawnHoming(self, instance.transform.position, player.transform.position, angleOffset: -30, size: size);
-                    Projectile.spawnHoming(self, instance.transform.position, player.transform.position, angleOffset: 30, size: size);
-                    break;
-                default:
-                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, size: size);
-                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: -30, size: size);
-                    Projectile.spawnBasic(self, instance.transform.position, player.transform.position, angleOffset: 30, size: size);
-                    break;
-            }
-        });
-    }
-
-    // Shoots an arc of bullets
-    public static AISequence ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, float maxTime = 10f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, Vector3? target = null)
-    {
+    public static AISequence ShootWave(int amount = 1, float arcWidth = 360f, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM, Type type=Type.BASIC, Vector3? target=null) {
         return new AISequence(0f, () =>
         {
             Glare();
+
 
             float halfArcWidth = -arcWidth / 2f;
 
             for (int i = 0; i < amount; i++)
             {
-                
+
                 Vector3 source = instance.transform.position;
-                Vector3 sink = target.HasValue ? target.Value : player.transform.position;
+                Vector3 sink = target ?? player.transform.position;
                 Vector3 direction = instance.transform.position - player.transform.position;
 
-                float angleOffset = halfArcWidth + offset + (i * (arcWidth / amount));
+                float offset = halfArcWidth + angleOffset + (i * (arcWidth / amount));
 
-                switch(type) {
-                    case Type.BASIC:
-                    case Type.INDESTRUCTIBLE:
-                        Projectile.spawnBasic(
-                            self,
-                            source,// + Quaternion.AngleAxis(angleOffset, Vector3.up) * (10 * direction.normalized),
-                            sink,
-                            maxTime,
-                            angleOffset,
-                            speed,
-                            size
-                        );
-                        break;
-                    case Type.HOMING:
-                        Projectile.spawnHoming(
-                            self,
-                            source,// + Quaternion.AngleAxis(angleOffset, Vector3.up) * (10 * Vector3.back),
-                            sink,
-                            maxTime,
-                            angleOffset,
-                            speed,
-                            size
-                        );
-                        break;
+                Projectile projectile = Projectile.Create(self, source, sink, offset, maxTime, speed, size);
+                switch (type)
+                {
+                    case Type.HOMING: projectile.Homing(); break;
+                    default: break;
                 }
             }
         });
     }
 
-    public static AISequence ShootHexCurve(bool clockwise = true, float offset = 0f)
-    {
-        return ShootHexCurve(clockwise, offset, new Vector3(0, 1.31f, -1f));
-    }
-
-    // Shoots a hexagonal pattern of curving projectiles.
-    public static AISequence ShootHexCurve(bool clockwise, float offset, Vector3 target) {
+    public static AISequence ShootArc(int density=50, float from=0, float to=360, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM, Type type=Type.BASIC, Vector3? target=null) {
         return new AISequence(0f, () =>
         {
-            float multiplier = clockwise ? 1f : -1f;
+            Glare();
 
-            Speed speed = Speed.FAST;
-            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (0 * multiplier), speed);
-            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (60 * multiplier), speed);
-            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (120 * multiplier), speed);
-            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (180 * multiplier), speed);
-            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (240 * multiplier), speed);
-            Projectile.spawnCurving(self, instance.transform.position, target, (float)speed * multiplier * 2f, 3f, offset + (300 * multiplier), speed);
+            // Ensure that "from" is always less than "to".
+            if (to < from)
+            {
+                float temp = from;
+                from = to;
+                to = temp;
+            }
+
+
+            Vector3 source = instance.transform.position;
+            Vector3 sink = target ?? player.transform.position;
+
+            float step = 360f / density;
+            for (float i = from; i <= to; i += step) {
+                Projectile projectile = Projectile.Create(self, source, sink, i, maxTime, speed, size);
+                switch(type) {
+                    case Type.HOMING: projectile.Homing(); break;
+                    default: break;
+                }
+            }
         });
     }
 
-    public static AISequence ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
+    public static AISequence ShootWall(int amount = 30, float arcWidth = 120, float angleOffset = 0, int exceptMin = 7, int exceptMax = 20, Vector3? target = null)
+    {
+        return new AISequence(0, () =>
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                if (i >= exceptMin && i < exceptMax)
+                {
+                    continue;
+                }
+                float offset = (-arcWidth / 2) + angleOffset + (i * (arcWidth / amount));
+                Projectile.Create(self, null, target, offset, speed: Speed.SLOW);
+            }
+        });
+    }
+
+
+    public static AISequence ShootHexCurve(bool clockwise, Vector3? target=null, float angleOffset=0f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM) {
+        return new AISequence(0f, () =>
+        {
+            float multiplier = clockwise ? 1f : -1f;
+            float curveSpeed = (float)speed * multiplier * 2f;
+            float maxTime = 3f;
+            for (int i = 0; i < 6; i++) {
+                Projectile.Create(self, instance.transform.position, target ?? SOUTH_CLOSE, angleOffset + (i * multiplier * 60), maxTime, speed, size)
+                          .Curving(curveSpeed, true);
+            }
+        });
+    }
+
+    public static AISequence ShootLine(int amount=50, float width=75f, Vector3? target=null, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM) {
         return new AISequence(0f, () =>
         {
 
@@ -257,25 +255,18 @@ public class BossController : MonoBehaviour
             for (int i = 0; i < amount; i++)
             {
                 Vector3 spawn = instance.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
-                Projectile.spawnBasic(
-                    self,
-                    spawn,
-                    spawn + targetPos,
-                    speed: speed,
-                    size: Size.MEDIUM
-                );
+                Projectile.Create(self, spawn, spawn + targetPos, speed: speed, size: size);
             }
         });
     }
 
-    public static AISequence ShootDeathHex(float maxTime1 = 1f)
+    public static AISequence ShootDeathHex(float maxTime = 1f)
     {
         return new AISequence(0f, () =>
         {
-
             for (int i = 0; i < 6; i++)
             {
-                Projectile.spawnDeathHex(self, instance.transform.position, player.transform.position, maxTime1, i * 60f);
+                Projectile.Create(self, instance.transform.position, player.transform.position, angleOffset: i * 60f, maxTime: maxTime);
             }
         });
     }

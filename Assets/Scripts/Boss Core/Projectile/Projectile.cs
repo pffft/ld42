@@ -24,14 +24,6 @@ namespace Projectiles
         public static Material greenMaterial;
         public static Material purpleMaterial;
 
-        // Please make sure you add a link between new Projectile.Type and
-        // System.Type (that extends Projectile) here, if you modify Type!
-        public static readonly Dictionary<Type, System.Type> TypeClassLookup = new Dictionary<Type, System.Type> {
-            {Type.HOMING, typeof(ProjectileHoming)},
-            {Type.CURVING, typeof(ProjectileCurving)},
-            {Type.DEATHHEX, typeof(ProjectileDeathHex)}
-        };
-
         void Update()
         {
             currentTime += Time.deltaTime;
@@ -106,12 +98,12 @@ namespace Projectiles
         public virtual Material GetCustomMaterial() { return null; }
 
         /*
-         * Creates a new Projectile of the specified speed/size/type.
+         * Creates a new basic Projectile with the provided parameters. The default
+         * will be a small, medium speed projectile that starts at the entity's position
+         * and moves to the right; it will die after 10 seconds.
          */
-        private static Projectile CreateGeneric(Entity entity, Vector3 start,
-            Quaternion startRotation, float maxTime, Speed speed, Size size, Type type, params object[] args)
+        public static Projectile Create(Entity entity, Vector3? start=null, Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.SMALL)
         {
-            
             GameObject newObj;
 
             // Assign a default material based on the size; normally, small = blue, med = orange, large = red.
@@ -143,18 +135,45 @@ namespace Projectiles
                     break;
             }
 
-            newObj.transform.position = start;
-            newObj.transform.rotation = startRotation;
+            // Resolve the start position. If the start is null, then we default to the entity's position.
+            Vector3 startPosition = start ?? entity.transform.position;
+
+            // Resolve the target position. If it's null, and this is a boss projectile, we check if
+            // we're locked onto a position. If so, we take that position; else we take the current player position.
+            // Otherwise, we take the target as-is; or a default forward if it's null.
+            Vector3 targetPosition;
+            if (entity.name.Equals(BossController.BOSS_NAME) && !target.HasValue) {
+                if (BossController.isPlayerLocked) {
+                    targetPosition = BossController.playerLockPosition;
+                } else {
+                    // TODO cache me
+                    targetPosition = GameObject.Find("Player").transform.position;
+                }
+            } else if (target.HasValue) {
+                targetPosition = target.Value;
+            } else {
+                targetPosition = Vector3.forward;
+            }
+
+            // Figure out the final rotation value based on the target and offset.
+            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+
+            // We need to ignore the y coordiante to get an accurate target vector.
+            Vector3 topDownSpawn = new Vector3(startPosition.x, 0, startPosition.z);
+            Vector3 topDownTarget = new Vector3(targetPosition.x, 0, targetPosition.z);
+
+            // The final rotation is the offset added to the spawn-target rotation.
+            Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
+
+            // Set the position and rotation.
+            newObj.transform.position = startPosition;
+            newObj.transform.rotation = rotation;
+
 
             Projectile projectile;
 
             // Look up the subclass we should add based on the type
-            System.Type projType;
-            if (TypeClassLookup.TryGetValue(type, out projType)) {
-                projectile = (Projectile) newObj.AddComponent(projType);
-            } else {
-                projectile = newObj.AddComponent<Projectile>();
-            }
+            projectile = newObj.AddComponent<Projectile>();
 
             // Assign and init the RigidBody (or create one if it doesn't exist)
             Rigidbody body = newObj.GetComponent<Rigidbody>();
@@ -162,12 +181,11 @@ namespace Projectiles
             {
                 body = newObj.AddComponent<Rigidbody>();
             }
-            body.velocity = startRotation * (Vector3.forward * (float)speed);
+            body.velocity = rotation * (Vector3.forward * (float)speed);
             body.useGravity = false;
 
             projectile.speed = speed;
             projectile.size = size;
-            projectile.type = type;
 
             projectile.entity = entity;
             projectile.currentTime = 0;
@@ -175,71 +193,41 @@ namespace Projectiles
             projectile.velocity = (float)speed;
             projectile.damage = 5f;
 
-            // Assign a different, custom material (if applicable)
-            Material customMaterial = projectile.GetCustomMaterial();
-            if (customMaterial != null) {
-                newObj.GetComponent<MeshRenderer>().material = customMaterial;
-            }
-
-            // Custom initialization for subclasses
-            projectile.Initialize(args);
-
             return projectile;
         }
 
-        public static void spawnBasic(Entity entity, Vector3 spawn, Vector3 target, float maxTime = 10f, float angleOffset = 0,
-                                Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
-        {
+        /*
+         * Copies the data of this Projectile into a new one.
+         * This then deletes the original Projectile component.
+         * 
+         * This method is used by extension methods to help cast to a given type.
+        */
+        public T CastTo<T>() where T : Projectile {
+            T other = gameObject.AddComponent<T>();
 
-            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+            // Copy the data over
+            other.entity = entity;
 
-            Vector3 topDownSpawn = new Vector3(spawn.x, 0, spawn.z);
-            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+            other.speed = speed;
+            other.size = size;
+            other.currentTime = 0;
+            other.maxTime = maxTime;
 
-            Projectile.CreateGeneric(entity, spawn,
-                                     offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn),
-                                     maxTime, speed, size, Type.BASIC);
-        }
+            other.damage = damage;
+            other.velocity = velocity;
 
-        public static void spawnHoming(Entity entity, Vector3 spawn, Vector3 target, float maxTime = 10f, float angleOffset = 0,
-                                Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
-        {
+            // Assign a different, custom material (if applicable)
+            Material customMaterial = other.GetCustomMaterial();
+            if (customMaterial != null)
+            {
+                gameObject.GetComponent<MeshRenderer>().material = customMaterial;
+            }
 
-            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+            // Destroy this component so the other one takes priority
+            GameObject.Destroy(this);
 
-            Vector3 topDownSpawn = new Vector3(spawn.x, 0, spawn.z);
-            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
-
-            Projectile.CreateGeneric(entity, spawn,
-                                     offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn),
-                                     maxTime, speed, size, Type.HOMING);
-        }
-
-        public static void spawnCurving(Entity entity, Vector3 spawn, Vector3 target, float curveSpeed, float maxTime = 10f, float angleOffset = 0,
-                                Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, bool leavesTrail = true)
-        {
-            
-            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
-
-            Vector3 topDownSpawn = new Vector3(spawn.x, 0, spawn.z);
-            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
-
-            Projectile.CreateGeneric(entity, spawn,
-                                     offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn),
-                                     maxTime, speed, size, Type.CURVING, curveSpeed, leavesTrail);
-        }
-
-        public static void spawnDeathHex(Entity entity, Vector3 spawn, Vector3 target, float maxTime = 1f, float angleOffset = 0,
-                                         Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
-        {
-            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
-
-            Vector3 topDownSpawn = new Vector3(spawn.x, 0, spawn.z);
-            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
-
-            Projectile.CreateGeneric(entity, spawn,
-                                     offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn),
-                                     maxTime, speed, size, Type.DEATHHEX);
+            // Return the new component
+            return other;
         }
     }
 }

@@ -33,11 +33,11 @@ namespace AI
         );
 
         /*
-         * Shoots a 165 wave with a 45 degree gap in the middle.
+         * Shoots two 60 degree waves with a 45 degree gap in the middle.
          */
-        public static AISequence SHOOT_WAVE_MIDDLE_GAP = new AISequence(
-            ShootWave(25, 60f, -45f, speed: Speed.VERY_FAST),
-            ShootWave(25, 60f, 45f, speed: Speed.VERY_FAST)
+        public static AISequence SHOOT_WAVE_MIDDLE_GAP = AISequence.Merge(
+            ShootArc(150,  22.5f,  22.5f + 60f, speed: Speed.MEDIUM),
+            ShootArc(150, -22.5f, -22.5f - 60f, speed: Speed.MEDIUM)
         );
 
         /*
@@ -45,7 +45,7 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_5 = new AISequence(
             Strafe(true, 5f, 100),
-            Shoot1(Type.HOMING, Size.MEDIUM)
+            Shoot1(type: Type.HOMING, size: Size.MEDIUM)
         );
 
         /*
@@ -53,7 +53,7 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_10 = new AISequence(
             Strafe(true, 10f, 50),
-            Shoot1(Type.HOMING, Size.MEDIUM)
+            Shoot1(type: Type.HOMING, size: Size.MEDIUM)
         );
 
         /*
@@ -61,7 +61,7 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_15 = new AISequence(
             Strafe(true, 15f, 30),
-            Shoot1(Type.HOMING, Size.MEDIUM)
+            Shoot1(type: Type.HOMING, size: Size.MEDIUM)
         );
 
         /*
@@ -69,14 +69,14 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_65 = new AISequence(
             Strafe(true, 65f, 50),
-            Shoot1(Type.HOMING, Size.MEDIUM)
+            Shoot1(type: Type.HOMING, size: Size.MEDIUM)
         );
 
         /*
          * Fires a line at the player, then strafes 60 degrees.
          */
         public static AISequence LINE_STRAFE_60 = new AISequence(
-            ShootLine(50, 75f, Speed.SNIPE).Wait(0.2f),
+            ShootLine(50, 75f, speed: Speed.SNIPE).Wait(0.2f),
             Strafe(true, 60f, 50)
         );
 
@@ -112,7 +112,7 @@ namespace AI
             .Wait(0.1f),
             Strafe(true, 30f, 50)
             .Wait(0.3f),
-            ShootLine(50, 100f, Speed.VERY_FAST, Vector3.zero)
+            ShootLine(50, 100f, Vector3.zero, Speed.VERY_FAST)
             .Wait(0.2f),
             Strafe(true, 30f, 50)
         );
@@ -158,9 +158,9 @@ namespace AI
 
         public static AISequence DOUBLE_HEX_CURVE = new AISequence(
             Teleport(CENTER).Wait(1.5f),
-            ShootHexCurve(true, 0f),
+            ShootHexCurve(true),
             ShootWave(50, 360, 0f).Wait(0.5f),
-            ShootHexCurve(true, 30f).Wait(0.5f),
+            ShootHexCurve(true, angleOffset: 30f).Wait(0.5f),
             SHOOT_360.Wait(1f),
             SHOOT_360.Wait(1f)
         );
@@ -194,42 +194,43 @@ namespace AI
             Teleport(WEST_MED),
             SLOW_WAVE_CIRCLE.Times(6),
             SLOW_WAVE_CIRCLE.Times(3),
-            ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.left),
+            ShootLine(50, 75f, Vector3.left, Speed.MEDIUM_SLOW),
             SLOW_WAVE_CIRCLE.Times(3),
-            ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.right),
+            ShootLine(50, 75f, Vector3.right, Speed.MEDIUM_SLOW),
             SLOW_WAVE_CIRCLE.Times(3),
-            ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.left),
+            ShootLine(50, 75f, Vector3.left, Speed.MEDIUM_SLOW),
             SLOW_WAVE_CIRCLE.Times(3),
-            ShootLine(50, 75f, Speed.MEDIUM_SLOW, Vector3.right)
+            ShootLine(50, 75f, Vector3.right, Speed.MEDIUM_SLOW)
         );
 
         public static AISequence JUMP_ROPE_FAST = new AISequence(4, 
             CameraMove(false, new Vector3(0, 17.5f, -35)).Wait(1f),
             Teleport(WEST_FAR, 200),
-            ShootLine(50, 100f, Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE),
             Teleport(EAST_FAR, 200),
-            ShootLine(50, 100f, Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE),
             Teleport(WEST_FAR, 200),
-            ShootLine(50, 100f, Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE),
             Teleport(EAST_FAR, 200),
-            ShootLine(50, 100f, Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE),
             CameraMove(true)
         );
 
-        public static AISequence DOUBLE_HEX_CURVE_HARD = new AISequence(10, 
+        public static AISequence DOUBLE_HEX_CURVE_HARD = new AISequence(
+            10, 
             Teleport(CENTER).Wait(1f),
-            ShootHexCurve(true, 0f).Wait(0.5f),
-            ShootHexCurve(true, 30f).Wait(0.5f),
+            ShootHexCurve(true, angleOffset: 0f).Wait(0.5f),
+            ShootHexCurve(true, angleOffset: 30f).Wait(0.5f),
             SHOOT3_WAVE3,
             Teleport(CENTER),
-            ShootHexCurve(false, 0f),
-            ShootHexCurve(false, 30f),
+            ShootHexCurve(false, angleOffset: 0f),
+            ShootHexCurve(false, angleOffset: 30f),
             // This homing might be too hard; especially with this amount of 360s.
-            Shoot3(Type.HOMING, Size.MEDIUM).Wait(0.1f).Times(10),
+            Shoot3(type: Type.HOMING, size: Size.MEDIUM).Wait(0.1f).Times(10),
             SHOOT_360,
-            Shoot3(Type.HOMING, Size.MEDIUM).Wait(0.1f).Times(5),
+            Shoot3(type: Type.HOMING, size: Size.MEDIUM).Wait(0.1f).Times(5),
             SHOOT_360,
-            Shoot3(Type.HOMING, Size.MEDIUM).Wait(0.1f).Times(5),
+            Shoot3(type: Type.HOMING, size: Size.MEDIUM).Wait(0.1f).Times(5),
             SHOOT_360.Wait(0.5f),
             SHOOT_360.Wait(0.5f)
         );
@@ -253,7 +254,7 @@ namespace AI
                 {
                     sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(Type.HOMING, Size.LARGE));
+                sequences.Add(Shoot1(type: Type.HOMING, size: Size.LARGE));
                 for (int j = 7; j < 15; j++)
                 {
                     sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
@@ -266,12 +267,12 @@ namespace AI
                 {
                     sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(Type.HOMING, Size.LARGE));
+                sequences.Add(Shoot1(type: Type.HOMING, size: Size.LARGE));
                 for (int j = 5; j < 10; j++)
                 {
                     sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(Type.HOMING, Size.LARGE));
+                sequences.Add(Shoot1(type: Type.HOMING, size: Size.LARGE));
                 for (int j = 10; j < 15; j++)
                 {
                     sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
@@ -324,6 +325,60 @@ namespace AI
             return sequences.ToArray();
         });
 
+        public static AISequence SWEEP_WALL_CLOCKWISE = new AISequence(5, () =>
+        {
+            List<AISequence> sequences = new List<AISequence>();
+
+            for (int angle = 0; angle < 72; angle += 6)
+            {
+                sequences.Add(ShootWall(angleOffset: angle).Wait(0.1f));
+            }
+
+            for (int angle = 72; angle >= 0; angle -= 6)
+            {
+                sequences.Add(ShootWall(angleOffset: angle).Wait(0.1f));
+            }
+            return sequences.ToArray();
+        });
+
+        public static AISequence SWEEP_WALL_COUNTERCLOCKWISE = new AISequence(5, () =>
+        {
+            List<AISequence> sequences = new List<AISequence>();
+
+            for (int angle = 0; angle >= -72; angle -= 6)
+            {
+                sequences.Add(ShootWall(angleOffset: angle).Wait(0.1f));
+            }
+
+            for (int angle = -72; angle <= 0; angle += 6)
+            {
+                sequences.Add(ShootWall(angleOffset: angle).Wait(0.1f));
+            }
+            return sequences.ToArray();
+
+        });
+
+        public static AISequence SWEEP2 = new AISequence(5, () =>
+        {
+            return Merge(
+                ShootArc(100, -20, -10, size: Size.SMALL), 
+                ShootArc(100, 10, 90, size: Size.SMALL));
+        });
+        
+        public static AISequence SWEEP_WALL_BACK_AND_FORTH = new AISequence(
+            6,
+            PlayerLock(true),
+            SWEEP_WALL_CLOCKWISE,
+            SWEEP_WALL_COUNTERCLOCKWISE,
+            PlayerLock(false)
+        );
+
+        public static AISequence SHOOT_HARD = new AISequence(
+            6,
+            ShootWall(exceptMin: 10, exceptMax: 20).Wait(0.5f),
+            ShootWall(exceptMin: 20, exceptMax: 30).Wait(0.5f),
+            ShootWall(exceptMin: 0, exceptMax: 10).Wait(0.5f)
+        );
 
 
         #endregion

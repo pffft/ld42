@@ -10,6 +10,7 @@ namespace AI
      * information. This allows for for loops over sequences and events.
      */
     public delegate AISequence[] GenerateSequences();
+    public delegate AISequence GenerateSequence();
 
     public partial class AISequence
     {
@@ -73,6 +74,30 @@ namespace AI
          * "Explodes" the generation function and adds all the elements to a single AISequence.
          */
         public AISequence(float difficulty, GenerateSequences genFunction) : this(difficulty, genFunction()) {}
+
+        /*
+         * Executes the generation function and instantiates this AISequence as the result.
+         */
+        public AISequence(float difficulty, GenerateSequence genFunction) : this(difficulty, genFunction()) {}
+
+        /*
+         * Merges the given array of AISequences, and executes all of them concurrently.
+         * This is useful for chaining individual "Shoot1" methods together.
+         */
+        public static AISequence Merge(params AISequence[] sequences) {
+            return new AISequence(0f, () => {
+                for (int i = 0; i < sequences.Length; i++) {
+                    for (int j = 0; j < sequences[i].events.Length; j++) {
+                        sequences[i].events[j].action();
+                    }
+                }
+            });
+        }
+
+        public static AISequence Merge(List<AISequence> sequences) {
+            return Merge(sequences.ToArray());
+        }
+
 
         public static AISequence Repeat(AISequence seq, int times)
         {
