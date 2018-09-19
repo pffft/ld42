@@ -54,13 +54,20 @@ namespace Projectiles
                 curDivergence += homingScale;
             }
         }
+    }
 
-		public override void Initialize(params object[] args) {
-            this.player = GameObject.Find("Player");
-            this.body = GetComponent<Rigidbody>();
-            this.wasClose = false;
-            this.curDivergence = 0f;
-            this.homingScale = velocity / 7f;
-		}
+    public static class ProjectileHomingHelper {
+        public static ProjectileHoming Homing(this Projectile projectile)
+        {
+            ProjectileHoming homing = projectile.CastTo<ProjectileHoming>();
+
+            homing.player = GameObject.Find("Player");
+            homing.body = projectile.GetComponent<Rigidbody>();
+            homing.wasClose = false;
+            homing.curDivergence = 0f;
+            homing.homingScale = projectile.velocity / 7f;
+
+            return homing;
+        }
     }
 }

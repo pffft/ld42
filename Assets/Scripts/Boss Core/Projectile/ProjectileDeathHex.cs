@@ -16,8 +16,23 @@ namespace Projectiles
             Rigidbody body = GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.spawnCurving(entity, transform.position, body.velocity, body.velocity.magnitude * 6f, 3f, i * 60f, Speed.MEDIUM);
+                //Projectile.spawnCurving(entity, transform.position, body.velocity, body.velocity.magnitude * 6f, 3f, i * 60f, Speed.MEDIUM);
+                Projectile.Create(entity,
+                                  start:transform.position, 
+                                  target:body.velocity, 
+                                  angleOffset:i * 60f, 
+                                  maxTime:body.velocity.magnitude * 6f, 
+                                  speed:Speed.MEDIUM)
+                          .Curving(3f, false);
             }
 		}
 	}
+
+    public static class ProjectileDeathHexHelper
+    {
+        public static ProjectileDeathHex DeathHex(this Projectile projectile)
+        {
+            return projectile.CastTo<ProjectileDeathHex>();
+        }
+    }
 }
