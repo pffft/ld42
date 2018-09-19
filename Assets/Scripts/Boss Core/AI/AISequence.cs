@@ -10,7 +10,6 @@ namespace AI
      * information. This allows for for loops over sequences and events.
      */
     public delegate AISequence[] GenerateSequences();
-    public delegate AIEvent[] GenerateEvents();
 
     public partial class AISequence
     {
@@ -29,94 +28,51 @@ namespace AI
          */
         public float difficulty;
 
-        private static Dictionary<string, AISequence> sequenceDictionary = new Dictionary<string, AISequence>();
-
         public AISequence() { }
 
-        public AISequence(AIEvent[] events) : this(-1, events) { }
-
-        /*
-         * Takes an arbitrary length list of AIEvents and combines them into an AISequence.
-         */
-        public AISequence(float difficulty, AIEvent[] events)
+        private AISequence(AIEvent[] events)
         {
-            this.difficulty = difficulty;
             this.events = events;
         }
 
-        public AISequence(params object[] objects) : this(-1, objects) { }
+        /*
+         * Creates a new singleton AISequence from the given Action.
+         * This has no delay after its event.
+         */
+        public AISequence(AIEvent.Action a)
+        {
+            this.events = new AIEvent[] { new AIEvent(0f, a) };
+        }
 
         /*
-         * Takes an arbitrary length list of AIEvents and AISequences, and makes one
-         * large list containing all elements.
+         * Creates a new singleton AISequence from the given Action.
+         * This will have an additional delay afterwards.
          */
-        public AISequence(float difficulty, params object[] objects)
+        public AISequence(float duration, AIEvent.Action action)
+        {
+            this.events = new AIEvent[] { new AIEvent(duration, action) };
+        }
+       
+        public AISequence(params AISequence[] sequences) : this(-1, sequences) { }
+
+        /*
+         * Takes an arbitrary length list of AISequences and combines them into an AISequence.
+         */
+        public AISequence(float difficulty, params AISequence[] sequences)
         {
             this.difficulty = difficulty;
-
-            Debug.Log("AISequence constructor called. Is events null?: " + (objects == null));
-
             List<AIEvent> eventsList = new List<AIEvent>();
-            foreach (object o in objects)
+            foreach (AISequence sequence in sequences)
             {
-                Debug.Log(o.GetType());
-                if (o is AIEvent)
-                {
-                    eventsList.Add((AIEvent)o);
-                }
-                else if (o is AISequence)
-                {
-                    if (((AISequence)o).events == null)
-                    {
-                        Debug.Log("Found AISequence with null events list when creating AISequence.");
-                        continue;
-                    }
-                    eventsList.AddRange(((AISequence)o).events);
-                }
+                eventsList.AddRange(sequence.events);
             }
-
-            events = eventsList.ToArray();
+            this.events = eventsList.ToArray();
         }
 
         /*
          * "Explodes" the generation function and adds all the elements to a single AISequence.
          */
         public AISequence(float difficulty, GenerateSequences genFunction) : this(difficulty, genFunction()) {}
-
-        public AISequence(float difficulty, GenerateEvents genFunction) : this(difficulty, genFunction()) {}
-
-        /*
-         * Remembers the provided AISequence by the given name.
-         */
-        public static void AddSequence(string name, AISequence sequence)
-        {
-            sequenceDictionary.Add(name, sequence);
-        }
-
-        /*
-         * Gets a previously saved AISequence by the given name.
-         */
-        public static AISequence GetSequence(string name)
-        {
-            return sequenceDictionary[name];
-        }
-
-        public static AISequence Repeat(AIEvent iEvent, int times)
-        {
-            if (times == 0)
-            {
-                times = 1;
-                Debug.LogError("Cannot repeat event 0 times");
-            }
-
-            AIEvent[] newEvents = new AIEvent[times];
-            for (int i = 0; i < times; i++)
-            {
-                newEvents[i] = iEvent;
-            }
-            AISequence sequence = new AISequence(newEvents);
-            return sequence;
-        }
 
         public static AISequence Repeat(AISequence seq, int times)
         {
@@ -166,22 +122,6 @@ namespace AI
          */
         public static AISequence Pause(float duration) {
             return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) });
-        }
-
-        /*
-         * Returns this AISequence with an additional AIEvent added to the end.
-         * This copies the entire AISequence over. If you want to add multiple events
-         * this way, it's better to register an AISequence using "AddSequence".
-         */
-        public AISequence Then(AIEvent ev)
-        {
-            AIEvent[] newEvents = new AIEvent[this.events.Length + 1];
-            for (int i = 0; i < this.events.Length; i++)
-            {
-                newEvents[i] = this.events[i];
-            }
-            newEvents[this.events.Length] = ev;
-            return new AISequence(newEvents);
         }
 
         /*

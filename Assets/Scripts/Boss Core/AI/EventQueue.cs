@@ -30,7 +30,7 @@ namespace AI
         /*
          * Add a single event to the queue, as soon as possible.
          */
-        public void Add(float duration, AIEvent.Action action, params object[] pars)
+        public void Add(float duration, AIEvent.Action action)
         {
             float start = 0;
             if (internalTime > lastTime)
@@ -43,7 +43,7 @@ namespace AI
                 lastTime += duration;
             }
 
-            events.Enqueue(new AIEvent(start, duration, action, pars));
+            events.Enqueue(new AIEvent(start, duration, action));
         }
 
         /*
@@ -51,13 +51,13 @@ namespace AI
          */
         public void Add(AIEvent e)
         {
-            Add(e.duration, e.action, e.parameters);
+            Add(e.duration, e.action);
         }
 
         /*
          * Adds a list of events in a sequence.
          */
-        public void AddSequence(AISequence sequence)
+        public void Add(AISequence sequence)
         {
             if (sequence.events == null)
             {
@@ -72,44 +72,27 @@ namespace AI
                     Debug.LogError("Found null event!");
                     continue;
                 }
-                Add(e.duration, e.action, e.parameters);
+                Add(e.duration, e.action);
             }
         }
 
         /*
          * Adds a sequence with an additional delay afterwards.
          */
-        public void AddSequence(float delay, AISequence sequence)
+        public void Add(float delay, AISequence sequence)
         {
-            AddSequence(sequence);
-            Add(delay, null);
-        }
-
-        /*
-         * Adds a sequence that is in the Sequence dictionary.
-         */
-        public void AddSequence(string sequenceName)
-        {
-            AddSequence(AISequence.GetSequence(sequenceName));
-        }
-
-        /*
-         * Adds a sequence with an additional delay afterwards.
-         */
-        public void AddSequence(float delay, string sequenceName)
-        {
-            AddSequence(AISequence.GetSequence(sequenceName));
-            Add(delay, null);
+            Add(sequence);
+            Add(delay, (AISequence)null);
         }
 
         /*
          * Adds a single action "times" times to the queue.
          */
-        public void AddRepeat(float duration, AIEvent.Action action, int times, params object[] pars)
+        public void AddRepeat(float duration, AIEvent.Action action, int times)
         {
             for (int i = 0; i < times; i++)
             {
-                Add(duration, action, pars);
+                Add(duration, action);
             }
         }
 
@@ -120,16 +103,8 @@ namespace AI
         {
             for (int i = 0; i < times; i++)
             {
-                AddSequence(sequence);
+                Add(sequence);
             }
-        }
-
-        /*
-         * Adds a sequence that is in the Sequence dictionary, "times" times.
-         */
-        public void AddSequenceRepeat(int times, string sequenceName)
-        {
-            AddSequenceRepeat(times, AISequence.GetSequence(sequenceName));
         }
 
         /*
@@ -155,13 +130,6 @@ namespace AI
                 // If the event is new, we fire it
                 if (lastEvent != iEvent)
                 {
-                    if (iEvent.parameters != null)
-                    {
-                        foreach (object o in iEvent.parameters)
-                        {
-                            // Debug.Log("Parameter: " + o);
-                        }
-                    }
                     if (iEvent.action != null)
                     {
                         iEvent.action();
