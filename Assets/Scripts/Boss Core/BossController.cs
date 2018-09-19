@@ -97,9 +97,9 @@ public class BossController : MonoBehaviour
         // TODO: Find a way to turn this into an AISequence using a method!!!
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
-        phase = AIPhase.PHASE1;
+        phase = AIPhase.HARD_PHASE;
         for (int i = 0; i < 100; i++) {
-            eventQueue.AddSequence(phase.GetNext());
+            eventQueue.Add(phase.GetNext());
         }
 
         Profiler.EndSample();
@@ -119,9 +119,9 @@ public class BossController : MonoBehaviour
         instance.transform.rotation = lookRotation;
     }
 
-    public static AIEvent Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
+    public static AISequence Shoot1(Type type = Type.BASIC, Size size = Size.SMALL, Vector3? target = null, float angleOffset = 0f)
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
             Glare();
 
@@ -154,9 +154,9 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
+    public static AISequence Shoot3(Type type = Type.BASIC, Size size = Size.SMALL)
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
             switch (type)
             {
@@ -180,9 +180,9 @@ public class BossController : MonoBehaviour
     }
 
     // Shoots an arc of bullets
-    public static AIEvent ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, Vector3? target = null)
+    public static AISequence ShootWave(int amount = 1, float arcWidth = 360f, float offset = 0f, float maxTime = 10f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, Vector3? target = null)
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
             Glare();
 
@@ -204,9 +204,10 @@ public class BossController : MonoBehaviour
                             self,
                             source,// + Quaternion.AngleAxis(angleOffset, Vector3.up) * (10 * direction.normalized),
                             sink,
-                            angleOffset: angleOffset,
-                            speed: speed,
-                            size: size
+                            maxTime,
+                            angleOffset,
+                            speed,
+                            size
                         );
                         break;
                     case Type.HOMING:
@@ -214,9 +215,10 @@ public class BossController : MonoBehaviour
                             self,
                             source,// + Quaternion.AngleAxis(angleOffset, Vector3.up) * (10 * Vector3.back),
                             sink,
-                            angleOffset: angleOffset,
-                            speed: speed,
-                            size: size
+                            maxTime,
+                            angleOffset,
+                            speed,
+                            size
                         );
                         break;
                 }
@@ -224,14 +226,14 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent ShootHexCurve(bool clockwise = true, float offset = 0f)
+    public static AISequence ShootHexCurve(bool clockwise = true, float offset = 0f)
     {
         return ShootHexCurve(clockwise, offset, new Vector3(0, 1.31f, -1f));
     }
 
     // Shoots a hexagonal pattern of curving projectiles.
-    public static AIEvent ShootHexCurve(bool clockwise, float offset, Vector3 target) {
-        return new AIEvent(0f, () =>
+    public static AISequence ShootHexCurve(bool clockwise, float offset, Vector3 target) {
+        return new AISequence(0f, () =>
         {
             float multiplier = clockwise ? 1f : -1f;
 
@@ -245,8 +247,8 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
-        return new AIEvent(0f, () =>
+    public static AISequence ShootLine(int amount = 50, float width = 75f, Speed speed = Speed.MEDIUM, Vector3? target = null) {
+        return new AISequence(0f, () =>
         {
 
             Vector3 targetPos = target.HasValue ? target.Value - instance.transform.position : player.transform.position - instance.transform.position;
@@ -266,9 +268,9 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent ShootDeathHex(float maxTime1 = 1f)
+    public static AISequence ShootDeathHex(float maxTime1 = 1f)
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
 
             for (int i = 0; i < 6; i++)
@@ -278,8 +280,8 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent Teleport(Vector3? target = null, int speed = 100) {
-        return new AIEvent(0f, () =>
+    public static AISequence Teleport(Vector3? target = null, int speed = 100) {
+        return new AISequence(0f, () =>
         {
 
             if (target.HasValue)
@@ -357,9 +359,9 @@ public class BossController : MonoBehaviour
         eventQueue.Unpause();
     }
 
-    public static AIEvent Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
+    public static AISequence Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
             self.movespeed.SetBase(speed);
 
@@ -370,9 +372,9 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent CameraMove(bool isFollow = false, Vector3? targetPosition = null)
+    public static AISequence CameraMove(bool isFollow = false, Vector3? targetPosition = null)
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
             CameraController.GetInstance().IsFollowing = isFollow;
 
@@ -383,9 +385,9 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AIEvent PlayerLock(bool enableLock = true)
+    public static AISequence PlayerLock(bool enableLock = true)
     {
-        return new AIEvent(0f, () =>
+        return new AISequence(0f, () =>
         {
             if (enableLock)
             {

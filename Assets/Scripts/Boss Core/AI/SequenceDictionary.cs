@@ -165,7 +165,7 @@ namespace AI
             SHOOT_360.Wait(1f)
         );
 
-        public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(6.5,
+        public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(6.5f,
             Teleport().Wait(0.2f),
             HOMING_STRAFE_15.Times(15),//.Wait(0.3f) // This is hard; adding wait is reasonable
             SHOOT_2_WAVES.Times(2)
@@ -173,12 +173,17 @@ namespace AI
 
         /*
          * A really intricate pattern. 6 projectiles that explode into 6 more projectiles,
-         * repeated twice to forme a lattice.
+         * repeated twice to forme a lattice. Safe spot is a midpoint between any two of
+         * the first projectiles, near the far edge of the arena.
          */
-        public static AISequence DEATH_HEX = new AISequence(9, 
+        public static AISequence DEATH_HEX = new AISequence(
+            8, 
             Teleport(CENTER).Wait(0.5f),
             ShootDeathHex(2f).Wait(1f),
-            ShootDeathHex(1f).Wait(5f)
+            ShootDeathHex(1f).Wait(2f),
+            ShootWave(50, 360, 0, 0.25f).Wait(1f),
+            ShootWave(50, 360, 0, 0.25f).Wait(1f),
+            ShootWave(50, 360, 0, 0.25f).Wait(0.75f)
         );
 
         /*
@@ -233,7 +238,7 @@ namespace AI
             LINE_CIRCLE_STRAFE_60.Times(6)
         );
 
-        public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5, 
+        public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5f, 
             Teleport(WEST_FAR),
             LINE_STRAFE_60.Times(6),
             LINE_CIRCLE_STRAFE_60.Times(6)
@@ -246,32 +251,32 @@ namespace AI
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                    sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(Type.HOMING, Size.LARGE).AsSequence());
+                sequences.Add(Shoot1(Type.HOMING, Size.LARGE));
                 for (int j = 7; j < 15; j++)
                 {
-                    sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                    sequences.Add(ShootWave(4, 360, j * 6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(AISequence.SHOOT_360);
+                sequences.Add(SHOOT_360);
             }
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(Type.HOMING, Size.LARGE).AsSequence());
+                sequences.Add(Shoot1(Type.HOMING, Size.LARGE));
                 for (int j = 5; j < 10; j++)
                 {
-                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(Type.HOMING, Size.LARGE).AsSequence());
+                sequences.Add(Shoot1(Type.HOMING, Size.LARGE));
                 for (int j = 10; j < 15; j++)
                 {
-                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f).AsSequence());
+                    sequences.Add(ShootWave(4, 360, j * -6f, target: Vector3.forward).Wait(0.1f));
                 }
-                sequences.Add(AISequence.SHOOT_360);
+                sequences.Add(SHOOT_360);
             }
             return sequences.ToArray();
         });
@@ -285,7 +290,7 @@ namespace AI
             List<AISequence> sequences = new List<AISequence>();
             for (int i = -30; i < 90; i += 5)
             {
-                sequences.Add(new AISequence(-1, new AIEvent[] { Shoot1(angleOffset: i).Wait(0.01f) }));
+                sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
             }
             return sequences.ToArray();
         });
@@ -295,17 +300,29 @@ namespace AI
             List<AISequence> sequences = new List<AISequence>();
             for (int i = -30; i < 90; i += 5)
             {
-                sequences.Add(new AISequence(-1, new AIEvent[] { Shoot1(angleOffset: i).Wait(0.01f) }));
+                sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
             }
             sequences.Add(Pause(0.75f));
             for (int i = 30; i > -90; i -= 5)
             {
-                sequences.Add(new AISequence(-1, new AIEvent[] { Shoot1(angleOffset: i).Wait(0.01f) }));
+                sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
             }
             return sequences.ToArray();
         });
 
-
+        public static AISequence RANDOM_200_WAVE = new AISequence(6, () =>
+        {
+            List<AISequence> sequences = new List<AISequence>();
+            for (int j = 0; j < 10; j++)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    sequences.Add(ShootWave(Random.Range(3, 9), 360, speed: Speed.SLOW, size: Size.MEDIUM));
+                }
+                sequences.Add(Pause(1f));
+            }
+            return sequences.ToArray();
+        });
 
 
 
