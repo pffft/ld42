@@ -129,7 +129,7 @@ namespace AI
             Shoot3().Wait(0.1f).Times(20),
             SHOOT_360,
             Shoot3().Wait(0.1f).Times(20),
-            SHOOT_360
+            SHOOT_360.Wait(0.5f) 
         );
 
         public static AISequence HEX_CURVE_INTRO = new AISequence(4, 
@@ -187,24 +187,23 @@ namespace AI
         );
 
         public static AISequence SPLIT_6 = new AISequence(
-            4, () => { 
-                return new AISequence(0f, () => { 
-                    Projectile.Create(self, null, null, 0, 0.25f, Speed.VERY_FAST).DeathHex(); 
-                // TODO: have a builder notation for this so that it's possible to override ondeath trigger like this:
-                // Projectile.Create(...).DeathHex().OnDeathTrigger(() => {});
-                // Maybe add an UnfinishedProjectile so that we don't build a projectile until it has enough info?
-                // Maybe add delegates instead of functions to override, so you can just set the delegate?
-                // ..or instead just have setters that take a delegate as an input, and call those as triggers
-                }); 
-            }
+            4,
+            Teleport().Wait(0.5f),
+            new AISequence(() => {
+                Projectile proj = Projectile.Create(self)
+                    .SetMaxTime(0.25f)
+                    .SetSpeed(Speed.VERY_FAST)
+                    .Curving(0f, false)
+                    .OnDestroyTimeout(CallbackDictionary.SPAWN_6);
+            }).Wait(0.25f)
         );
 
         public static AISequence SPLIT_6_CURVE = new AISequence(
-            4, () => {
-                return new AISequence(0f, () => {
-                    Projectile.Create(self, null, null, 0, 0.25f, Speed.VERY_FAST).DeathHex();
-                });
-            }
+            5f, 
+            Teleport().Wait(0.5f),
+            new AISequence(() => {
+                Projectile.Create(self, null, null, 0, 0.25f, Speed.VERY_FAST).DeathHex();
+            }).Wait(0.5f)
         );
 
         /*
@@ -241,7 +240,7 @@ namespace AI
             10, 
             Teleport(CENTER).Wait(1f),
             ShootHexCurve(true, angleOffset: 0f).Wait(0.5f),
-            ShootHexCurve(true, angleOffset: 30f).Wait(0.5f),
+            ShootHexCurve(true, angleOffset: 30f),
             SHOOT3_WAVE3,
             Teleport(CENTER),
             ShootHexCurve(false, angleOffset: 0f),
@@ -254,10 +253,6 @@ namespace AI
             Shoot3(type: Type.HOMING, size: Size.MEDIUM).Wait(0.1f).Times(5),
             SHOOT_360.Wait(0.5f),
             SHOOT_360.Wait(0.5f)
-        );
-
-        public static AISequence test = new AISequence(
-            LINE_CIRCLE_STRAFE_60.Times(6)
         );
 
         public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5f, 
@@ -307,41 +302,103 @@ namespace AI
          * Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.
          * This doesn't lock onto the player's old position, so it will follow the player.
          */
-        public static AISequence SWEEP = new AISequence(2, () =>
-        {
-            List<AISequence> sequences = new List<AISequence>();
-            for (int i = -30; i < 90; i += 5)
+        public static AISequence SWEEP = new AISequence(
+            2,
+            Teleport(),
+            new AISequence(() =>
             {
-                sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
-            }
-            return sequences.ToArray();
-        });
-
-        public static AISequence SWEEP_BACK_AND_FORTH = new AISequence(3, () =>
-        {
-            List<AISequence> sequences = new List<AISequence>();
-            for (int i = -30; i < 90; i += 5)
-            {
-                sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
-            }
-            sequences.Add(Pause(0.75f));
-            for (int i = 30; i > -90; i -= 5)
-            {
-                sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
-            }
-            return sequences.ToArray();
-        });
-
-        public static AISequence RANDOM_200_WAVE = new AISequence(6, () =>
-        {
-            List<AISequence> sequences = new List<AISequence>();
-            for (int j = 0; j < 10; j++)
-            {
-                for (int i = 0; i < 5; i++)
+                List<AISequence> sequences = new List<AISequence>();
+                for (int i = -30; i < 90; i += 5)
                 {
-                    sequences.Add(ShootWave(Random.Range(3, 9), 360, speed: Speed.SLOW, size: Size.MEDIUM));
+                    sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
                 }
-                sequences.Add(Pause(1f));
+                return sequences.ToArray();
+            }).Wait(0.25f)
+        );
+
+        public static AISequence SWEEP_BACK_AND_FORTH = new AISequence(
+            3,
+            Teleport(), 
+            new AISequence(() => {
+                List<AISequence> sequences = new List<AISequence>();
+                for (int i = -30; i < 90; i += 5)
+                {
+                    sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
+                }
+                sequences.Add(Pause(0.75f));
+                for (int i = 30; i > -90; i -= 5)
+                {
+                    sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
+                }
+                return sequences.ToArray();
+            }).Wait(0.5f)
+        );
+
+        public static AISequence SWEEP_BACK_AND_FORTH_ADVANCED = new AISequence(
+            6.5f,
+            Teleport().Wait(0.25f),
+            PlayerLock(true),
+            new AISequence(() => {
+                List<AISequence> sequences = new List<AISequence>();
+                for (int i = -30; i < 80; i += 5) {
+                    sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
+                }
+                //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
+                for (int i = 80; i > -80; i -= 5)
+                {
+                    sequences.Add(Merge(
+                        Shoot1(angleOffset: i),
+                        Shoot1(angleOffset: i, size: Size.MEDIUM, speed: Speed.SLOW)).Wait(0.01f));
+                }
+                //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
+                for (int i = -80; i < 80; i += 5)
+                {
+                    sequences.Add(Shoot1(angleOffset: i).Wait(0.01f));
+                }
+                //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
+                for (int i = 80; i > -80; i -= 5) {
+                    sequences.Add(Merge(
+                        Shoot1(angleOffset: i),
+                        Shoot1(angleOffset: i, size: Size.MEDIUM, speed: Speed.SLOW)).Wait(0.01f));
+                }
+                for (int i = -80; i < 80; i += 5)
+                {
+                    sequences.Add(Merge(
+                        Shoot1(angleOffset: i),
+                        Shoot1(angleOffset: i, size: Size.TINY, speed: Speed.FAST)).Wait(0.01f));
+                }
+                //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
+                for (int i = 80; i > -30; i -= 5)
+                {
+                    sequences.Add(Merge(
+                        Shoot1(angleOffset: i),
+                        Shoot1(angleOffset: i, size: Size.MEDIUM, speed: Speed.SLOW)).Wait(0.01f));
+                }
+                return sequences.ToArray();
+            }).Wait(0.5f),
+            PlayerLock(false)
+        );
+
+        public static AISequence RANDOM_200_WAVE = new AISequence(8, () => {
+            List<AISequence> sequences = new List<AISequence>();
+            for (int j = 0; j < 200; j++) {
+                switch (Random.Range(0, 3))
+                {
+                    case 0: sequences.Add(Merge(
+                        Shoot1(angleOffset: Random.Range(0, 360f), size: Size.SMALL, speed: Speed.FAST),
+                        Shoot1(angleOffset: Random.Range(0, 360f), size: Size.SMALL, speed: Speed.FAST),
+                        Shoot1(angleOffset: Random.Range(0, 360f), size: Size.TINY, speed: Speed.FAST)
+                    )); break;
+                    case 1: sequences.Add(Merge(
+                        Shoot1(angleOffset: Random.Range(0, 360f), size: Size.MEDIUM, speed: Speed.MEDIUM),
+                        Shoot1(angleOffset: Random.Range(0, 360f), size: Size.MEDIUM, speed: Speed.MEDIUM)
+                    )); break;
+                    case 2: sequences.Add(Shoot1(angleOffset: Random.Range(0, 360f), size: Size.LARGE, speed: Speed.SLOW)); break;
+                }
+                if (j % 20 == 0) {
+                    sequences.Add(Shoot1(size: Size.MEDIUM, speed: Speed.MEDIUM, type: Type.HOMING));
+                }
+                sequences.Add(Pause(0.05f));
             }
             return sequences.ToArray();
         });

@@ -39,19 +39,20 @@ namespace AI
         /*
          * Creates a new singleton AISequence from the given Action.
          * This has no delay after its event.
+         * 
+         * This is mostly used for generators internally; it assigns an invalid
+         * difficulty as a placeholder. 
          */
-        public AISequence(AIEvent.Action a)
-        {
-            this.events = new AIEvent[] { new AIEvent(0f, a) };
-        }
+        public AISequence(AIEvent.Action a) : this(-1, a) { }
 
         /*
          * Creates a new singleton AISequence from the given Action.
-         * This will have an additional delay afterwards.
+         * This has no delay after its event.
          */
-        public AISequence(float duration, AIEvent.Action action)
+        public AISequence(float difficulty, AIEvent.Action a)
         {
-            this.events = new AIEvent[] { new AIEvent(duration, action) };
+            this.difficulty = difficulty;
+            this.events = new AIEvent[] { new AIEvent(0f, a) };
         }
        
         public AISequence(params AISequence[] sequences) : this(-1, sequences) { }
@@ -70,22 +71,27 @@ namespace AI
             this.events = eventsList.ToArray();
         }
 
+
         /*
          * "Explodes" the generation function and adds all the elements to a single AISequence.
          */
-        public AISequence(float difficulty, GenerateSequences genFunction) : this(difficulty, genFunction()) {}
+        public AISequence(GenerateSequences genFunction) : this(-1, genFunction()) { }
+
+        public AISequence(float difficulty, GenerateSequences genFunction) : this(difficulty, genFunction()) { }
 
         /*
          * Executes the generation function and instantiates this AISequence as the result.
          */
-        public AISequence(float difficulty, GenerateSequence genFunction) : this(difficulty, genFunction()) {}
+        public AISequence(GenerateSequence genFunction) : this(-1, genFunction()) { }
+
+        public AISequence(float difficulty, GenerateSequence genFunction) : this(difficulty, genFunction())  { }
 
         /*
          * Merges the given array of AISequences, and executes all of them concurrently.
          * This is useful for chaining individual "Shoot1" methods together.
          */
         public static AISequence Merge(params AISequence[] sequences) {
-            return new AISequence(0f, () => {
+            return new AISequence(() => {
                 for (int i = 0; i < sequences.Length; i++) {
                     for (int j = 0; j < sequences[i].events.Length; j++) {
                         sequences[i].events[j].action();

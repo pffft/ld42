@@ -99,13 +99,11 @@ public class BossController : MonoBehaviour
         // TODO: Find a way to turn this into an AISequence using a method!!!
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
-        /*
-        phase = AIPhase.PHASE1;
+        phase = AIPhase.HARD_PHASE;
         for (int i = 0; i < 100; i++) {
             eventQueue.Add(phase.GetNext());
         }
-        */
-        eventQueue.Add(AISequence.SPLIT_6.Wait(4f).Times(5));
+        //eventQueue.Add(AISequence.SWEEP_BACK_AND_FORTH_ADVANCED);
 
         Profiler.EndSample();
     }
@@ -125,7 +123,7 @@ public class BossController : MonoBehaviour
     }
 
     public static AISequence Shoot1(Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.SMALL, Type type=Type.BASIC) {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             Glare();
 
@@ -140,7 +138,7 @@ public class BossController : MonoBehaviour
 
     public static AISequence Shoot3(Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size = Size.SMALL, Type type = Type.BASIC)
     {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             Glare();
 
@@ -160,7 +158,7 @@ public class BossController : MonoBehaviour
 
     // Deprecated; should be a call to ShootArc.
     public static AISequence ShootWave(int amount = 1, float arcWidth = 360f, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM, Type type=Type.BASIC, Vector3? target=null) {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             Glare();
 
@@ -187,7 +185,7 @@ public class BossController : MonoBehaviour
     }
 
     public static AISequence ShootArc(int density=50, float from=0, float to=360, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM, Type type=Type.BASIC, Vector3? target=null) {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             Glare();
 
@@ -233,7 +231,7 @@ public class BossController : MonoBehaviour
 
 
     public static AISequence ShootHexCurve(bool clockwise, Vector3? target=null, float angleOffset=0f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM) {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             float multiplier = clockwise ? 1f : -1f;
             float curveSpeed = (float)speed * multiplier * 2f;
@@ -246,7 +244,7 @@ public class BossController : MonoBehaviour
     }
 
     public static AISequence ShootLine(int amount=50, float width=75f, Vector3? target=null, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM) {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
 
             Vector3 targetPos = target.HasValue ? target.Value - instance.transform.position : player.transform.position - instance.transform.position;
@@ -262,7 +260,7 @@ public class BossController : MonoBehaviour
 
     public static AISequence ShootDeathHex(float maxTime = 1f)
     {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             for (int i = 0; i < 6; i++)
             {
@@ -273,7 +271,7 @@ public class BossController : MonoBehaviour
     }
 
     public static AISequence Teleport(Vector3? target = null, int speed = 100) {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
 
             if (target.HasValue)
@@ -353,7 +351,7 @@ public class BossController : MonoBehaviour
 
     public static AISequence Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
     {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             self.movespeed.SetBase(speed);
 
@@ -366,7 +364,7 @@ public class BossController : MonoBehaviour
 
     public static AISequence CameraMove(bool isFollow = false, Vector3? targetPosition = null)
     {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             CameraController.GetInstance().IsFollowing = isFollow;
 
@@ -379,7 +377,7 @@ public class BossController : MonoBehaviour
 
     public static AISequence PlayerLock(bool enableLock = true)
     {
-        return new AISequence(0f, () =>
+        return new AISequence(() =>
         {
             if (enableLock)
             {

@@ -24,7 +24,7 @@ namespace Projectiles
         public override Material GetCustomMaterial() {
             return Resources.Load<Material>("Art/Materials/PurpleTransparent");
         }
-
+        
         public override void CustomUpdate() {
             Vector3 idealVelocity = velocity * (player.transform.position - transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, body.velocity, Vector3.up);

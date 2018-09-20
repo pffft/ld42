@@ -3,12 +3,22 @@ using System.Collections.Generic;
 using CombatCore;
 using UnityEngine;
 
-//Test
 namespace Projectiles
 {
+    /*
+     * Used for handling death events for Projectiles.
+     * In the future, other callbacks might be added.
+     */
+    public delegate void ProjectileCallbackDelegate(Projectile self);
+
     public class Projectile : MonoBehaviour
     {
         public Entity entity;
+
+        // Used internally for the builder notation
+        public Vector3 start;
+        public Vector3 target;
+        public float angleOffset;
 
         public Speed speed;
         public Size size;
@@ -25,39 +35,221 @@ namespace Projectiles
         public static Material greenMaterial;
         public static Material purpleMaterial;
 
+        /*
+         * Creates a default Projectile component for the builder notation.
+         * By default, this is a small, medium speed projectile with a max life
+         * of 10. It will start at the entity's position and aim at the player
+         * (if the entity is the boss), or else aim forward (for the player).
+         */
+        public static Projectile Create(Entity entity)
+        {
+            // Create new GameObject
+            GameObject newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Projectile"));
+
+            // Default start and target
+            Vector3 startPosition = entity.transform.position;
+            Vector3 targetPosition;
+            if (entity.name.Equals(BossController.BOSS_NAME)) {
+                // TODO cache me
+                targetPosition = BossController.isPlayerLocked ? 
+                   BossController.playerLockPosition : 
+                   GameObject.Find("Player").transform.position;
+            } else {
+                targetPosition = Vector3.forward;
+            }
+
+            // Create a new Projectile component
+            Projectile projectile = newObj.AddComponent<Projectile>();
+
+            // Assign and init the RigidBody (or create one if it doesn't exist)
+            Rigidbody body = newObj.GetComponent<Rigidbody>();
+            if (body == null)
+            {
+                body = newObj.AddComponent<Rigidbody>();
+            }
+            body.useGravity = false;
+
+            // Set up basic projectile information
+            projectile.entity = entity;
+            projectile.currentTime = 0;
+            projectile.damage = 5f;
+
+            // Set defaults.
+            return projectile
+                .SetStart(startPosition)
+                .SetTarget(targetPosition)
+                .SetAngleOffset(0f)
+                .SetMaxTime(10f)
+                .SetSpeed(Speed.MEDIUM)
+                .SetSize(Size.SMALL);
+        }
+
+        #region Builder Methods
+
+        // Builder method
+        public Projectile SetStart(Vector3? start) 
+        {
+            this.start = start ?? entity.transform.position;
+            UpdateOrientationAndVelocity();
+            return this;
+        }
+
+        // Builder method
+        public Projectile SetTarget(Vector3? target)
+        {
+            Vector3 targetPosition;
+            if (target == null) {
+                if (entity.name.Equals(BossController.BOSS_NAME))
+                {
+                    // TODO cache me
+                    targetPosition = BossController.isPlayerLocked ?
+                       BossController.playerLockPosition :
+                       GameObject.Find("Player").transform.position;
+                }
+                else
+                {
+                    targetPosition = Vector3.forward;
+                }
+            } else {
+                targetPosition = target.Value;
+            }
+
+            this.target = targetPosition;
+            UpdateOrientationAndVelocity();
+            return this;
+        }
+
+        // Builder method
+        public Projectile SetAngleOffset(float offsetDegrees) {
+            this.angleOffset = offsetDegrees;
+            UpdateOrientationAndVelocity();
+            return this;
+        }
+
+        // Builder method
+        public Projectile SetMaxTime(float seconds) {
+            this.maxTime = seconds;
+            return this;
+        }
+
+        // Builder method
+        public Projectile SetSpeed(Speed speed) {
+            this.speed = speed;
+            UpdateOrientationAndVelocity();
+            return this;
+        }
+
+        // Builder method
+        public Projectile SetSize(Size size) {
+            this.size = size;
+            gameObject.transform.localScale = SizeToScale(size) * Vector3.one;
+            switch (size)
+            {
+                case Size.TINY:
+                case Size.SMALL:
+                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/BlueTransparent");
+                    break;
+                case Size.MEDIUM:
+                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                    break;
+                case Size.LARGE:
+                case Size.HUGE:
+                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
+                    break;
+                default:
+                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                    break;
+            }
+
+            return this;
+        }
+
+        /* Updates this Projectile's orientation and velocity. Called when the start,
+         * target, angleOffset, or speed are changed using the builder methods.
+         */
+        private void UpdateOrientationAndVelocity()
+        {
+            Vector3 start = this.start;
+
+            // Remove any height from the start and target vectors
+            Vector3 topDownSpawn = new Vector3(start.x, 0, start.z);
+            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+
+            // Add in rotation offset from the angleOffset parameter
+            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+
+            // Compute the final rotation
+            Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
+
+            this.gameObject.transform.position = start;
+            this.gameObject.transform.rotation = rotation;
+            this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)speed);
+            this.velocity = (float)speed;
+        }
+
+        #endregion
+
+        /*
+         * A helper function that retuns the local scale of a projectile, given
+         * its size. This corresponds to its diameter.
+         */
+        public static float SizeToScale(Size size)
+        {
+            return 1.0f + ((float)size / 2.0f);
+        }
+
         void Update()
         {
             currentTime += Time.deltaTime;
 
             if (currentTime >= maxTime)
             {
-                OnDestroyTimeout();
+                OnDestroyTimeoutImpl(this);
                 Destroy(this.gameObject);
             }
 
             if (transform.position.magnitude > 100f)
             {
-                OnDestroyOutOfBounds();
+                OnDestroyOutOfBoundsImpl(this);
                 Destroy(this.gameObject);
             }
 
             CustomUpdate();
         }
 
+        #region Event Callbacks
+
         /*
          * Called after object is destroyed due to time limit.
          */
-        public virtual void OnDestroyTimeout() { }
+        public ProjectileCallbackDelegate OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
+
+        public virtual Projectile OnDestroyTimeout(ProjectileCallbackDelegate deleg) {
+            this.OnDestroyTimeoutImpl = deleg;
+            return this;
+        }
 
         /*
          * Called after object is destroyed due to hitting the arena.
          */
-        public virtual void OnDestroyOutOfBounds() { }
+        public ProjectileCallbackDelegate OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
+
+        public virtual Projectile OnDestroyOutOfBounds(ProjectileCallbackDelegate deleg) {
+            this.OnDestroyOutOfBoundsImpl = deleg;
+            return this;
+        }
 
         /*
          * Called when the object hits the player
          */
-        public virtual void OnDestroyCollision() { }
+        public ProjectileCallbackDelegate OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
+
+        public virtual Projectile OnDestroyCollision(ProjectileCallbackDelegate deleg) {
+            this.OnDestroyCollisionImpl = deleg;
+            return this;
+        }
+
+        #endregion
 
         /*
          * Called at the end of every frame on update.
@@ -78,7 +270,7 @@ namespace Projectiles
                 {
                     Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, this.entity, damage);
-                    OnDestroyCollision();
+                    OnDestroyCollisionImpl(this);
                     Destroy(this.gameObject);
                 }
             }
@@ -87,7 +279,7 @@ namespace Projectiles
         /*
          * Get the preferred material for this projectile.
          * The standard only sets material based on size; if you want your projectile
-         * to have its own material, return it here.
+         * to have its own material, override this method and return it here.
          *
          * If you want to use the standard projectile logic, simply return null here.
          */
@@ -100,96 +292,14 @@ namespace Projectiles
          */
         public static Projectile Create(Entity entity, Vector3? start=null, Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.SMALL)
         {
-            GameObject newObj;
-
-            // Assign a default material based on the size; normally, small = blue, med = orange, large = red.
-            switch (size)
-            {
-                case Size.TINY:
-                    newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/ProjectileTiny"));
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/BlueTransparent");
-                    break;
-                case Size.SMALL:
-                    newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/ProjectileSmall"));
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/BlueTransparent");
-                    break;
-                case Size.MEDIUM:
-                    newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/ProjectileMedium"));
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeTransparent");
-                    break;
-                case Size.LARGE:
-                    newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/ProjectileLarge"));
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
-                    break;
-                case Size.HUGE:
-                    newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/ProjectileHuge"));
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
-                    break;
-                default:
-                    newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/ProjectileMedium"));
-                    newObj.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeTransparent");
-                    break;
-            }
-
-            // Resolve the start position. If the start is null, then we default to the entity's position.
-            Vector3 startPosition = start ?? entity.transform.position;
-
-            // Resolve the target position. If it's null, and this is a boss projectile, we check if
-            // we're locked onto a position. If so, we take that position; else we take the current player position.
-            // Otherwise, we take the target as-is; or a default forward if it's null.
-            Vector3 targetPosition;
-            if (entity.name.Equals(BossController.BOSS_NAME) && !target.HasValue) {
-                if (BossController.isPlayerLocked) {
-                    targetPosition = BossController.playerLockPosition;
-                } else {
-                    // TODO cache me
-                    targetPosition = GameObject.Find("Player").transform.position;
-                }
-            } else if (target.HasValue) {
-                targetPosition = target.Value;
-            } else {
-                targetPosition = Vector3.forward;
-            }
-
-            // Figure out the final rotation value based on the target and offset.
-            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
-
-            // We need to ignore the y coordiante to get an accurate target vector.
-            Vector3 topDownSpawn = new Vector3(startPosition.x, 0, startPosition.z);
-            Vector3 topDownTarget = new Vector3(targetPosition.x, 0, targetPosition.z);
-
-            // The final rotation is the offset added to the spawn-target rotation.
-            Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
-
-            // Set the position and rotation.
-            newObj.transform.position = startPosition;
-            newObj.transform.rotation = rotation;
-
-
-            Projectile projectile;
-
-            // Look up the subclass we should add based on the type
-            projectile = newObj.AddComponent<Projectile>();
-
-            // Assign and init the RigidBody (or create one if it doesn't exist)
-            Rigidbody body = newObj.GetComponent<Rigidbody>();
-            if (body == null)
-            {
-                body = newObj.AddComponent<Rigidbody>();
-            }
-            body.velocity = rotation * (Vector3.forward * (float)speed);
-            body.useGravity = false;
-
-            projectile.speed = speed;
-            projectile.size = size;
-
-            projectile.entity = entity;
-            projectile.currentTime = 0;
-            projectile.maxTime = maxTime;
-            projectile.velocity = (float)speed;
-            projectile.damage = 5f;
-
-            return projectile;
+            return Projectile
+                .Create(entity)
+                .SetStart(start)
+                .SetTarget(target)
+                .SetAngleOffset(angleOffset)
+                .SetMaxTime(maxTime)
+                .SetSpeed(speed)
+                .SetSize(size);
         }
 
         /*

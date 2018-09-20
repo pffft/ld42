@@ -9,45 +9,45 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1008441667352886}
+  m_RootGameObject: {fileID: 1006427959804524}
   m_IsPrefabAsset: 1
---- !u!1 &1008441667352886
+--- !u!1 &1006427959804524
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4169424194814742}
-  - component: {fileID: 33568052008698818}
-  - component: {fileID: 23708541419949922}
-  - component: {fileID: 135298931331851482}
+  - component: {fileID: 4391544331996442}
+  - component: {fileID: 33891604236213812}
+  - component: {fileID: 23401503133097866}
+  - component: {fileID: 135333052153630226}
   m_Layer: 8
-  m_Name: ProjectileMedium
+  m_Name: Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4169424194814742
+--- !u!4 &4391544331996442
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1008441667352886}
+  m_GameObject: {fileID: 1006427959804524}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23708541419949922
+--- !u!23 &23401503133097866
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1008441667352886}
+  m_GameObject: {fileID: 1006427959804524}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -77,19 +77,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &33568052008698818
+--- !u!33 &33891604236213812
 MeshFilter:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1008441667352886}
+  m_GameObject: {fileID: 1006427959804524}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!135 &135298931331851482
+--- !u!135 &135333052153630226
 SphereCollider:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1008441667352886}
+  m_GameObject: {fileID: 1006427959804524}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
