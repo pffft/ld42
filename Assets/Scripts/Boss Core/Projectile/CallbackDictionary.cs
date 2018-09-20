@@ -37,5 +37,11 @@ namespace Projectiles
                           .Curving(0f, false);
             }
         };
+
+        // TODO: there should be a better way to call AISequences from these callbacks
+        public static ProjectileCallbackDelegate SPAWN_WAVE = (self) =>
+        {
+            BossController.ShootWave().events[0].action();
+        };
     }
 }
