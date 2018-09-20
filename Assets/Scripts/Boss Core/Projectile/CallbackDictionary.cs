@@ -41,7 +41,16 @@ namespace Projectiles
         // TODO: there should be a better way to call AISequences from these callbacks
         public static ProjectileCallbackDelegate SPAWN_WAVE = (self) =>
         {
-            BossController.ShootWave().events[0].action();
+            //BossController.ShootWave(50).events[0].action();
+            for (int i = 0; i < 50; i++) {
+                Projectile
+                    .Create(self.entity)
+                    .SetStart(self.transform.position)
+                    .SetTarget(Vector3.forward)
+                    .SetSize(Size.MEDIUM)
+                    .SetSpeed(Speed.MEDIUM)
+                    .SetAngleOffset(i * (360f / 50f));
+            }
         };
     }
 }

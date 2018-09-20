@@ -382,7 +382,7 @@ namespace AI
         public static AISequence RANDOM_200_WAVE = new AISequence(8, () => {
             List<AISequence> sequences = new List<AISequence>();
             for (int j = 0; j < 200; j++) {
-                switch (Random.Range(0, 4))
+                switch (Random.Range(0, 3))
                 {
                     case 0: sequences.Add(Merge(
                         Shoot1(angleOffset: Random.Range(0, 360f), size: Size.SMALL, speed: Speed.FAST),
@@ -394,19 +394,21 @@ namespace AI
                         Shoot1(angleOffset: Random.Range(0, 360f), size: Size.MEDIUM, speed: Speed.MEDIUM)
                     )); break;
                     case 2: sequences.Add(Shoot1(angleOffset: Random.Range(0, 360f), size: Size.LARGE, speed: Speed.SLOW)); break;
-                    case 3: sequences.Add(new AISequence(() => {
-                        // TODO test me!
+                }
+                if (j % 20 == 0) {
+                    sequences.Add(Shoot1(size: Size.MEDIUM, speed: Speed.MEDIUM, type: Type.HOMING));
+                }
+                if (j % 40 == 0) {
+                    sequences.Add(new AISequence(() =>
+                    {
                         Projectile
                             .Create(self)
                             .SetSize(Size.MEDIUM)
                             .SetSpeed(Speed.MEDIUM)
-                            .SetMaxTime(1f)
-                            .OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE); // this might not work
-                        }
-                    )); break;
-                }
-                if (j % 20 == 0) {
-                    sequences.Add(Shoot1(size: Size.MEDIUM, speed: Speed.MEDIUM, type: Type.HOMING));
+                            .SetAngleOffset(Random.Range(0, 360f))
+                            .SetMaxTime(0.5f)
+                            .OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE);
+                    }));
                 }
                 sequences.Add(Pause(0.05f));
             }
