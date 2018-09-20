@@ -99,7 +99,7 @@ namespace AI
         /*
          * Adds a given sequence to the queue "times" number of times.
          */
-        public void AddSequenceRepeat(int times, AISequence sequence)
+        public void AddRepeat(int times, AISequence sequence)
         {
             for (int i = 0; i < times; i++)
             {

@@ -85,11 +85,6 @@ namespace Projectiles
         }
 
         /*
-         * Called upon creation with any additional parameters this object needs.
-         */
-        public virtual void Initialize(params object[] args) { }
-
-        /*
          * Get the preferred material for this projectile.
          * The standard only sets material based on size; if you want your projectile
          * to have its own material, return it here.

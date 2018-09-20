@@ -186,6 +186,27 @@ namespace AI
             ShootWave(50, 360, 0, 0.25f).Wait(0.75f)
         );
 
+        public static AISequence SPLIT_6 = new AISequence(
+            4, () => { 
+                return new AISequence(0f, () => { 
+                    Projectile.Create(self, null, null, 0, 0.25f, Speed.VERY_FAST).DeathHex(); 
+                // TODO: have a builder notation for this so that it's possible to override ondeath trigger like this:
+                // Projectile.Create(...).DeathHex().OnDeathTrigger(() => {});
+                // Maybe add an UnfinishedProjectile so that we don't build a projectile until it has enough info?
+                // Maybe add delegates instead of functions to override, so you can just set the delegate?
+                // ..or instead just have setters that take a delegate as an input, and call those as triggers
+                }); 
+            }
+        );
+
+        public static AISequence SPLIT_6_CURVE = new AISequence(
+            4, () => {
+                return new AISequence(0f, () => {
+                    Projectile.Create(self, null, null, 0, 0.25f, Speed.VERY_FAST).DeathHex();
+                });
+            }
+        );
+
         /*
          * Fires six slow circles around the arena in a circular pattern.
          * Then repeats twice, with lines appearing on the left and right sides.

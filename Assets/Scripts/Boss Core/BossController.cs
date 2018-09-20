@@ -105,9 +105,7 @@ public class BossController : MonoBehaviour
             eventQueue.Add(phase.GetNext());
         }
         */
-        eventQueue.Add(AISequence.SHOOT_360.Wait(0.5f));
-        eventQueue.Add(AISequence.SHOOT_WAVE_MIDDLE_GAP.Wait(0.5f));
-        eventQueue.Add(AISequence.SHOOT_360);
+        eventQueue.Add(AISequence.SPLIT_6.Wait(4f).Times(5));
 
         Profiler.EndSample();
     }
@@ -160,6 +158,7 @@ public class BossController : MonoBehaviour
         });
     }
 
+    // Deprecated; should be a call to ShootArc.
     public static AISequence ShootWave(int amount = 1, float arcWidth = 360f, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.MEDIUM, Type type=Type.BASIC, Vector3? target=null) {
         return new AISequence(0f, () =>
         {
@@ -215,6 +214,7 @@ public class BossController : MonoBehaviour
         });
     }
 
+    // Deprecated; can be created from two merged ShootArc calls.
     public static AISequence ShootWall(int amount = 30, float arcWidth = 120, float angleOffset = 0, int exceptMin = 7, int exceptMax = 20, Vector3? target = null)
     {
         return new AISequence(0, () =>
@@ -266,7 +266,8 @@ public class BossController : MonoBehaviour
         {
             for (int i = 0; i < 6; i++)
             {
-                Projectile.Create(self, instance.transform.position, player.transform.position, angleOffset: i * 60f, maxTime: maxTime);
+                Projectile.Create(self, instance.transform.position, player.transform.position, angleOffset: i * 60f, maxTime: maxTime)
+                          .DeathHex();
             }
         });
     }

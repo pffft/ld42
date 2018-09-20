@@ -21,9 +21,9 @@ namespace Projectiles
                                   start:transform.position, 
                                   target:body.velocity, 
                                   angleOffset:i * 60f, 
-                                  maxTime:body.velocity.magnitude * 6f, 
-                                  speed:Speed.MEDIUM)
-                          .Curving(3f, false);
+                                  maxTime:3f, 
+                                  speed:this.speed)
+                          .Curving((float)speed * 2f, true);
             }
 		}
 	}
