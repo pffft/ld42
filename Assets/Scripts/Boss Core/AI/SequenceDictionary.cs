@@ -175,9 +175,11 @@ namespace AI
          * A really intricate pattern. 6 projectiles that explode into 6 more projectiles,
          * repeated twice to forme a lattice. Safe spot is a midpoint between any two of
          * the first projectiles, near the far edge of the arena.
+         * 
+         * ** This might have changed due to the way ShootDeathHex was implemented.
          */
         public static AISequence DEATH_HEX = new AISequence(
-            8, 
+            9, 
             Teleport(CENTER).Wait(0.5f),
             ShootDeathHex(2f).Wait(1f),
             ShootDeathHex(1f).Wait(2f),

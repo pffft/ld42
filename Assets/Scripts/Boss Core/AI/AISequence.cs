@@ -29,37 +29,26 @@ namespace AI
          */
         public float difficulty;
 
-        public AISequence() { }
-
-        private AISequence(AIEvent[] events)
-        {
-            this.events = events;
-        }
+        // Used internally as a shortcut.
+        private AISequence(AIEvent[] events) { this.events = events; }
 
         /*
          * Creates a new singleton AISequence from the given Action.
          * This has no delay after its event.
-         * 
-         * This is mostly used for generators internally; it assigns an invalid
-         * difficulty as a placeholder. 
          */
         public AISequence(AIEvent.Action a) : this(-1, a) { }
 
-        /*
-         * Creates a new singleton AISequence from the given Action.
-         * This has no delay after its event.
-         */
         public AISequence(float difficulty, AIEvent.Action a)
         {
             this.difficulty = difficulty;
             this.events = new AIEvent[] { new AIEvent(0f, a) };
         }
-       
-        public AISequence(params AISequence[] sequences) : this(-1, sequences) { }
 
         /*
          * Takes an arbitrary length list of AISequences and combines them into an AISequence.
          */
+        public AISequence(params AISequence[] sequences) : this(-1, sequences) { }
+
         public AISequence(float difficulty, params AISequence[] sequences)
         {
             this.difficulty = difficulty;
@@ -88,7 +77,9 @@ namespace AI
 
         /*
          * Merges the given array of AISequences, and executes all of them concurrently.
-         * This is useful for chaining individual "Shoot1" methods together.
+         * 
+         * This is useful for chaining individual "Shoot1" methods together,
+         * or stitching various "ShootArc" methods.
          */
         public static AISequence Merge(params AISequence[] sequences) {
             return new AISequence(() => {
@@ -104,31 +95,25 @@ namespace AI
             return Merge(sequences.ToArray());
         }
 
-
-        public static AISequence Repeat(AISequence seq, int times)
+        /*
+         * Returns this AISequence repeated "times" number of times.
+         */
+        public AISequence Times(int times)
         {
             if (times == 0)
             {
                 times = 1;
                 Debug.LogError("Cannot repeat sequence 0 times");
             }
-            AIEvent[] newEvents = new AIEvent[seq.events.Length * times];
+            AIEvent[] newEvents = new AIEvent[this.events.Length * times];
             for (int i = 0; i < times; i++)
             {
-                for (int j = 0; j < seq.events.Length; j++)
+                for (int j = 0; j < this.events.Length; j++)
                 {
-                    newEvents[(i * seq.events.Length) + j] = seq.events[j];
+                    newEvents[(i * this.events.Length) + j] = this.events[j];
                 }
             }
             return new AISequence(newEvents);
-        }
-
-        /*
-         * Returns this AISequence repeated "times" number of times.
-         */
-        public AISequence Times(int times)
-        {
-            return Repeat(this, times);
         }
 
         /*
@@ -172,6 +157,6 @@ namespace AI
 
             return new AISequence(newEvents);
         }
-            
+
     }
 }
