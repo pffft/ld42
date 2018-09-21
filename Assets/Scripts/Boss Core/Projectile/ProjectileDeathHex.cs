@@ -16,7 +16,9 @@ namespace Projectiles
     {
         public static ProjectileDeathHex DeathHex(this Projectile projectile)
         {
-            return (ProjectileDeathHex)projectile.CastTo<ProjectileDeathHex>().OnDestroyTimeout(CallbackDictionary.SPAWN_6_CURVING);
+            return (ProjectileDeathHex)projectile
+                .CastTo<ProjectileDeathHex>()
+                .OnDestroyTimeout(CallbackDictionary.SPAWN_6_CURVING);
         }
     }
 }

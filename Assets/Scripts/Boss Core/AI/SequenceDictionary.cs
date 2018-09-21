@@ -447,13 +447,6 @@ namespace AI
             return sequences.ToArray();
 
         });
-
-        public static AISequence SWEEP2 = new AISequence(5, () =>
-        {
-            return Merge(
-                ShootArc(100, -20, -10, size: Size.SMALL), 
-                ShootArc(100, 10, 90, size: Size.SMALL));
-        });
         
         public static AISequence SWEEP_WALL_BACK_AND_FORTH = new AISequence(
             6,
@@ -463,11 +456,74 @@ namespace AI
             PlayerLock(false)
         );
 
-        public static AISequence SHOOT_HARD = new AISequence(
+        public static AISequence WAVE_REVERSE_TARGET = new AISequence(
+            5,
+            new AISequence(() =>
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    Projectile
+                        .Create(self)
+                        .SetSpeed(Speed.FAST)
+                        .SetSize(Size.MEDIUM)
+                        .SetMaxTime(1f)
+                        .SetAngleOffset(i * (360f / 50f))
+                        .OnDestroyTimeout(CallbackDictionary.SPAWN_1_TOWARDS_PLAYER);
+                }
+            })
+        );
+
+
+        public static AISequence WAVE_REVERSE = new AISequence(
+            4,
+            new AISequence(() =>
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    Projectile
+                        .Create(self)
+                        .SetSpeed(Speed.FAST)
+                        .SetSize(Size.MEDIUM)
+                        .SetMaxTime(1.5f)
+                        .SetAngleOffset(i * (360f / 50f))
+                        .OnDestroyTimeout(CallbackDictionary.REVERSE);
+                }
+            })
+        );
+                
+        public static AISequence WAVE_REVERSE_FASTER = new AISequence(
+            4,
+            new AISequence(() =>
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    Projectile
+                        .Create(self)
+                        .SetSpeed(Speed.FAST)
+                        .SetSize(Size.MEDIUM)
+                        .SetMaxTime(1.5f)
+                        .SetAngleOffset(i * (360f / 50f))
+                        .OnDestroyTimeout(CallbackDictionary.REVERSE_FASTER);
+                }
+            })
+        );
+
+        public static AISequence CIRCLE_IN_OUT = new AISequence(
             6,
-            ShootWall(exceptMin: 10, exceptMax: 20).Wait(0.5f),
-            ShootWall(exceptMin: 20, exceptMax: 30).Wait(0.5f),
-            ShootWall(exceptMin: 0, exceptMax: 10).Wait(0.5f)
+            Teleport(CENTER).Wait(0.5f),
+            WAVE_REVERSE.Wait(1.5f).Times(5)
+        );
+
+        public static AISequence CIRCLE_JUMP_ROPE = new AISequence(
+            8.5f,
+            Teleport(CENTER).Wait(0.5f),
+            WAVE_REVERSE_FASTER.Wait(1f),
+            WAVE_REVERSE_FASTER,
+            Shoot1(size: Size.TINY, speed: Speed.VERY_FAST).Wait(0.1f).Times(60) // This pushes it a bit over 8.
+            // Adding any of the below additional attacks makes it too hard for gameplay purposes.
+            //Shoot1(size: Size.TINY, speed: Speed.VERY_FAST, angleOffset: -20f).Wait(0.1f).Times(30)
+            //Shoot3(speed: Speed.FAST, size: Size.SMALL).Wait(0.1f).Times(60)
+            //Shoot1(size: Size.TINY, speed: Speed.VERY_FAST).Wait(0.25f).Times(6).Then(Shoot1(size: Size.MEDIUM, speed: Speed.FAST, type: Type.HOMING).Wait(0.25f)).Times(4)
         );
 
 

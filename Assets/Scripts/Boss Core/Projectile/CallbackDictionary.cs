@@ -52,5 +52,49 @@ namespace Projectiles
                     .SetAngleOffset(i * (360f / 50f));
             }
         };
+
+        public static ProjectileCallbackDelegate SPAWN_1_TOWARDS_PLAYER = (self) =>
+        {
+            Projectile
+                .Create(self.entity)
+                .SetStart(self.transform.position)
+                .SetTarget(null)
+                .SetSize(self.size)
+                .SetSpeed(Speed.SNIPE);
+        };
+
+        public static ProjectileCallbackDelegate REVERSE = (self) =>
+        {
+            Projectile
+                .Create(self.entity)
+                .SetStart(self.transform.position)
+                .SetTarget(self.start)
+                .SetMaxTime(self.maxTime)
+                .SetSize(self.size)
+                .SetSpeed(self.speed);
+        };
+
+        public static ProjectileCallbackDelegate REVERSE_FASTER = (self) =>
+        {
+            if (self.speed == Speed.LIGHTNING)
+            {
+                return;
+            }
+
+            Speed currentSpeed = self.speed;
+            Speed[] speeds = (Speed[])System.Enum.GetValues(currentSpeed.GetType());
+            Speed nextSpeed = speeds[System.Array.IndexOf(speeds, currentSpeed) + 1];
+
+            Debug.Log("New speed: " + nextSpeed);
+
+            Projectile
+                .Create(self.entity)
+                .SetStart(self.transform.position)
+                .SetTarget(self.start)
+                .SetSize(self.size)
+                .SetSpeed(nextSpeed)
+                .SetMaxTime(2f * 1.5f * (float)Speed.FAST / (float)nextSpeed)
+                .OnDestroyTimeout(REVERSE_FASTER);
+        };
     }
 }

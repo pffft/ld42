@@ -48,14 +48,17 @@ namespace AI
             .AddSequence(10, SWEEP_BACK_AND_FORTH_ADVANCED)
             .AddSequence(10, SPLIT_6)
             .AddSequence(10, SPLIT_6_CURVE)
+            .AddSequence(10, CIRCLE_IN_OUT)
+            //.AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
             .AddScriptedSequence(5, JUMP_ROPE_FAST);
 
         public static AIPhase HARD_PHASE = new AIPhase()
             //.AddSequence(10, WAVE_CIRCLE)
-            //.AddSequence(10, DOUBLE_HEX_CURVE_HARD)
-            //.AddSequence(10, DEATH_HEX)
+            .AddSequence(10, DOUBLE_HEX_CURVE_HARD)
+            .AddSequence(10, DEATH_HEX)
             //.AddSequence(10, FOUR_WAY_SWEEP_WITH_HOMING)
             .AddSequence(10, RANDOM_200_WAVE)
+            .AddSequence(10, CIRCLE_JUMP_ROPE)
             ;
     }
 }

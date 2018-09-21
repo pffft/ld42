@@ -99,11 +99,11 @@ public class BossController : MonoBehaviour
         // TODO: Find a way to turn this into an AISequence using a method!!!
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
-        phase = AIPhase.HARD_PHASE;
+        phase = AIPhase.PHASE1;
         for (int i = 0; i < 100; i++) {
             eventQueue.Add(phase.GetNext());
         }
-        //eventQueue.Add(AISequence.SWEEP_BACK_AND_FORTH_ADVANCED);
+        //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
 
         Profiler.EndSample();
     }

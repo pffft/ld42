@@ -13,6 +13,7 @@ namespace Projectiles
         MEDIUM = 25,
         FAST = 35,
         VERY_FAST = 45,
-        SNIPE = 50
+        SNIPE = 50, // This is realistically the fastest speed you should use.
+        LIGHTNING = 60
     };
 }
