@@ -225,15 +225,16 @@ namespace AI
             ShootLine(50, 75f, Vector3.right, Speed.MEDIUM_SLOW)
         );
 
-        public static AISequence JUMP_ROPE_FAST = new AISequence(4, 
+        public static AISequence JUMP_ROPE_FAST = new AISequence(
+            4, 
             CameraMove(false, new Vector3(0, 17.5f, -35)).Wait(1f),
-            Teleport(WEST_FAR, 200),
+            Teleport(WEST_FAR, 35),
             ShootLine(50, 100f, speed: Speed.SNIPE),
-            Teleport(EAST_FAR, 200),
+            Teleport(EAST_FAR, 35),
             ShootLine(50, 100f, speed: Speed.SNIPE),
-            Teleport(WEST_FAR, 200),
+            Teleport(WEST_FAR, 35),
             ShootLine(50, 100f, speed: Speed.SNIPE),
-            Teleport(EAST_FAR, 200),
+            Teleport(EAST_FAR, 35),
             ShootLine(50, 100f, speed: Speed.SNIPE),
             CameraMove(true)
         );
@@ -377,7 +378,7 @@ namespace AI
                         Shoot1(angleOffset: i, size: Size.MEDIUM, speed: Speed.SLOW)).Wait(0.01f));
                 }
                 return sequences.ToArray();
-            }).Wait(0.5f),
+            }).Wait(0.75f),
             PlayerLock(false)
         );
 
@@ -472,7 +473,25 @@ namespace AI
                         .SetAngleOffset(i * (360f / 50f))
                         .OnDestroyTimeout(CallbackDictionary.SPAWN_1_TOWARDS_PLAYER);
                 }
-            })
+            }).Wait(2f)
+        );
+
+        public static AISequence WAVE_REVERSE_TARGET_HOMING = new AISequence(
+            7,
+            new AISequence(() =>
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    Projectile
+                        .Create(self)
+                        .SetSpeed(Speed.FAST)
+                        .SetSize(Size.MEDIUM)
+                        .SetMaxTime(1f)
+                        .SetAngleOffset(i * (360f / 50f))
+                        .Homing()
+                        .OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER);
+                }
+            }).Wait(2f)
         );
 
 
@@ -513,7 +532,7 @@ namespace AI
         public static AISequence CIRCLE_IN_OUT = new AISequence(
             6,
             Teleport(CENTER).Wait(0.5f),
-            WAVE_REVERSE.Wait(1.5f).Times(5)
+            WAVE_REVERSE.Wait(1.5f).Times(5).Wait(3f)
         );
 
         public static AISequence CIRCLE_JUMP_ROPE = new AISequence(

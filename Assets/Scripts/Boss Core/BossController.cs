@@ -30,6 +30,10 @@ public class BossController : MonoBehaviour
     // The event queue. This is filled with sequences representing future actions.
     private static EventQueue eventQueue;
 
+    // Toggles insane mode. This just makes everything a living hell.
+    // Specifically, every waiting period is reduced and movement speed is buffed.
+    public static bool insaneMode = false;
+
     #region Arena Location constants
     public static float BOSS_HEIGHT = 1.31f;
     private static float FAR = 45f;
@@ -100,9 +104,11 @@ public class BossController : MonoBehaviour
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
         phase = AIPhase.PHASE1;
+        /*
         for (int i = 0; i < 100; i++) {
             eventQueue.Add(phase.GetNext());
         }
+        */
         //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
 
         Profiler.EndSample();
@@ -114,6 +120,10 @@ public class BossController : MonoBehaviour
         //Vector3 playerPos = player.transform.position;
 
         eventQueue.Update();
+        if (eventQueue.Empty())
+        {
+            eventQueue.Add(phase.GetNext());
+        }
     }
 
     public static void Glare()
@@ -270,13 +280,12 @@ public class BossController : MonoBehaviour
         });
     }
 
-    public static AISequence Teleport(Vector3? target = null, int speed = 100) {
+    public static AISequence Teleport(Vector3? target = null, int speed = 25) {
         return new AISequence(() =>
         {
-
+            self.movespeed.LockTo(speed);
             if (target.HasValue)
             {
-                self.movespeed.SetBase(speed);
                 instance.StartCoroutine(Dashing(target.Value));
                 Glare();
                 return;
@@ -333,7 +342,7 @@ public class BossController : MonoBehaviour
         float dist;
         while ((dist = Vector3.Distance(targetPosition, instance.transform.position)) > 0f) {
             
-            float dashDistance = self.movespeed.Value * 4 * Time.deltaTime;
+            float dashDistance = (insaneMode ? 1.2f : 1f) * self.movespeed.Value * 4 * Time.deltaTime;
 
             if (dist < dashDistance)
             {
@@ -345,15 +354,15 @@ public class BossController : MonoBehaviour
             yield return null;
         }
 
-        self.movespeed.SetBase(100);
+        self.movespeed.LockTo(25);
         eventQueue.Unpause();
     }
 
-    public static AISequence Strafe(bool clockwise = true, float degrees = 10f, int speed = 100, Vector3 center = default(Vector3))
+    public static AISequence Strafe(bool clockwise = true, float degrees = 10f, int speed = 25, Vector3 center = default(Vector3))
     {
         return new AISequence(() =>
         {
-            self.movespeed.SetBase(speed);
+            self.movespeed.LockTo(speed);
 
             Vector3 oldPosVector = instance.transform.position - center;
             Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);

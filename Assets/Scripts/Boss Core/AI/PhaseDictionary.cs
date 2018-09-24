@@ -49,8 +49,27 @@ namespace AI
             .AddSequence(10, SPLIT_6)
             .AddSequence(10, SPLIT_6_CURVE)
             .AddSequence(10, CIRCLE_IN_OUT)
-            //.AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
+            .AddSequence(10, SWEEP_WALL_CLOCKWISE)
+            .AddSequence(10, SWEEP_WALL_COUNTERCLOCKWISE)
+            .AddSequence(5, SWEEP_WALL_BACK_AND_FORTH)
+            .AddSequence(10, WAVE_REVERSE) // maybe add a new color for reversal attacks
+            .AddSequence(10, WAVE_REVERSE_TARGET)
+            .AddSequence(10, WAVE_REVERSE_TARGET_HOMING) // is this too hard? 
+                                                         //.AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
             .AddScriptedSequence(5, JUMP_ROPE_FAST);
+
+        static AIPhase() {
+            if (BossController.insaneMode)
+            {
+                PHASE1
+                    .AddSequence(10, DOUBLE_HEX_CURVE_HARD)
+                    .AddSequence(10, DEATH_HEX)
+                    .AddSequence(10, FOUR_WAY_SWEEP_WITH_HOMING)
+                    .AddSequence(10, RANDOM_200_WAVE)
+                    .AddSequence(10, CIRCLE_JUMP_ROPE)
+                    ;
+            }
+        }
 
         public static AIPhase HARD_PHASE = new AIPhase()
             //.AddSequence(10, WAVE_CIRCLE)

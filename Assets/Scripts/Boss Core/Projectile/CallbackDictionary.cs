@@ -59,8 +59,21 @@ namespace Projectiles
                 .Create(self.entity)
                 .SetStart(self.transform.position)
                 .SetTarget(null)
+                .SetMaxTime(self.maxTime)
                 .SetSize(self.size)
                 .SetSpeed(Speed.SNIPE);
+        };
+
+        public static ProjectileCallbackDelegate SPAWN_1_HOMING_TOWARDS_PLAYER = (self) =>
+        {
+            Projectile
+                .Create(self.entity)
+                .SetStart(self.transform.position)
+                .SetTarget(null)
+                .SetSize(self.size)
+                .SetSpeed(Speed.SNIPE)
+                .SetMaxTime(self.maxTime)
+                .Homing();
         };
 
         public static ProjectileCallbackDelegate REVERSE = (self) =>

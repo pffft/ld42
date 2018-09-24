@@ -32,17 +32,18 @@ namespace AI
          */
         public void Add(float duration, AIEvent.Action action)
         {
-            float start = 0;
-            if (internalTime > lastTime)
+
+            if (BossController.insaneMode)
             {
-                start = internalTime;
-            }
-            else
-            {
-                start = lastTime;
-                lastTime += duration;
+                duration = duration / 1.5f;
             }
 
+            // Schedule the event immediately if possible (internalTime), or if
+            // there are other events on the queue already (lastTime > internalTime),
+            // schedule the event as soon as possible.
+            float start = Mathf.Max(internalTime, lastTime);
+            //float start = internalTime;
+            lastTime = start + duration;
             events.Enqueue(new AIEvent(start, duration, action));
         }
 
@@ -79,11 +80,13 @@ namespace AI
         /*
          * Adds a sequence with an additional delay afterwards.
          */
+        /*
         public void Add(float delay, AISequence sequence)
         {
             Add(sequence);
             Add(delay, (AISequence)null);
         }
+        */
 
         /*
          * Adds a single action "times" times to the queue.
