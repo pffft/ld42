@@ -111,6 +111,8 @@ public class BossController : MonoBehaviour
         */
         //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
 
+        eventQueue.Add(AISequence.AOE_TEST);
+
         Profiler.EndSample();
     }
 
@@ -120,10 +122,12 @@ public class BossController : MonoBehaviour
         //Vector3 playerPos = player.transform.position;
 
         eventQueue.Update();
+        /*
         if (eventQueue.Empty())
         {
             eventQueue.Add(phase.GetNext());
         }
+        */
     }
 
     public static void Glare()

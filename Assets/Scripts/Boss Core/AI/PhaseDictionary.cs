@@ -45,6 +45,7 @@ namespace AI
             //.AddSequence(10, DEATH_HEX)
             .AddSequence(10, SWEEP)
             .AddSequence(10, SWEEP_BACK_AND_FORTH)
+            .AddSequence(10, SWEEP_BACK_AND_FORTH_MEDIUM)
             .AddSequence(10, SWEEP_BACK_AND_FORTH_ADVANCED)
             .AddSequence(10, SPLIT_6)
             .AddSequence(10, SPLIT_6_CURVE)
