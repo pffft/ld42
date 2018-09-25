@@ -258,6 +258,10 @@ namespace AI
         // TODO: make an "unbuilt" aoe object- or have a specific and separate "create"
         // function that actually generates a new AOE object. that way we can pass in
         // an AOE and create it within a sequence only.
+        //
+        // make sure that if "target" is null, that the values get updated on create rather
+        // than being set on instantiation.
+        //
         // TODO: apply same changes to projectile.
         public static AISequence ShootAOE(AOE aoe)
         {
