@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using static BossController;
+using static AI.SequenceGenerators;
 using Projectiles;
 
 // TODO: move all boss controller sequences in here
@@ -204,7 +205,10 @@ namespace AI
             5f, 
             Teleport().Wait(0.5f),
             new AISequence(() => {
-                Projectile.Create(self, null, null, 0, 0.25f, Speed.VERY_FAST).DeathHex();
+                Projectile.Create(self)
+                          .SetMaxTime(0.25f)
+                          .SetSpeed(Speed.VERY_FAST)
+                          .DeathHex();
             }).Wait(0.5f)
         );
 

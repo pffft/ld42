@@ -4,7 +4,6 @@ using CombatCore;
 using UnityEngine;
 
 using UnityEngine.Profiling;
-using Projectiles; // TODO fold "speed" out into Boss core
 
 public class AOE : MonoBehaviour {
 
@@ -32,8 +31,11 @@ public class AOE : MonoBehaviour {
     // Where the attack is facing (the 0 line is defined by start-target)
     private Vector3 target;
 
+    // internal. How much this attack is rotated from the north line.
+    private float internalRotation;
+
     // How much this attack is rotated from the center line.
-    private float angleOffset = 0f;
+    private float angleOffset;
 
     // The scale of the inside ring, from 0-1 relative to the outside ring.
     // This value has no effect if "fixedWidth" is set; it will impact the
@@ -52,10 +54,10 @@ public class AOE : MonoBehaviour {
 
     // Does nothing if 0. Else, represents how many units there are between
     // the inner and outer ring at all times.
-    private float fixedWidth = 0;
+    private float fixedWidth;
 
     // internal. Time since the move started
-    private float currentTime = 0f;
+    private float currentTime;
 
     // The maximum lifetime of this attack
     private float maxTime = 100f;
@@ -84,7 +86,7 @@ public class AOE : MonoBehaviour {
         // Update the size of the AOE per its expansion rate.
         // We divide by two because AOEs move based on radius, not diameter;
         // this makes the speeds faster than for projectiles without this correction.
-        scale += (float)expansionSpeed / 2f * Time.deltaTime;
+        scale += (float)expansionSpeed * Time.deltaTime;
         gameObject.transform.localScale = scale * Vector3.one;
 
         // If the inner expansion speed is set, we must recompute the mesh- except if it's equal 
@@ -136,6 +138,12 @@ public class AOE : MonoBehaviour {
             aoe.regions[i] = false;
         }
 
+        // Initial config
+        aoe.SetStart(null)
+           .SetTarget(null)
+           .SetSpeed(Speed.MEDIUM)
+           .SetInnerSpeed(Speed.MEDIUM)
+           .SetInnerScale(0.9f);
         aoe.RecomputeMeshHole(); // Initial computation
 
         // We set the scale to 0 so that timing based attacks work properly.
@@ -147,14 +155,18 @@ public class AOE : MonoBehaviour {
 
     public AOE On(float from, float to)
     {
-        // Ensure negatives work, and that the bounds are valid
+        if (to < from)
+        {
+            return On(to, from);
+        }
+
+        if (from < 0 && to > 0)
+        {
+            return On(from + 360, 360).On(0, to);
+        }
+
         from = from < 0 ? from + 360 : from;
         to = to < 0 ? to + 360 : to;
-        if (to < from) {
-            float temp = to;
-            to = from;
-            from = temp;
-        }
 
         for (int i = 0; i < NUM_SECTIONS; i++)
         {
@@ -170,15 +182,18 @@ public class AOE : MonoBehaviour {
 
     public AOE Off(float from, float to)
     {
-        // Ensure negatives work, and that the bounds are valid
-        from = from < 0 ? from + 360 : from;
-        to = to < 0 ? to + 360 : to;
         if (to < from)
         {
-            float temp = to;
-            to = from;
-            from = temp;
+            return Off(to, from);
         }
+
+        if (from < 0 && to > 0)
+        {
+            return Off(from + 360, 360).Off(0, to);
+        }
+
+        from = from < 0 ? from + 360 : from;
+        to = to < 0 ? to + 360 : to;
 
         for (int i = 0; i < NUM_SECTIONS; i++)
         {
@@ -192,17 +207,37 @@ public class AOE : MonoBehaviour {
         return this;
     }
 
-    public AOE SetStart(Vector3 start)
+    public AOE SetStart(Vector3? start)
     {
-        this.start = start;
-        this.transform.position = start;
+        this.start = start ?? entity.transform.position;
+        this.transform.position = this.start;
         UpdateOrientation();
         return this;
     }
 
-    public AOE SetTarget(Vector3 target)
+    public AOE SetTarget(Vector3? target)
     {
-        this.target = target;
+        Vector3 targetPosition;
+        if (target == null)
+        {
+            if (entity.name.Equals(BossController.BOSS_NAME))
+            {
+                // TODO cache me
+                targetPosition = BossController.isPlayerLocked ?
+                   BossController.playerLockPosition :
+                   GameObject.Find("Player").transform.position;
+            }
+            else
+            {
+                targetPosition = Vector3.forward;
+            }
+        }
+        else
+        {
+            targetPosition = target.Value;
+        }
+
+        this.target = targetPosition;
         UpdateOrientation();
         return this;
     }
@@ -213,17 +248,22 @@ public class AOE : MonoBehaviour {
         Vector3 topDownSpawn = new Vector3(start.x, 0, start.z);
         Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
 
-        // Add in rotation offset from the angleOffset parameter
-        Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+        float degrees = Vector3.Angle(Vector3.forward, topDownTarget - topDownSpawn);
+        if (topDownTarget.x < 0) {
+            degrees = 360 - degrees;
+        }
+        this.internalRotation = degrees;
+        Debug.Log("internal rotation: " + degrees);
 
         // Compute the final rotation
-        Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
-        transform.rotation = rotation;
+        Quaternion rotation = Quaternion.AngleAxis(degrees + this.angleOffset, Vector3.up);
+        this.gameObject.transform.rotation = rotation;
     }
 
     public AOE SetAngleOffset(float degrees) {
         this.angleOffset = degrees;
         this.gameObject.transform.rotation = Quaternion.AngleAxis(degrees, Vector3.up);
+        UpdateOrientation();
         return this;
     }
 
@@ -281,12 +321,18 @@ public class AOE : MonoBehaviour {
             }
 
             // Get the section the player is colliding with
-            float degrees = Vector3.Angle(Vector3.forward, playerPositionFlat) + angleOffset;
+            float degrees = Vector3.Angle(Vector3.forward, playerPositionFlat);
             if (playerPositionFlat.x < 0) {
                 degrees = 360 - degrees;
             }
+            degrees -= internalRotation;
+            degrees -= angleOffset;
+            degrees = Mathf.Repeat(degrees, 360f);
+
+            Debug.Log(degrees);
 
             int section = (int)(degrees / THETA_STEP);
+            //Debug.Log("In section " + section);
 
             if (regions[section]) {
                 Entity.DamageEntity(otherEntity, this.entity, damage);
@@ -305,8 +351,8 @@ public class AOE : MonoBehaviour {
                 continue;
             }
 
-            float theta1 = Mathf.Deg2Rad * i * THETA_STEP;
-            float theta2 = Mathf.Deg2Rad * (i + 1) * THETA_STEP;
+            float theta1 = Mathf.Deg2Rad * (90f + (i * THETA_STEP));
+            float theta2 = Mathf.Deg2Rad * (90f + ((i + 1) * THETA_STEP));
 
             verticesList.Add(new Vector3(innerScale * Mathf.Cos(theta1), 0f, innerScale * Mathf.Sin(theta1)));
             verticesList.Add(new Vector3(Mathf.Cos(theta1), 0f, Mathf.Sin(theta1)));

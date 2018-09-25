@@ -14,7 +14,7 @@ namespace AI
         private List<AIPhaseScriptedComponent> scriptedSequences;
         private List<AIPhaseScriptedComponent> repeatingScriptedSequences;
 
-        private int totalWeight = 0;
+        private int totalWeight;
         private int count = -1;
 
         public AIPhase()

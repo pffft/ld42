@@ -8,14 +8,14 @@ namespace AI
     public class EventQueue
     {
 
-        private Queue<AIEvent> events;
+        private readonly Queue<AIEvent> events;
         private AIEvent lastEvent;
         private float lastTime;
 
         private float internalTime;
         private bool paused;
 
-        public EventQueue(Entity reference)
+        public EventQueue()
         {
             events = new Queue<AIEvent>();
             lastEvent = null;

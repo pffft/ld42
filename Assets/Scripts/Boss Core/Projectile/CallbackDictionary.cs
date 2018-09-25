@@ -13,12 +13,12 @@ namespace Projectiles
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.Create(self.entity,
-                                  start: self.transform.position,
-                                  target: body.velocity,
-                                  angleOffset: i * 60f,
-                                  maxTime: 3f,
-                                  speed: self.speed)
+                Projectile.Create(self.entity)
+                          .SetStart(self.transform.position)
+                          .SetTarget(body.velocity)
+                          .SetAngleOffset(i * 60f)
+                          .SetMaxTime(3f)
+                          .SetSpeed(self.speed)
                           .Curving((float)self.speed * 2f, true);
             }
         };
@@ -28,12 +28,12 @@ namespace Projectiles
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.Create(self.entity,
-                                  start: self.transform.position,
-                                  target: body.velocity,
-                                  angleOffset: i * 60f,
-                                  maxTime: 3f,
-                                  speed: self.speed)
+                Projectile.Create(self.entity)
+                          .SetStart(self.transform.position)
+                          .SetTarget(body.velocity)
+                          .SetAngleOffset(i * 60f)
+                          .SetMaxTime(3f)
+                          .SetSpeed(self.speed)
                           .Curving(0f, false);
             }
         };
@@ -43,13 +43,12 @@ namespace Projectiles
         {
             //BossController.ShootWave(50).events[0].action();
             for (int i = 0; i < 50; i++) {
-                Projectile
-                    .Create(self.entity)
-                    .SetStart(self.transform.position)
-                    .SetTarget(Vector3.forward)
-                    .SetSize(Size.MEDIUM)
-                    .SetSpeed(Speed.MEDIUM)
-                    .SetAngleOffset(i * (360f / 50f));
+                Projectile.Create(self.entity)
+                          .SetStart(self.transform.position)
+                          .SetTarget(Vector3.forward)
+                          .SetSize(Size.MEDIUM)
+                          .SetSpeed(Speed.MEDIUM)
+                          .SetAngleOffset(i * (360f / 50f));
             }
         };
 

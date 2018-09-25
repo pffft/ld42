@@ -5,7 +5,7 @@ namespace CombatCore.StatusComponents
 {
 	public class Reflecting : StatusComponent
 	{
-		private int hitsAbsorbed = 0;
+		private int hitsAbsorbed;
 
 		public override void OnApply(Entity subject)
 		{
@@ -26,7 +26,12 @@ namespace CombatCore.StatusComponents
             for (int i = -hitsAbsorbed / 2; i <= hitsAbsorbed / 2; i++)
             {
                 //Projectile.spawnBasic(subject, subject.transform.position, subject.transform.forward, 2f, i * 30f, Speed.VERY_FAST);
-                Projectile.Create(subject, target: subject.transform.forward, maxTime: 2f, angleOffset: i * 30f, speed: Speed.VERY_FAST);
+                //Projectile.Create(subject, target: subject.transform.forward, maxTime: 2f, angleOffset: i * 30f, speed: Speed.VERY_FAST);
+                Projectile.Create(subject)
+                          .SetTarget(subject.transform.forward)
+                          .SetMaxTime(2f)
+                          .SetAngleOffset(i * 30f)
+                          .SetSpeed(Speed.VERY_FAST);
             }
 
 			subject.SetRooted (false);

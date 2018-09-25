@@ -286,23 +286,6 @@ namespace Projectiles
         public virtual Material GetCustomMaterial() { return null; }
 
         /*
-         * Creates a new basic Projectile with the provided parameters. The default
-         * will be a small, medium speed projectile that starts at the entity's position
-         * and moves to the right; it will die after 10 seconds.
-         */
-        public static Projectile Create(Entity entity, Vector3? start=null, Vector3? target=null, float angleOffset=0f, float maxTime=10f, Speed speed=Speed.MEDIUM, Size size=Size.SMALL)
-        {
-            return Projectile
-                .Create(entity)
-                .SetStart(start)
-                .SetTarget(target)
-                .SetAngleOffset(angleOffset)
-                .SetMaxTime(maxTime)
-                .SetSpeed(speed)
-                .SetSize(size);
-        }
-
-        /*
          * Copies the data of this Projectile into a new one.
          * This then deletes the original Projectile component.
          * 
@@ -330,7 +313,7 @@ namespace Projectiles
             }
 
             // Destroy this component so the other one takes priority
-            GameObject.Destroy(this);
+            Destroy(this);
 
             // Return the new component
             return other;

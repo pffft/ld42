@@ -10,7 +10,7 @@ namespace Projectiles
         public Rigidbody body;
         public float curveAmount;
 
-        public int count = 0;
+        public int count;
         public float numSpawners = 30f;
 
         public bool leavesTrail;
@@ -30,11 +30,11 @@ namespace Projectiles
                 if (currentTime > count / numSpawners)
                 {
                     count++;
-                    Projectile.Create(entity,
-                                      start: transform.position,
-                                      maxTime: maxTime - currentTime,
-                                      size: Size.SMALL,
-                                      speed: Speed.FROZEN);
+                    Create(entity)
+                      .SetStart(transform.position)
+                      .SetMaxTime(maxTime - currentTime)
+                      .SetSize(Size.SMALL)
+                      .SetSpeed(Speed.FROZEN);
                 }
             }
         }

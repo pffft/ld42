@@ -70,9 +70,10 @@ namespace CombatCore
 		private static bool PlayerShoot(Entity subject, Vector3 targetPosition, params object[] args)
 		{
             Debug.Log ("PlayerShoot");
-			//Vector3 dir = targetPosition - subject.transform.position;
-            //Quaternion rot = Quaternion.LookRotation (dir, Vector3.up);
-            Projectile.Create(subject, target: targetPosition, maxTime: 2f, speed: Speed.VERY_FAST);
+            Projectile.Create(subject)
+                      .SetTarget(targetPosition)
+                      .SetMaxTime(2f)
+                      .SetSpeed(Speed.VERY_FAST);
 
 			//TODO throw shield, player abilities disabled while shield is thrown
 
