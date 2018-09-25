@@ -111,7 +111,7 @@ public class BossController : MonoBehaviour
         */
         //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
 
-        eventQueue.Add(AISequence.AOE_TEST);
+        eventQueue.Add(AISequence.AOE_TEST.Times(50));
 
         Profiler.EndSample();
     }

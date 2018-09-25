@@ -40,7 +40,7 @@ public class AOE : MonoBehaviour {
     private float damage = 5f;
 
     private float currentTime = 0f;
-    private float maxTime = 10f;
+    private float maxTime = 100f;
 
     private float angleOffset = 0f;
 
@@ -72,10 +72,10 @@ public class AOE : MonoBehaviour {
         // to the outer expansion speed, which is the same as just scaling. Then we don't recompute.
         if (Mathf.Abs(innerExpansionSpeed) > 0.01f && !Mathf.Approximately(expansionSpeed, innerExpansionSpeed))
         {
-            Debug.Log("Separate inner update");
+            //Debug.Log("Separate inner update");
             float ideal = (innerExpansionSpeed / expansionSpeed);
             innerScale = innerScale - ((innerScale - ideal) * Time.deltaTime);
-            Debug.Log(innerScale);
+            //Debug.Log(innerScale);
 
             RecomputeMeshHole();
             return;
@@ -108,10 +108,6 @@ public class AOE : MonoBehaviour {
         collider.radius = 1f;
         collider.isTrigger = true;
 
-        Rigidbody body = obj.AddComponent<Rigidbody>();
-        body.useGravity = false;
-        body.isKinematic = true;
-
         AOE aoe = obj.AddComponent<AOE>();
         aoe.entity = self;
         aoe.regions = new bool[NUM_SECTIONS];
@@ -136,6 +132,7 @@ public class AOE : MonoBehaviour {
         // Set max size/ max time
         // Set expansion speed
         // Thickness- as % or as fixed distance
+        // rotation?
     }
 
     public AOE On(float from, float to) {
@@ -232,49 +229,6 @@ public class AOE : MonoBehaviour {
         }
     }
 
-    // Makes a mesh that connects to the center. Currently unused
-    private void RecomputeMesh()
-    {
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-
-        List<Vector3> verticesList = new List<Vector3>();
-        for (int i = 0; i < NUM_SECTIONS; i++)
-        {
-            if (!regions[i]) {
-                continue;
-            }
-
-            float theta1 = Mathf.Deg2Rad * i * THETA_STEP;
-            float theta2 = Mathf.Deg2Rad * (i + 1) * THETA_STEP;
-
-            verticesList.Add(Vector3.zero);
-            verticesList.Add(new Vector3(scale * Mathf.Cos(theta1), 0f, scale * Mathf.Sin(theta1)));
-            verticesList.Add(new Vector3(scale * Mathf.Cos(theta2), 0f, scale * Mathf.Sin(theta2)));
-        }
-
-        Vector3[] vertices = verticesList.ToArray();
-
-        int[] triangles = new int[vertices.Length];
-        for (int i = 0; i < triangles.Length / 3; i++)
-        {
-            triangles[(3 * i) + 0] = (3 * i) + 0;
-            triangles[(3 * i) + 1] = (3 * i) + 1;
-            triangles[(3 * i) + 2] = (3 * i) + 2;
-        }
-
-        // Unity complains about assigning a new vertices array to a mesh
-        if (meshFilter.sharedMesh.vertices.Length != vertices.Length)
-        {
-            meshFilter.sharedMesh.Clear();
-        }
-        meshFilter.sharedMesh.vertices = vertices;
-        meshFilter.sharedMesh.triangles = triangles;
-        meshFilter.sharedMesh.RecalculateNormals();
-
-        transform.position = new Vector3(0f, HEIGHT, 0f);
-        name = "AOE";
-    }
-
     // Makes a mesh, possibly with a hole in the middle of variable distance.
     private void RecomputeMeshHole() {
         MeshFilter meshFilter = GetComponent<MeshFilter>();
@@ -319,63 +273,4 @@ public class AOE : MonoBehaviour {
         meshFilter.sharedMesh.RecalculateNormals();
         transform.position = new Vector3(0f, HEIGHT, 0f);
     }
-
-    /*
-    private static AOE GenerateWithoutHole(bool isCancel = false)
-    {
-        GameObject obj = new GameObject();
-        MeshFilter meshFilter = obj.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
-        MeshCollider meshCollider = obj.AddComponent<MeshCollider>();
-
-        AOE aoe = obj.AddComponent<AOE>();
-
-        aoe.regions = new bool[NUM_SECTIONS];
-
-        Mesh mesh = new Mesh();
-
-        Vector3[] vertices = new Vector3[NUM_SECTIONS * 3];
-        //float thetaStep = 360f / numSections;
-        for (int i = 0; i < NUM_SECTIONS; i++)
-        {
-            float theta1 = Mathf.Deg2Rad * i * THETA_STEP;
-            float theta2 = Mathf.Deg2Rad * (i + 1) * THETA_STEP;
-
-            vertices[(3 * i) + 0] = Vector3.zero;
-            vertices[(3 * i) + 1] = new Vector3(Mathf.Cos(theta1), 0f, Mathf.Sin(theta1));
-            vertices[(3 * i) + 2] = new Vector3(Mathf.Cos(theta2), 0f, Mathf.Sin(theta2));
-        }
-
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            Debug.Log(vertices[i]);
-        }
-
-        int[] triangles = new int[NUM_SECTIONS * 3];
-        for (int i = 0; i < NUM_SECTIONS; i++)
-        {
-            triangles[(3 * i) + 0] = (3 * i) + 0;
-            triangles[(3 * i) + 1] = (3 * i) + 2;
-            triangles[(3 * i) + 2] = (3 * i) + 1;
-        }
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
-
-        meshFilter.mesh = mesh;
-        if (!isCancel)
-        {
-            obj.transform.position = new Vector3(0f, HEIGHT, 0f);
-            meshRenderer.material = new Material(Resources.Load<Material>("Art/Materials/AOE"));
-        } else
-        {
-            obj.transform.position = new Vector3(0f, HEIGHT + 0.01f, 0f);
-            meshRenderer.material = new Material(Shader.Find("Diffuse"));
-        }
-        meshCollider.sharedMesh = mesh;
-
-        return aoe;
-    }
-    */
 }

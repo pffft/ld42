@@ -266,7 +266,7 @@ namespace Projectiles
             Entity otherEntity = otherObject.GetComponent<Entity>();
             if (otherEntity != null)
             {
-                if (otherEntity.GetFaction() != this.entity.GetFaction())
+                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != this.entity.GetFaction())
                 {
                     Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, this.entity, damage);
