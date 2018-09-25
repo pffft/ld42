@@ -4,6 +4,7 @@ using CombatCore;
 using UnityEngine;
 
 using UnityEngine.Profiling;
+using Projectiles; // TODO fold "speed" out into Boss core
 
 public class AOE : MonoBehaviour {
 
@@ -31,8 +32,8 @@ public class AOE : MonoBehaviour {
     // internal tracker of current scale
     private float scale = 1f;
 
-    private float innerExpansionSpeed = 5f;
-    private float expansionSpeed = 20f;
+    private Speed innerExpansionSpeed = Speed.MEDIUM_SLOW;
+    private Speed expansionSpeed = Speed.MEDIUM_SLOW;
 
     private float fixedWidth = 0;
 
@@ -61,19 +62,19 @@ public class AOE : MonoBehaviour {
         if (scale > GameObject.Find("Arena").transform.localScale.x * 50f)
         {
             //Debug.Log("Ring hit arena. Returning.");
-            //Destroy(this.gameObject);
+            Destroy(this.gameObject);
         }
 
         // Update the size of the AOE per its expansion rate.
-        scale += expansionSpeed * Time.deltaTime;
+        scale += (float)expansionSpeed / 2f * Time.deltaTime;
         gameObject.transform.localScale = scale * Vector3.one;
 
         // If the inner expansion speed is set, we must recompute the mesh- except if it's equal 
         // to the outer expansion speed, which is the same as just scaling. Then we don't recompute.
-        if (Mathf.Abs(innerExpansionSpeed) > 0.01f && !Mathf.Approximately(expansionSpeed, innerExpansionSpeed))
+        if (Mathf.Abs((float)innerExpansionSpeed) > 0.01f && !Mathf.Approximately((float)expansionSpeed, (float)innerExpansionSpeed))
         {
             //Debug.Log("Separate inner update");
-            float ideal = (innerExpansionSpeed / expansionSpeed);
+            float ideal = ((float)innerExpansionSpeed / (float)expansionSpeed);
             innerScale = innerScale - ((innerScale - ideal) * Time.deltaTime);
             //Debug.Log(innerScale);
 
@@ -112,10 +113,10 @@ public class AOE : MonoBehaviour {
         aoe.entity = self;
         aoe.regions = new bool[NUM_SECTIONS];
         for (int i = 0; i < aoe.regions.Length; i++) {
-            aoe.regions[i] = true;
+            aoe.regions[i] = false;
         }
         //aoe.Off(0, 120).Off(140, 150).Off(180, 270).On(200, 220);
-        aoe.Off(0, 60).Off(120, 180).Off(240, 300);
+        //aoe.Off(0, 60).Off(120, 180).Off(240, 300);
 
         aoe.RecomputeMeshHole();
 
@@ -135,11 +136,12 @@ public class AOE : MonoBehaviour {
         // rotation?
     }
 
-    public AOE On(float from, float to) {
-        for (int i = 0; i < NUM_SECTIONS; i++) 
+    public AOE On(float from, float to)
+    {
+        for (int i = 0; i < NUM_SECTIONS; i++)
         {
             float angle = (i + 0.5f) * THETA_STEP;
-            if (angle >= from && angle <= to) 
+            if (angle >= from && angle <= to)
             {
                 regions[i] = true;
             }
@@ -162,15 +164,33 @@ public class AOE : MonoBehaviour {
         return this;
     }
 
+    public AOE SetStart(Vector3 start)
+    {
+        this.transform.position = start;
+        return this;
+    }
+
+    // TODO implement me
+    public AOE SetTarget(Vector3 target)
+    {
+        return this;
+    }
+
     public AOE SetAngleOffset(float degrees) {
         this.angleOffset = degrees;
         this.gameObject.transform.rotation = Quaternion.AngleAxis(degrees, Vector3.up);
         return this;
     }
 
+    public AOE SetSpeed(Speed speed)
+    {
+        this.expansionSpeed = speed;
+        return this;
+    }
+
     public AOE SetFixedWidth(float width) {
         this.innerScale = 0f;
-        this.innerExpansionSpeed = 0f;
+        this.innerExpansionSpeed = Speed.FROZEN;
         this.fixedWidth = width;
         RecomputeMeshHole();
         return this;
@@ -184,7 +204,7 @@ public class AOE : MonoBehaviour {
         return this;
     }
 
-    public AOE SetInnerSpeed(float speed) {
+    public AOE SetInnerSpeed(Speed speed) {
         //this.innerScale = 0f; // initial inner scale gives slightly different effects
         this.innerExpansionSpeed = speed;
         this.fixedWidth = 0f;

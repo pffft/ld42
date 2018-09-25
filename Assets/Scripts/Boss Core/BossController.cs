@@ -111,7 +111,14 @@ public class BossController : MonoBehaviour
         */
         //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
 
-        eventQueue.Add(AISequence.AOE_TEST.Times(50));
+        eventQueue.Add(new AISequence(() => {
+            float degrees = Vector3.Angle(player.transform.position, Vector3.forward);
+            if (player.transform.position.x < 0)
+            {
+                degrees = 360 - degrees;
+            }
+            AOE.Create(self).SetSpeed(Speed.SLOW).On(0, 120).SetAngleOffset(150).SetFixedWidth(5);
+        }));
 
         Profiler.EndSample();
     }
