@@ -8,13 +8,6 @@ using Projectiles; // TODO fold "speed" out into Boss core
 
 public class AOE : MonoBehaviour {
 
-    //private static float oldInnerRadius = 5f;
-    //private static float oldRadius = 10f;
-
-    //public static float innerRadius = 5f;
-    //public static float radius = 10f;
-
-    // This value might be tweaked based on how smooth the AOE attacks need to look.
     // How many sections are in the AOE attack mesh
     public const int NUM_SECTIONS = 360 / 5;
 
@@ -24,27 +17,50 @@ public class AOE : MonoBehaviour {
     // The height at which we render the AOE, so it doesn't clip the ground.
     private const float HEIGHT = 0.5f;
 
-    // internal tracker of what triangles are on or off
+    // How much damage this attack does (TODO make this a parameter; same for Projectiles)
+    private const float damage = 5f;
+
+    // Mostly so we know what side we're on.
+    private Entity entity;
+
+    // internal. Tracks what triangles are on or off in the mesh
     private bool[] regions;
 
-    private float innerScale = 1f;
+    // Origin of the attack
+    private Vector3 start;
 
-    // internal tracker of current scale
-    private float scale = 1f;
+    // Where the attack is facing (the 0 line is defined by start-target)
+    private Vector3 target;
 
-    private Speed innerExpansionSpeed = Speed.MEDIUM_SLOW;
-    private Speed expansionSpeed = Speed.MEDIUM_SLOW;
-
-    private float fixedWidth = 0;
-
-    private Entity entity;
-    private float damage = 5f;
-
-    private float currentTime = 0f;
-    private float maxTime = 100f;
-
+    // How much this attack is rotated from the center line.
     private float angleOffset = 0f;
 
+    // The scale of the inside ring, from 0-1 relative to the outside ring.
+    // This value has no effect if "fixedWidth" is set; it will impact the
+    // profile of the attack if "innerExpansionSpeed" is set and different
+    // from "expansionSpeed". 
+    private float innerScale = 1f;
+
+    // Current scale. This relates exactly to the radius of the attack.
+    private float scale = 1f;
+
+    // How fast the inner ring expands
+    private Speed innerExpansionSpeed = Speed.MEDIUM_SLOW;
+
+    // How fast the outer ring expands
+    private Speed expansionSpeed = Speed.MEDIUM_SLOW;
+
+    // Does nothing if 0. Else, represents how many units there are between
+    // the inner and outer ring at all times.
+    private float fixedWidth = 0;
+
+    // internal. Time since the move started
+    private float currentTime = 0f;
+
+    // The maximum lifetime of this attack
+    private float maxTime = 100f;
+
+    // Every AOE has the same material, for now. We cache it here.
     private static readonly Material AOE_MATERIAL;
     static AOE() {
         AOE_MATERIAL = new Material(Resources.Load<Material>("Art/Materials/AOE"));
@@ -66,6 +82,8 @@ public class AOE : MonoBehaviour {
         }
 
         // Update the size of the AOE per its expansion rate.
+        // We divide by two because AOEs move based on radius, not diameter;
+        // this makes the speeds faster than for projectiles without this correction.
         scale += (float)expansionSpeed / 2f * Time.deltaTime;
         gameObject.transform.localScale = scale * Vector3.one;
 
@@ -96,11 +114,13 @@ public class AOE : MonoBehaviour {
     public static AOE Create(Entity self)
     {
         GameObject obj = new GameObject();
+        obj.transform.position = self.transform.position;
         obj.layer = LayerMask.NameToLayer("AOE");
         obj.name = "AOE";
 
         MeshFilter meshFilter = obj.AddComponent<MeshFilter>();
         meshFilter.mesh = new Mesh();
+
         MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
         meshRenderer.material = AOE_MATERIAL;
 
@@ -115,29 +135,27 @@ public class AOE : MonoBehaviour {
         for (int i = 0; i < aoe.regions.Length; i++) {
             aoe.regions[i] = false;
         }
-        //aoe.Off(0, 120).Off(140, 150).Off(180, 270).On(200, 220);
-        //aoe.Off(0, 60).Off(120, 180).Off(240, 300);
 
-        aoe.RecomputeMeshHole();
-
+        aoe.RecomputeMeshHole(); // Initial computation
 
         // We set the scale to 0 so that timing based attacks work properly.
-        // Otherwise the scale is 1 by default.
+        // Otherwise the scale is 1, because computing the mesh required it.
         aoe.scale = 0f;
         obj.transform.localScale = aoe.scale * Vector3.one;
         return aoe;
-
-        // Set origin pos
-        // Set on(from, to) and off(from, to)
-        // Set angleOffset 
-        // Set max size/ max time
-        // Set expansion speed
-        // Thickness- as % or as fixed distance
-        // rotation?
     }
 
     public AOE On(float from, float to)
     {
+        // Ensure negatives work, and that the bounds are valid
+        from = from < 0 ? from + 360 : from;
+        to = to < 0 ? to + 360 : to;
+        if (to < from) {
+            float temp = to;
+            to = from;
+            from = temp;
+        }
+
         for (int i = 0; i < NUM_SECTIONS; i++)
         {
             float angle = (i + 0.5f) * THETA_STEP;
@@ -152,6 +170,16 @@ public class AOE : MonoBehaviour {
 
     public AOE Off(float from, float to)
     {
+        // Ensure negatives work, and that the bounds are valid
+        from = from < 0 ? from + 360 : from;
+        to = to < 0 ? to + 360 : to;
+        if (to < from)
+        {
+            float temp = to;
+            to = from;
+            from = temp;
+        }
+
         for (int i = 0; i < NUM_SECTIONS; i++)
         {
             float angle = (i + 0.5f) * THETA_STEP;
@@ -166,14 +194,31 @@ public class AOE : MonoBehaviour {
 
     public AOE SetStart(Vector3 start)
     {
+        this.start = start;
         this.transform.position = start;
+        UpdateOrientation();
         return this;
     }
 
-    // TODO implement me
     public AOE SetTarget(Vector3 target)
     {
+        this.target = target;
+        UpdateOrientation();
         return this;
+    }
+
+    // Updates the 0 line for the AOE attack. Called when start or target change.
+    private void UpdateOrientation() {
+        // Remove any height from the start and target vectors
+        Vector3 topDownSpawn = new Vector3(start.x, 0, start.z);
+        Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+
+        // Add in rotation offset from the angleOffset parameter
+        Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+
+        // Compute the final rotation
+        Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
+        transform.rotation = rotation;
     }
 
     public AOE SetAngleOffset(float degrees) {
@@ -249,7 +294,7 @@ public class AOE : MonoBehaviour {
         }
     }
 
-    // Makes a mesh, possibly with a hole in the middle of variable distance.
+    // Makes a mesh, possibly with a hole if variable size in the middle.
     private void RecomputeMeshHole() {
         MeshFilter meshFilter = GetComponent<MeshFilter>();
 

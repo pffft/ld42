@@ -8,7 +8,6 @@ namespace AI
     public class EventQueue
     {
 
-        private Entity entity;
         private Queue<AIEvent> events;
         private AIEvent lastEvent;
         private float lastTime;
@@ -18,8 +17,6 @@ namespace AI
 
         public EventQueue(Entity reference)
         {
-            this.entity = reference;
-
             events = new Queue<AIEvent>();
             lastEvent = null;
             lastTime = 0;
