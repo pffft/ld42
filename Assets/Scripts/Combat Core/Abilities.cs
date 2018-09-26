@@ -71,9 +71,9 @@ namespace CombatCore
 		{
             Debug.Log ("PlayerShoot");
             Projectile.New(subject)
-                      .SetTarget(targetPosition)
-                      .SetMaxTime(2f)
-                      .SetSpeed(Speed.VERY_FAST)
+                      .Target(targetPosition)
+                      .MaxTime(2f)
+                      .Speed(BossCore.Speed.VERY_FAST)
                       .Create();
 
 			//TODO throw shield, player abilities disabled while shield is thrown

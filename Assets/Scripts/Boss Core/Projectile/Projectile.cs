@@ -23,7 +23,7 @@ namespace Projectiles
             public Vector3 target;
             public float angleOffset;
 
-            public Speed speed;
+            public BossCore.Speed speed;
             public Size size;
             public Type type;
             public object[] _typeParameters;
@@ -77,8 +77,8 @@ namespace Projectiles
                 this.target = Vector3.zero;
                 this.angleOffset = 0f;
 
-                this.speed = Speed.MEDIUM;
-                this.size = Size.SMALL;
+                this.speed = BossCore.Speed.MEDIUM;
+                this.size = Projectiles.Size.SMALL;
                 this.type = Type.BASIC;
                 this._typeParameters = null;
 
@@ -93,42 +93,42 @@ namespace Projectiles
             }
 
             // Builder method
-            public ProjectileStructure SetStart(Vector3? start)
+            public ProjectileStructure Start(Vector3? start)
             {
                 this.preStart = start;
                 return this;
             }
 
             // Builder method
-            public ProjectileStructure SetTarget(Vector3? target)
+            public ProjectileStructure Target(Vector3? target)
             {
                 this.preTarget = target;
                 return this;
             }
 
             // Builder method
-            public ProjectileStructure SetAngleOffset(float offsetDegrees)
+            public ProjectileStructure AngleOffset(float offsetDegrees)
             {
                 this.angleOffset = offsetDegrees;
                 return this;
             }
 
             // Builder method
-            public ProjectileStructure SetMaxTime(float seconds)
+            public ProjectileStructure MaxTime(float seconds)
             {
                 this.maxTime = seconds;
                 return this;
             }
 
             // Builder method
-            public ProjectileStructure SetSpeed(Speed speed)
+            public ProjectileStructure Speed(BossCore.Speed speed)
             {
                 this.speed = speed;
                 return this;
             }
 
             // Builder method
-            public ProjectileStructure SetSize(Size size)
+            public ProjectileStructure Size(Size size)
             {
                 this.size = size;
                 return this;
@@ -183,7 +183,6 @@ namespace Projectiles
         public void Awake()
         {
             // Sets start
-            Debug.Log("Is data entity null?: " + (data.entity == null) + " type is " + GetType());
             data.start = data.preStart ?? data.entity.transform.position;
 
             // Sets target

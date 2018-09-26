@@ -93,6 +93,8 @@ public class BossController : MonoBehaviour
         //eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-120, 120).SetFixedWidth(6)).Wait(10f));
         //eventQueue.Add(ShootAOE(AOE.New(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(6)).Wait(0.5f).Times(20));
 
+        eventQueue.Add(AISequence.AOE_131_MEDIUM_LONG.Wait(0.5f).Times(10));
+
         Profiler.EndSample();
     }
 
@@ -100,7 +102,7 @@ public class BossController : MonoBehaviour
     void Update()
     {
         eventQueue.Update();
-        #if true
+        #if false
         if (eventQueue.Empty())
         {
             eventQueue.Add(phase.GetNext());

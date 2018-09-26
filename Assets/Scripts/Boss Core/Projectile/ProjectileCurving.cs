@@ -31,10 +31,10 @@ namespace Projectiles
                 {
                     count++;
                     New(data.entity)
-                        .SetStart(transform.position)
-                        .SetMaxTime(data.maxTime - data.currentTime)
-                        .SetSize(Size.SMALL)
-                        .SetSpeed(Speed.FROZEN)
+                        .Start(transform.position)
+                        .MaxTime(data.maxTime - data.currentTime)
+                        .Size(Size.SMALL)
+                        .Speed(BossCore.Speed.FROZEN)
                         .Create();
                 }
             }

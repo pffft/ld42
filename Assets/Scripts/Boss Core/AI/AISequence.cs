@@ -80,6 +80,9 @@ namespace AI
          * 
          * This is useful for chaining individual "Shoot1" methods together,
          * or stitching various "ShootArc" methods.
+         * 
+         * TODO: make this stitch more complex AISequences using their timings. do a zipper merge!
+         * this will allow things like having concurrent "Sweep" attacks in opposite directions.
          */
         public static AISequence Merge(params AISequence[] sequences) {
             return new AISequence(() => {

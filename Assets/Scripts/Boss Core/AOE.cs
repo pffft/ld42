@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using CombatCore;
 using UnityEngine;
 
+using BossCore;
+
 using UnityEngine.Profiling;
 
 public class AOE : MonoBehaviour {
@@ -71,8 +73,8 @@ public class AOE : MonoBehaviour {
             this.angleOffset = 0f;
             this.innerScale = 0.9f;
             this.scale = 1f;
-            this.innerExpansionSpeed = Speed.MEDIUM;
-            this.expansionSpeed = Speed.MEDIUM;
+            this.innerExpansionSpeed = BossCore.Speed.MEDIUM;
+            this.expansionSpeed = BossCore.Speed.MEDIUM;
             this.fixedWidth = 0f;
             this.currentTime = 0f;
             this.maxTime = 100f;
@@ -130,39 +132,39 @@ public class AOE : MonoBehaviour {
             return this;
         }
 
-        public AOEStructure SetStart(Vector3? start)
+        public AOEStructure Start(Vector3? start)
         {
             this.preStart = start;
             return this;
         }
 
-        public AOEStructure SetTarget(Vector3? target)
+        public AOEStructure Target(Vector3? target)
         {
             this.preTarget = target;
             return this;
         }
 
-        public AOEStructure SetAngleOffset(float degrees)
+        public AOEStructure AngleOffset(float degrees)
         {
             this.angleOffset = degrees;
             return this;
         }
 
-        public AOEStructure SetSpeed(Speed speed)
+        public AOEStructure Speed(Speed speed)
         {
             this.expansionSpeed = speed;
             return this;
         }
 
-        public AOEStructure SetFixedWidth(float width)
+        public AOEStructure FixedWidth(float width)
         {
             this.innerScale = 0f;
-            this.innerExpansionSpeed = Speed.FROZEN;
+            this.innerExpansionSpeed = BossCore.Speed.FROZEN;
             this.fixedWidth = width;
             return this;
         }
 
-        public AOEStructure SetInnerScale(float scale)
+        public AOEStructure InnerScale(float scale)
         {
             this.innerScale = scale;
             //this.innerExpansionSpeed = 0f;
@@ -170,7 +172,7 @@ public class AOE : MonoBehaviour {
             return this;
         }
 
-        public AOEStructure SetInnerSpeed(Speed speed)
+        public AOEStructure InnerSpeed(Speed speed)
         {
             //this.innerScale = 0f; // initial inner scale gives slightly different effects
             this.innerExpansionSpeed = speed;
@@ -194,7 +196,7 @@ public class AOE : MonoBehaviour {
             meshRenderer.material = AOE_MATERIAL;
 
             CapsuleCollider collider = obj.AddComponent<CapsuleCollider>();
-            collider.center = obj.transform.position;
+            collider.center = Vector3.zero;
             collider.radius = 1f;
             collider.isTrigger = true;
 
@@ -330,12 +332,11 @@ public class AOE : MonoBehaviour {
         Vector3 topDownTarget = new Vector3(data.target.x, 0, data.target.z);
 
         float degrees = Vector3.Angle(Vector3.forward, topDownTarget - topDownSpawn);
-        if (topDownTarget.x < 0)
+        if (topDownTarget.x < topDownSpawn.x)
         {
             degrees = 360 - degrees;
         }
         data.internalRotation = degrees;
-        Debug.Log("internal rotation: " + degrees);
 
         // Compute the final rotation
         Quaternion rotation = Quaternion.AngleAxis(degrees + data.angleOffset, Vector3.up);
@@ -351,7 +352,8 @@ public class AOE : MonoBehaviour {
         Entity otherEntity = otherObject.GetComponent<Entity>();
         if (otherEntity != null && !otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
         {
-            Vector3 playerPositionFlat = new Vector3(other.transform.position.x, 0f, other.transform.position.z);
+            // Position relative to us; not absolute
+            Vector3 playerPositionFlat = new Vector3(other.transform.position.x - transform.position.x, 0f, other.transform.position.z - transform.position.z);
 
             // Inside of the safe circle
             if (playerPositionFlat.magnitude < data.innerScale * data.scale)
@@ -373,8 +375,8 @@ public class AOE : MonoBehaviour {
             degrees -= data.internalRotation;
             degrees -= data.angleOffset;
             degrees = Mathf.Repeat(degrees, 360f);
-
             Debug.Log(degrees);
+
 
             int section = (int)(degrees / THETA_STEP);
             //Debug.Log("In section " + section);
@@ -427,6 +429,6 @@ public class AOE : MonoBehaviour {
         meshFilter.sharedMesh.vertices = vertices;
         meshFilter.sharedMesh.triangles = triangles;
         meshFilter.sharedMesh.RecalculateNormals();
-        transform.position = new Vector3(0f, HEIGHT, 0f);
+        transform.position = new Vector3(data.start.x, HEIGHT, data.start.z);
     }
 }

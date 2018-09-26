@@ -28,10 +28,10 @@ namespace CombatCore.StatusComponents
                 //Projectile.spawnBasic(subject, subject.transform.position, subject.transform.forward, 2f, i * 30f, Speed.VERY_FAST);
                 //Projectile.Create(subject, target: subject.transform.forward, maxTime: 2f, angleOffset: i * 30f, speed: Speed.VERY_FAST);
                 Projectile.New(subject)
-                          .SetTarget(subject.transform.forward)
-                          .SetMaxTime(2f)
-                          .SetAngleOffset(i * 30f)
-                          .SetSpeed(Speed.VERY_FAST)
+                          .Target(subject.transform.forward)
+                          .MaxTime(2f)
+                          .AngleOffset(i * 30f)
+                          .Speed(BossCore.Speed.VERY_FAST)
                           .Create();
             }
 

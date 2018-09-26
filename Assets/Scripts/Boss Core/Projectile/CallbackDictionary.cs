@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using BossCore;
+
 namespace Projectiles
 {
     public static class CallbackDictionary
     {
-        public static ProjectileCallbackDelegate NOTHING = (self) => { Debug.Log("Test"); };
+        public static ProjectileCallbackDelegate NOTHING = (self) => { };
 
         public static ProjectileCallbackDelegate SPAWN_6_CURVING = (self) =>
         {
@@ -14,11 +16,11 @@ namespace Projectiles
             for (int i = 0; i < 6; i++)
             {
                 Projectile.New(self.data.entity)
-                          .SetStart(self.transform.position)
-                          .SetTarget(body.velocity)
-                          .SetAngleOffset(i * 60f)
-                          .SetMaxTime(3f)
-                          .SetSpeed(self.data.speed)
+                          .Start(self.transform.position)
+                          .Target(body.velocity)
+                          .AngleOffset(i * 60f)
+                          .MaxTime(3f)
+                          .Speed(self.data.speed)
                           .Curving((float)self.data.speed * 2f, true)
                           .Create();
             }
@@ -26,16 +28,15 @@ namespace Projectiles
 
         public static ProjectileCallbackDelegate SPAWN_6 = (self) =>
         {
-            Debug.Log("SPAWN 6 called");
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
                 Projectile.New(self.data.entity)
-                          .SetStart(self.transform.position)
-                          .SetTarget(body.velocity)
-                          .SetAngleOffset(i * 60f)
-                          .SetMaxTime(3f)
-                          .SetSpeed(self.data.speed)
+                          .Start(self.transform.position)
+                          .Target(body.velocity)
+                          .AngleOffset(i * 60f)
+                          .MaxTime(3f)
+                          .Speed(self.data.speed)
                           .Curving(0f, false)
                           .Create();
             }
@@ -47,11 +48,11 @@ namespace Projectiles
             //BossController.ShootWave(50).events[0].action();
             for (int i = 0; i < 50; i++) {
                 Projectile.New(self.data.entity)
-                          .SetStart(self.transform.position)
-                          .SetTarget(Vector3.forward)
-                          .SetSize(Size.MEDIUM)
-                          .SetSpeed(Speed.MEDIUM)
-                          .SetAngleOffset(i * (360f / 50f))
+                          .Start(self.transform.position)
+                          .Target(Vector3.forward)
+                          .Size(Size.MEDIUM)
+                          .Speed(Speed.MEDIUM)
+                          .AngleOffset(i * (360f / 50f))
                           .Create();
             }
         };
@@ -60,11 +61,11 @@ namespace Projectiles
         {
             Projectile
                 .New(self.data.entity)
-                .SetStart(self.transform.position)
-                .SetTarget(null)
-                .SetMaxTime(self.data.maxTime)
-                .SetSize(self.data.size)
-                .SetSpeed(Speed.SNIPE)
+                .Start(self.transform.position)
+                .Target(null)
+                .MaxTime(self.data.maxTime)
+                .Size(self.data.size)
+                .Speed(Speed.SNIPE)
                 .Create();
         };
 
@@ -72,11 +73,11 @@ namespace Projectiles
         {
             Projectile
                 .New(self.data.entity)
-                .SetStart(self.transform.position)
-                .SetTarget(null)
-                .SetSize(self.data.size)
-                .SetSpeed(Speed.SNIPE)
-                .SetMaxTime(self.data.maxTime)
+                .Start(self.transform.position)
+                .Target(null)
+                .Size(self.data.size)
+                .Speed(Speed.SNIPE)
+                .MaxTime(self.data.maxTime)
                 .Create()
                 .Homing();
         };
@@ -85,11 +86,11 @@ namespace Projectiles
         {
             Projectile
                 .New(self.data.entity)
-                .SetStart(self.transform.position)
-                .SetTarget(self.data.start)
-                .SetMaxTime(self.data.maxTime)
-                .SetSize(self.data.size)
-                .SetSpeed(self.data.speed)
+                .Start(self.transform.position)
+                .Target(self.data.start)
+                .MaxTime(self.data.maxTime)
+                .Size(self.data.size)
+                .Speed(self.data.speed)
                 .Create();
         };
 
@@ -104,15 +105,13 @@ namespace Projectiles
             Speed[] speeds = (Speed[])System.Enum.GetValues(currentSpeed.GetType());
             Speed nextSpeed = speeds[System.Array.IndexOf(speeds, currentSpeed) + 1];
 
-            Debug.Log("New speed: " + nextSpeed);
-
             Projectile
                 .New(self.data.entity)
-                .SetStart(self.transform.position)
-                .SetTarget(self.data.start)
-                .SetSize(self.data.size)
-                .SetSpeed(nextSpeed)
-                .SetMaxTime(2f * 1.5f * (float)Speed.FAST / (float)nextSpeed)
+                .Start(self.transform.position)
+                .Target(self.data.start)
+                .Size(self.data.size)
+                .Speed(nextSpeed)
+                .MaxTime(2f * 1.5f * (float)Speed.FAST / (float)nextSpeed)
                 .OnDestroyTimeout(REVERSE_FASTER)
                 .Create();
         };

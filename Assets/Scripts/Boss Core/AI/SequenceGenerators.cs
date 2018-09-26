@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Projectiles;
-using CombatCore;
+using BossCore;
 using static BossController;
 
 namespace AI
@@ -76,8 +76,8 @@ namespace AI
 
                 float step = 360f / density;
                 for (float i = from; i <= to; i += step) {
-                    Projectile.ProjectileStructure newStruc = structure ?? Projectile.New(self).SetSize(Size.MEDIUM);
-                    newStruc.SetAngleOffset(i).Create();
+                    Projectile.ProjectileStructure newStruc = structure ?? Projectile.New(self).Size(Size.MEDIUM);
+                    newStruc.AngleOffset(i).Create();
                 }
             });
         }
@@ -86,8 +86,8 @@ namespace AI
         public static AISequence ShootWall(float angleOffset)
         {
             return AISequence.Merge(
-                ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, Projectile.New(self).SetSpeed(Speed.SLOW)),
-                ShootArc(100, angleOffset + 20, angleOffset + 60, Projectile.New(self).SetSpeed(Speed.SLOW))
+                ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, Projectile.New(self).Speed(Speed.SLOW)),
+                ShootArc(100, angleOffset + 20, angleOffset + 60, Projectile.New(self).Speed(Speed.SLOW))
             );
         }
 
@@ -102,8 +102,8 @@ namespace AI
                     float multiplier = clockwise ? 1f : -1f;
                     float curveSpeed = (float)struc.speed * multiplier * 2f;
 
-                    struc.SetAngleOffset(struc.angleOffset + (i * multiplier * 60))
-                         .SetMaxTime(3f)
+                    struc.AngleOffset(struc.angleOffset + (i * multiplier * 60))
+                         .MaxTime(3f)
                          .Create()
                          .Curving(curveSpeed, true);
                 }
@@ -122,10 +122,10 @@ namespace AI
                 {
                     Vector3 spawn = instance.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
                     Projectile.New(self)
-                              .SetStart(spawn)
-                              .SetTarget(spawn + targetPos)
-                              .SetSpeed(speed)
-                              .SetSize(size)
+                              .Start(spawn)
+                              .Target(spawn + targetPos)
+                              .Speed(speed)
+                              .Size(size)
                               .Create();
                 }
             });
@@ -138,9 +138,9 @@ namespace AI
                 for (int i = 0; i < 6; i++)
                 {
                     Projectile.New(self)
-                              .SetTarget(player.transform.position)
-                              .SetAngleOffset(i * 60f)
-                              .SetMaxTime(maxTime)
+                              .Target(player.transform.position)
+                              .AngleOffset(i * 60f)
+                              .MaxTime(maxTime)
                               .Create()
                               .DeathHex();
                 }

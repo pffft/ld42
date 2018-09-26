@@ -6,6 +6,7 @@ using static BossController;
 using static AI.SequenceGenerators;
 using static Projectiles.Projectile;
 using Projectiles;
+using BossCore;
 
 // TODO: move all boss controller sequences in here
 // make a JSON parser to make this job easier?
@@ -29,8 +30,8 @@ namespace AI
          */
         public static AISequence SHOOT_2_WAVES = new AISequence(
             Teleport(),
-            ShootArc(100, -45f, 45f, New(self).SetAngleOffset(-2.5f).SetSize(Size.MEDIUM).SetSpeed(Speed.VERY_FAST)),
-            ShootArc(100, -45f, 45f, New(self).SetAngleOffset(2.5f).SetSize(Size.MEDIUM).SetSpeed(Speed.VERY_FAST))
+            ShootArc(100, -45f, 45f, New(self).AngleOffset(-2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
+            ShootArc(100, -45f, 45f, New(self).AngleOffset(2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST))
             .Wait(1f)
         );
 
@@ -48,7 +49,7 @@ namespace AI
         public static AISequence HOMING_STRAFE_5 = new AISequence(
             Strafe(true, 5f, 100),
             //Shoot1(type: Type.HOMING, size: Size.MEDIUM)
-            Shoot1(New(self).SetSize(Size.MEDIUM).Homing())
+            Shoot1(New(self).Size(Size.MEDIUM).Homing())
         );
 
         /*
@@ -56,7 +57,7 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_10 = new AISequence(
             Strafe(true, 10f, 50),
-            Shoot1(New(self).SetSize(Size.MEDIUM).Homing())
+            Shoot1(New(self).Size(Size.MEDIUM).Homing())
         );
 
         /*
@@ -64,7 +65,7 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_15 = new AISequence(
             Strafe(true, 15f, 30),
-            Shoot1(New(self).SetSize(Size.MEDIUM).Homing())
+            Shoot1(New(self).Size(Size.MEDIUM).Homing())
         );
 
         /*
@@ -72,7 +73,7 @@ namespace AI
          */
         public static AISequence HOMING_STRAFE_65 = new AISequence(
             Strafe(true, 65f, 50),
-            Shoot1(New(self).SetSize(Size.MEDIUM).Homing())
+            Shoot1(New(self).Size(Size.MEDIUM).Homing())
         );
 
         /*
@@ -87,7 +88,7 @@ namespace AI
          * Shoots a medium-slow 360, then strafes 60 degrees.
          */
         public static AISequence SLOW_WAVE_CIRCLE = new AISequence(
-            ShootArc(75, 0f, 360f, New(self).SetSpeed(Speed.MEDIUM_SLOW).SetSize(Size.LARGE)),
+            ShootArc(75, 0f, 360f, New(self).Speed(Speed.MEDIUM_SLOW).Size(Size.LARGE)),
             Strafe(true, 60f, 50).Wait(0.5f)
         );
 
@@ -111,7 +112,7 @@ namespace AI
         */
 
         public static AISequence LINE_CIRCLE_STRAFE_60 = new AISequence(
-            ShootArc(75, 0f, 360f, New(self).SetSpeed(Speed.SLOW).SetSize(Size.LARGE))
+            ShootArc(75, 0f, 360f, New(self).Speed(Speed.SLOW).Size(Size.LARGE))
             .Wait(0.1f),
             Strafe(true, 30f, 50)
             .Wait(0.3f),
@@ -165,7 +166,7 @@ namespace AI
             PlayerLock(true),
             ShootHexCurve(true),
             ShootArc().Wait(0.5f),
-            ShootHexCurve(true, New(self).SetAngleOffset(30f)).Wait(0.5f),
+            ShootHexCurve(true, New(self).AngleOffset(30f)).Wait(0.5f),
             SHOOT_360.Wait(1f),
             SHOOT_360.Wait(1f),
             PlayerLock(false)
@@ -189,19 +190,18 @@ namespace AI
             Teleport(CENTER).Wait(0.5f),
             ShootDeathHex(2f).Wait(1f),
             ShootDeathHex(1f).Wait(2f),
-            ShootArc(structure: New(self).SetMaxTime(0.25f)).Wait(1f),
-            ShootArc(structure: New(self).SetMaxTime(0.25f)).Wait(1f),
-            ShootArc(structure: New(self).SetMaxTime(0.25f)).Wait(0.75f)
+            ShootArc(structure: New(self).MaxTime(0.25f)).Wait(1f),
+            ShootArc(structure: New(self).MaxTime(0.25f)).Wait(1f),
+            ShootArc(structure: New(self).MaxTime(0.25f)).Wait(0.75f)
         );
 
         public static AISequence SPLIT_6 = new AISequence(
             4,
             Teleport().Wait(0.5f),
             new AISequence(() => {
-                Debug.Log("SPLIT 6 called");
                 Projectile proj = Projectile.New(self)
-                                            .SetMaxTime(0.25f)
-                                            .SetSpeed(Speed.VERY_FAST)
+                                            .MaxTime(0.25f)
+                                            .Speed(Speed.VERY_FAST)
                                             .OnDestroyTimeout(CallbackDictionary.SPAWN_6)
                                             .Curving(0f, false)
                                             .Create();
@@ -212,7 +212,7 @@ namespace AI
         public static AISequence SPLIT_6_CURVE = new AISequence(
             5f, 
             Teleport().Wait(0.5f),
-            Shoot1(New(self).SetMaxTime(0.25f).SetSpeed(Speed.VERY_FAST).DeathHex()).Wait(0.5f)
+            Shoot1(New(self).MaxTime(0.25f).Speed(Speed.VERY_FAST).DeathHex()).Wait(0.5f)
         );
 
         /*
@@ -249,18 +249,18 @@ namespace AI
         public static AISequence DOUBLE_HEX_CURVE_HARD = new AISequence(
             10, 
             Teleport(CENTER).Wait(1f),
-            ShootHexCurve(true, New(self).SetAngleOffset(0f)).Wait(0.5f),
-            ShootHexCurve(true, New(self).SetAngleOffset(30f)),
+            ShootHexCurve(true, New(self).AngleOffset(0f)).Wait(0.5f),
+            ShootHexCurve(true, New(self).AngleOffset(30f)),
             SHOOT3_WAVE3,
             Teleport(CENTER),
-            ShootHexCurve(false, New(self).SetAngleOffset(0f)),
-            ShootHexCurve(false, New(self).SetAngleOffset(30f)),
+            ShootHexCurve(false, New(self).AngleOffset(0f)),
+            ShootHexCurve(false, New(self).AngleOffset(30f)),
             // This homing might be too hard; especially with this amount of 360s.
-            Shoot3(New(self).SetSize(Size.MEDIUM).Homing()).Wait(0.1f).Times(10),
+            Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(10),
             SHOOT_360,
-            Shoot3(New(self).SetSize(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
+            Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
             SHOOT_360,
-            Shoot3(New(self).SetSize(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
+            Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
             SHOOT_360.Wait(0.5f),
             SHOOT_360.Wait(0.5f)
         );
@@ -278,12 +278,12 @@ namespace AI
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).SetTarget(Vector3.forward).SetAngleOffset(j * 6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * 6f)).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(New(self).SetSize(Size.LARGE).Homing()));
+                sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
                 for (int j = 7; j < 15; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).SetTarget(Vector3.forward).SetAngleOffset(j * 6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * 6f)).Wait(0.1f));
                 }
                 sequences.Add(SHOOT_360);
             }
@@ -291,17 +291,17 @@ namespace AI
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).SetTarget(Vector3.forward).SetAngleOffset(j * -6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(New(self).SetSize(Size.LARGE).Homing()));
+                sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
                 for (int j = 5; j < 10; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).SetTarget(Vector3.forward).SetAngleOffset(j * -6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
                 }
-                sequences.Add(Shoot1(New(self).SetSize(Size.LARGE).Homing()));
+                sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
                 for (int j = 10; j < 15; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).SetTarget(Vector3.forward).SetAngleOffset(j * -6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
                 }
                 sequences.Add(SHOOT_360);
             }
@@ -320,7 +320,7 @@ namespace AI
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = -30; i < 90; i += 5)
                 {
-                    sequences.Add(Shoot1(New(self).SetAngleOffset(i)).Wait(0.01f));
+                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
                 }
                 return sequences.ToArray();
             }).Wait(0.25f)
@@ -333,12 +333,12 @@ namespace AI
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = -30; i < 90; i += 5)
                 {
-                    sequences.Add(Shoot1(New(self).SetAngleOffset(i)).Wait(0.01f));
+                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
                 }
                 sequences.Add(Pause(0.75f));
                 for (int i = 30; i > -90; i -= 5)
                 {
-                    sequences.Add(Shoot1(New(self).SetAngleOffset(i)).Wait(0.01f));
+                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
                 }
                 return sequences.ToArray();
             }).Wait(0.5f)
@@ -352,27 +352,27 @@ namespace AI
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = -30; i < 80; i += 5)
                 {
-                    sequences.Add(Shoot1(New(self).SetAngleOffset(i)).Wait(0.01f));
+                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
                 }
                 //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = 80; i > -80; i -= 5)
                 {
                     sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(i)),
-                        Shoot1(New(self).SetAngleOffset(i).SetSize(Size.MEDIUM).SetSpeed(Speed.SLOW))
+                        Shoot1(New(self).AngleOffset(i)),
+                        Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
                     ).Wait(0.01f));
                 }
                 //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = -80; i < 80; i += 5)
                 {
-                    sequences.Add(Shoot1(New(self).SetAngleOffset(i)).Wait(0.01f));
+                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
                 }
                 //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = 80; i > -80; i -= 5)
                 {
                     sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(i)),
-                        Shoot1(New(self).SetAngleOffset(i).SetSize(Size.MEDIUM).SetSpeed(Speed.SLOW))
+                        Shoot1(New(self).AngleOffset(i)),
+                        Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
                     ).Wait(0.01f));
                 }
                 return sequences.ToArray();
@@ -388,29 +388,29 @@ namespace AI
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = -30; i < 80; i += 5)
                 {
-                    sequences.Add(Shoot1(New(self).SetAngleOffset(i)).Wait(0.01f));
+                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
                 }
                         //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = 80; i > -80; i -= 5)
                 {
                     sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(i)),
-                        Shoot1(New(self).SetAngleOffset(i).SetSize(Size.MEDIUM).SetSpeed(Speed.SLOW))
+                        Shoot1(New(self).AngleOffset(i)),
+                        Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
                     ).Wait(0.01f));
                 }
                 for (int i = -80; i < 80; i += 5)
                 {
                     sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(i)),
-                        Shoot1(New(self).SetAngleOffset(i).SetSize(Size.TINY).SetSpeed(Speed.FAST))
+                        Shoot1(New(self).AngleOffset(i)),
+                        Shoot1(New(self).AngleOffset(i).Size(Size.TINY).Speed(Speed.FAST))
                     ).Wait(0.01f));
                 }
                         //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = 80; i > -30; i -= 5)
                 {
                     sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(i)),
-                        Shoot1(New(self).SetAngleOffset(i).SetSize(Size.MEDIUM).SetSpeed(Speed.SLOW))
+                        Shoot1(New(self).AngleOffset(i)),
+                        Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
                     ).Wait(0.01f));
                 }
                 return sequences.ToArray();
@@ -424,28 +424,28 @@ namespace AI
                 switch (Random.Range(0, 3))
                 {
                     case 0: sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(Random.Range(0, 360f)).SetSize(Size.SMALL).SetSpeed(Speed.FAST)),
-                        Shoot1(New(self).SetAngleOffset(Random.Range(0, 360f)).SetSize(Size.SMALL).SetSpeed(Speed.FAST)),
-                        Shoot1(New(self).SetAngleOffset(Random.Range(0, 360f)).SetSize(Size.TINY).SetSpeed(Speed.FAST))
+                        Shoot1(New(self).AngleOffset(Random.Range(0, 360f)).Size(Size.SMALL).Speed(Speed.FAST)),
+                        Shoot1(New(self).AngleOffset(Random.Range(0, 360f)).Size(Size.SMALL).Speed(Speed.FAST)),
+                        Shoot1(New(self).AngleOffset(Random.Range(0, 360f)).Size(Size.TINY).Speed(Speed.FAST))
                     )); break;
                     case 1: sequences.Add(Merge(
-                        Shoot1(New(self).SetAngleOffset(Random.Range(0, 360f)).SetSize(Size.MEDIUM).SetSpeed(Speed.MEDIUM)),
-                        Shoot1(New(self).SetAngleOffset(Random.Range(0, 360f)).SetSize(Size.MEDIUM).SetSpeed(Speed.MEDIUM)
+                        Shoot1(New(self).AngleOffset(Random.Range(0, 360f)).Size(Size.MEDIUM).Speed(Speed.MEDIUM)),
+                        Shoot1(New(self).AngleOffset(Random.Range(0, 360f)).Size(Size.MEDIUM).Speed(Speed.MEDIUM)
                     ))); break;
-                    case 2: sequences.Add(Shoot1(New(self).SetAngleOffset(Random.Range(0, 360f)).SetSize(Size.LARGE).SetSpeed(Speed.SLOW))); break;
+                    case 2: sequences.Add(Shoot1(New(self).AngleOffset(Random.Range(0, 360f)).Size(Size.LARGE).Speed(Speed.SLOW))); break;
                 }
                 if (j % 20 == 0) {
-                    sequences.Add(Shoot1(New(self).SetSize(Size.MEDIUM).Homing()));
+                    sequences.Add(Shoot1(New(self).Size(Size.MEDIUM).Homing()));
                 }
                 if (j % 40 == 0) {
                     sequences.Add(new AISequence(() =>
                     {
                         Projectile
                             .New(self)
-                            .SetSize(Size.MEDIUM)
-                            .SetSpeed(Speed.MEDIUM)
-                            .SetAngleOffset(Random.Range(0, 360f))
-                            .SetMaxTime(0.5f)
+                            .Size(Size.MEDIUM)
+                            .Speed(Speed.MEDIUM)
+                            .AngleOffset(Random.Range(0, 360f))
+                            .MaxTime(0.5f)
                             .OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)
                             .Create();
                     }));
@@ -504,10 +504,10 @@ namespace AI
                 {
                     Projectile
                         .New(self)
-                        .SetSpeed(Speed.FAST)
-                        .SetSize(Size.MEDIUM)
-                        .SetMaxTime(1f)
-                        .SetAngleOffset(i * (360f / 50f))
+                        .Speed(Speed.FAST)
+                        .Size(Size.MEDIUM)
+                        .MaxTime(1f)
+                        .AngleOffset(i * (360f / 50f))
                         .OnDestroyTimeout(CallbackDictionary.SPAWN_1_TOWARDS_PLAYER)
                         .Create();
                 }
@@ -522,10 +522,10 @@ namespace AI
                 {
                     Projectile
                         .New(self)
-                        .SetSpeed(Speed.FAST)
-                        .SetSize(Size.MEDIUM)
-                        .SetMaxTime(1f)
-                        .SetAngleOffset(i * (360f / 50f))
+                        .Speed(Speed.FAST)
+                        .Size(Size.MEDIUM)
+                        .MaxTime(1f)
+                        .AngleOffset(i * (360f / 50f))
                         .Homing()
                         .OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)
                         .Create();
@@ -542,10 +542,10 @@ namespace AI
                 {
                     Projectile
                         .New(self)
-                        .SetSpeed(Speed.FAST)
-                        .SetSize(Size.MEDIUM)
-                        .SetMaxTime(1.5f)
-                        .SetAngleOffset(i * (360f / 50f))
+                        .Speed(Speed.FAST)
+                        .Size(Size.MEDIUM)
+                        .MaxTime(1.5f)
+                        .AngleOffset(i * (360f / 50f))
                         .OnDestroyTimeout(CallbackDictionary.REVERSE)
                         .Create();
                 }
@@ -560,10 +560,10 @@ namespace AI
                 {
                     Projectile
                         .New(self)
-                        .SetSpeed(Speed.FAST)
-                        .SetSize(Size.MEDIUM)
-                        .SetMaxTime(1.5f)
-                        .SetAngleOffset(i * (360f / 50f))
+                        .Speed(Speed.FAST)
+                        .Size(Size.MEDIUM)
+                        .MaxTime(1.5f)
+                        .AngleOffset(i * (360f / 50f))
                         .OnDestroyTimeout(CallbackDictionary.REVERSE_FASTER)
                         .Create();
                 }
@@ -581,7 +581,7 @@ namespace AI
             Teleport(CENTER).Wait(0.5f),
             WAVE_REVERSE_FASTER.Wait(1f),
             WAVE_REVERSE_FASTER,
-            Shoot1(New(self).SetSize(Size.TINY).SetSpeed(Speed.VERY_FAST)).Wait(0.1f).Times(60) // This pushes it a bit over 8.
+            Shoot1(New(self).Size(Size.TINY).Speed(Speed.VERY_FAST)).Wait(0.1f).Times(60) // This pushes it a bit over 8.
             // Adding any of the below additional attacks makes it too hard for gameplay purposes.
             //Shoot1(size: Size.TINY, speed: Speed.VERY_FAST, angleOffset: -20f).Wait(0.1f).Times(30)
             //Shoot3(speed: Speed.FAST, size: Size.SMALL).Wait(0.1f).Times(60)
@@ -591,15 +591,40 @@ namespace AI
         public static AISequence AOE_TEST = new AISequence(
             3f,
             new AISequence(() => {
-            AOE.New(self).SetAngleOffset(60f);
+            AOE.New(self).AngleOffset(60f);
             }).Wait(0.1f)
         /*
         new AISequence(() => {
-            AOE.Create(self, true).SetSpeed(15f);
+            AOE.Create(self, true).Speed(15f);
         }).Wait(0.5f)
         */
         );
 
+        public static AISequence AOE_131_MEDIUM = new AISequence(
+            PlayerLock(true),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(10)).Wait(0.38f),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
+            PlayerLock(false)
+        );
+
+        public static AISequence AOE_131_FAST = new AISequence(
+            PlayerLock(true),
+            ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, 60).FixedWidth(5)).Wait(0.135f),
+            ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(10)).Wait(0.27f),
+            ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, 60).FixedWidth(5)).Wait(0.135f),
+            PlayerLock(false)
+        );
+
+
+        public static AISequence AOE_131_MEDIUM_LONG = new AISequence(
+            Teleport(),
+            PlayerLock(true),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(20)).Wait(0.76f),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
+            PlayerLock(false)
+        );
 
         #endregion
 
