@@ -576,7 +576,7 @@ namespace AI
         public static AISequence AOE_TEST = new AISequence(
             3f,
             new AISequence(() => {
-            AOE.Create(self).SetAngleOffset(60f);
+            AOE.New(self).SetAngleOffset(60f);
             }).Wait(0.1f)
         /*
         new AISequence(() => {

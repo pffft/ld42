@@ -7,6 +7,208 @@ using UnityEngine.Profiling;
 
 public class AOE : MonoBehaviour {
 
+    public struct AOEStructure
+    {
+
+        // Mostly so we know what side we're on.
+        internal Entity entity;
+
+        // internal. Tracks what triangles are on or off in the mesh
+        internal bool[] regions;
+
+        // Origin of the attack
+        internal Vector3? preStart; // A value assigned at start. Will be resolved later.
+        internal Vector3 start;
+
+        // Where the attack is facing (the 0 line is defined by start-target)
+        internal Vector3? preTarget; // A value assigned at start. Will be resolved later.
+        internal Vector3 target;
+
+        // internal. How much this attack is rotated from the north line.
+        internal float internalRotation;
+
+        // How much this attack is rotated from the center line.
+        internal float angleOffset;
+
+        // The scale of the inside ring, from 0-1 relative to the outside ring.
+        // This value has no effect if "fixedWidth" is set; it will impact the
+        // profile of the attack if "innerExpansionSpeed" is set and different
+        // from "expansionSpeed". 
+        internal float innerScale;
+
+        // Current scale. This relates exactly to the radius of the attack.
+        internal float scale;
+
+        // How fast the inner ring expands
+        internal Speed innerExpansionSpeed;
+
+        // How fast the outer ring expands
+        internal Speed expansionSpeed;
+
+        // Does nothing if 0. Else, represents how many units there are between
+        // the inner and outer ring at all times.
+        internal float fixedWidth;
+
+        // internal. Time since the move started
+        internal float currentTime;
+
+        // The maximum lifetime of this attack
+        internal float maxTime;
+
+        public AOEStructure(Entity self)
+        {
+            this.entity = self;
+            this.regions = new bool[NUM_SECTIONS];
+            for (int i = 0; i < regions.Length; i++)
+            {
+                regions[i] = false;
+            }
+            this.preStart = null;
+            this.start = Vector3.zero;
+            this.preTarget = null;
+            this.target = Vector3.zero;
+            this.internalRotation = 0f;
+            this.angleOffset = 0f;
+            this.innerScale = 0.9f;
+            this.scale = 1f;
+            this.innerExpansionSpeed = Speed.MEDIUM;
+            this.expansionSpeed = Speed.MEDIUM;
+            this.fixedWidth = 0f;
+            this.currentTime = 0f;
+            this.maxTime = 100f;
+        }
+
+        public AOEStructure On(float from, float to)
+        {
+            if (to < from)
+            {
+                return On(to, from);
+            }
+
+            if (from < 0 && to > 0)
+            {
+                return On(from + 360, 360).On(0, to);
+            }
+
+            from = from < 0 ? from + 360 : from;
+            to = to < 0 ? to + 360 : to;
+
+            for (int i = 0; i < NUM_SECTIONS; i++)
+            {
+                float angle = (i + 0.5f) * THETA_STEP;
+                if (angle >= from && angle <= to)
+                {
+                    regions[i] = true;
+                }
+            }
+            return this;
+        }
+
+        public AOEStructure Off(float from, float to)
+        {
+            if (to < from)
+            {
+                return Off(to, from);
+            }
+
+            if (from < 0 && to > 0)
+            {
+                return Off(from + 360, 360).Off(0, to);
+            }
+
+            from = from < 0 ? from + 360 : from;
+            to = to < 0 ? to + 360 : to;
+
+            for (int i = 0; i < NUM_SECTIONS; i++)
+            {
+                float angle = (i + 0.5f) * THETA_STEP;
+                if (angle >= from && angle <= to)
+                {
+                    regions[i] = false;
+                }
+            }
+            return this;
+        }
+
+        public AOEStructure SetStart(Vector3? start)
+        {
+            this.preStart = start;
+            return this;
+        }
+
+        public AOEStructure SetTarget(Vector3? target)
+        {
+            this.preTarget = target;
+            return this;
+        }
+
+        public AOEStructure SetAngleOffset(float degrees)
+        {
+            this.angleOffset = degrees;
+            return this;
+        }
+
+        public AOEStructure SetSpeed(Speed speed)
+        {
+            this.expansionSpeed = speed;
+            return this;
+        }
+
+        public AOEStructure SetFixedWidth(float width)
+        {
+            this.innerScale = 0f;
+            this.innerExpansionSpeed = Speed.FROZEN;
+            this.fixedWidth = width;
+            return this;
+        }
+
+        public AOEStructure SetInnerScale(float scale)
+        {
+            this.innerScale = scale;
+            //this.innerExpansionSpeed = 0f;
+            this.fixedWidth = 0f;
+            return this;
+        }
+
+        public AOEStructure SetInnerSpeed(Speed speed)
+        {
+            //this.innerScale = 0f; // initial inner scale gives slightly different effects
+            this.innerExpansionSpeed = speed;
+            this.fixedWidth = 0f;
+            return this;
+        }
+
+        public AOE Create()
+        {
+            // Set up the gameobject
+            GameObject obj = new GameObject();
+            obj.transform.position = entity.transform.position;
+            obj.layer = LayerMask.NameToLayer("AOE");
+            obj.name = "AOE";
+            obj.SetActive(false); // hack so we can assign variables on init
+
+            MeshFilter meshFilter = obj.AddComponent<MeshFilter>();
+            meshFilter.mesh = new Mesh();
+
+            MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
+            meshRenderer.material = AOE_MATERIAL;
+
+            CapsuleCollider collider = obj.AddComponent<CapsuleCollider>();
+            collider.center = obj.transform.position;
+            collider.radius = 1f;
+            collider.isTrigger = true;
+
+            // Add the component with this as its data reference
+            // We specifically make a copy, so that we can use this as a template.
+            AOE aoe = obj.AddComponent<AOE>();
+            aoe.data = new AOEStructure();
+            aoe.data = this;
+
+            obj.SetActive(true);
+            return aoe;
+        }
+    }
+
     // How many sections are in the AOE attack mesh
     public const int NUM_SECTIONS = 360 / 5;
 
@@ -19,208 +221,25 @@ public class AOE : MonoBehaviour {
     // How much damage this attack does (TODO make this a parameter; same for Projectiles)
     private const float damage = 5f;
 
-    // Mostly so we know what side we're on.
-    private Entity entity;
-
-    // internal. Tracks what triangles are on or off in the mesh
-    private bool[] regions;
-
-    // Origin of the attack
-    private Vector3 start;
-
-    // Where the attack is facing (the 0 line is defined by start-target)
-    private Vector3 target;
-
-    // internal. How much this attack is rotated from the north line.
-    private float internalRotation;
-
-    // How much this attack is rotated from the center line.
-    private float angleOffset;
-
-    // The scale of the inside ring, from 0-1 relative to the outside ring.
-    // This value has no effect if "fixedWidth" is set; it will impact the
-    // profile of the attack if "innerExpansionSpeed" is set and different
-    // from "expansionSpeed". 
-    private float innerScale = 1f;
-
-    // Current scale. This relates exactly to the radius of the attack.
-    private float scale = 1f;
-
-    // How fast the inner ring expands
-    private Speed innerExpansionSpeed = Speed.MEDIUM_SLOW;
-
-    // How fast the outer ring expands
-    private Speed expansionSpeed = Speed.MEDIUM_SLOW;
-
-    // Does nothing if 0. Else, represents how many units there are between
-    // the inner and outer ring at all times.
-    private float fixedWidth;
-
-    // internal. Time since the move started
-    private float currentTime;
-
-    // The maximum lifetime of this attack
-    private float maxTime = 100f;
-
     // Every AOE has the same material, for now. We cache it here.
     private static readonly Material AOE_MATERIAL;
     static AOE() {
         AOE_MATERIAL = new Material(Resources.Load<Material>("Art/Materials/AOE"));
     }
 
-    public void Update() {
-        // Timeout
-        currentTime += Time.deltaTime;
-        if (currentTime > maxTime) {
-            Destroy(this.gameObject);
-        }
+    // A reference containing the data we'll be using.
+    private AOEStructure data;
 
-        // Hit the arena walls
-        // should be "innerscale"- what about AOE attacks without hole in center?
-        if (scale > GameObject.Find("Arena").transform.localScale.x * 50f)
-        {
-            //Debug.Log("Ring hit arena. Returning.");
-            Destroy(this.gameObject);
-        }
-
-        // Update the size of the AOE per its expansion rate.
-        // We divide by two because AOEs move based on radius, not diameter;
-        // this makes the speeds faster than for projectiles without this correction.
-        scale += (float)expansionSpeed * Time.deltaTime;
-        gameObject.transform.localScale = scale * Vector3.one;
-
-        // If the inner expansion speed is set, we must recompute the mesh- except if it's equal 
-        // to the outer expansion speed, which is the same as just scaling. Then we don't recompute.
-        if (Mathf.Abs((float)innerExpansionSpeed) > 0.01f && !Mathf.Approximately((float)expansionSpeed, (float)innerExpansionSpeed))
-        {
-            //Debug.Log("Separate inner update");
-            float ideal = ((float)innerExpansionSpeed / (float)expansionSpeed);
-            innerScale = innerScale - ((innerScale - ideal) * Time.deltaTime);
-            //Debug.Log(innerScale);
-
-            RecomputeMeshHole();
-            return;
-        }
-
-        // If we have a fixed width to maintain, we must recompute.
-        if (Mathf.Abs(fixedWidth) > 0.01f)
-        {
-            //Debug.Log("Fixed width update");
-            innerScale = (scale < fixedWidth) ? 0f : (scale - fixedWidth) / scale;
-
-            RecomputeMeshHole();
-            return;
-        }
-    }
-
-    public static AOE Create(Entity self)
+    // Initialize values to the latest ones- start and target, if null, should
+    // be set to the live boss/player positions.
+    public void Awake()
     {
-        GameObject obj = new GameObject();
-        obj.transform.position = self.transform.position;
-        obj.layer = LayerMask.NameToLayer("AOE");
-        obj.name = "AOE";
+        data.start = data.preStart ?? data.entity.transform.position;
 
-        MeshFilter meshFilter = obj.AddComponent<MeshFilter>();
-        meshFilter.mesh = new Mesh();
-
-        MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
-        meshRenderer.material = AOE_MATERIAL;
-
-        CapsuleCollider collider = obj.AddComponent<CapsuleCollider>();
-        collider.center = obj.transform.position;
-        collider.radius = 1f;
-        collider.isTrigger = true;
-
-        AOE aoe = obj.AddComponent<AOE>();
-        aoe.entity = self;
-        aoe.regions = new bool[NUM_SECTIONS];
-        for (int i = 0; i < aoe.regions.Length; i++) {
-            aoe.regions[i] = false;
-        }
-
-        // Initial config
-        aoe.SetStart(null)
-           .SetTarget(null)
-           .SetSpeed(Speed.MEDIUM)
-           .SetInnerSpeed(Speed.MEDIUM)
-           .SetInnerScale(0.9f);
-        aoe.RecomputeMeshHole(); // Initial computation
-
-        // We set the scale to 0 so that timing based attacks work properly.
-        // Otherwise the scale is 1, because computing the mesh required it.
-        aoe.scale = 0f;
-        obj.transform.localScale = aoe.scale * Vector3.one;
-        return aoe;
-    }
-
-    public AOE On(float from, float to)
-    {
-        if (to < from)
-        {
-            return On(to, from);
-        }
-
-        if (from < 0 && to > 0)
-        {
-            return On(from + 360, 360).On(0, to);
-        }
-
-        from = from < 0 ? from + 360 : from;
-        to = to < 0 ? to + 360 : to;
-
-        for (int i = 0; i < NUM_SECTIONS; i++)
-        {
-            float angle = (i + 0.5f) * THETA_STEP;
-            if (angle >= from && angle <= to)
-            {
-                regions[i] = true;
-            }
-        }
-        RecomputeMeshHole();
-        return this;
-    }
-
-    public AOE Off(float from, float to)
-    {
-        if (to < from)
-        {
-            return Off(to, from);
-        }
-
-        if (from < 0 && to > 0)
-        {
-            return Off(from + 360, 360).Off(0, to);
-        }
-
-        from = from < 0 ? from + 360 : from;
-        to = to < 0 ? to + 360 : to;
-
-        for (int i = 0; i < NUM_SECTIONS; i++)
-        {
-            float angle = (i + 0.5f) * THETA_STEP;
-            if (angle >= from && angle <= to)
-            {
-                regions[i] = false;
-            }
-        }
-        RecomputeMeshHole();
-        return this;
-    }
-
-    public AOE SetStart(Vector3? start)
-    {
-        this.start = start ?? entity.transform.position;
-        this.transform.position = this.start;
-        UpdateOrientation();
-        return this;
-    }
-
-    public AOE SetTarget(Vector3? target)
-    {
         Vector3 targetPosition;
-        if (target == null)
+        if (data.preTarget == null)
         {
-            if (entity.name.Equals(BossController.BOSS_NAME))
+            if (data.entity.name.Equals(BossController.BOSS_NAME))
             {
                 // TODO cache me
                 targetPosition = BossController.isPlayerLocked ?
@@ -234,67 +253,93 @@ public class AOE : MonoBehaviour {
         }
         else
         {
-            targetPosition = target.Value;
+            targetPosition = data.preTarget.Value;
         }
 
-        this.target = targetPosition;
+        data.target = targetPosition;
         UpdateOrientation();
-        return this;
+
+        RecomputeMeshHole();
+
+        // We set the scale to 0 so that timing based attacks work properly.
+        // Otherwise the scale is 1, because computing the mesh required it.
+        data.scale = 0;
+        transform.localScale = data.scale * Vector3.one;
     }
 
+	public void Update()
+    {
+        // Timeout
+        data.currentTime += Time.deltaTime;
+        if (data.currentTime > data.maxTime)
+        {
+            Destroy(this.gameObject);
+        }
+
+        // Hit the arena walls
+        // should be "innerscale"- what about AOE attacks without hole in center?
+        if (data.scale > GameObject.Find("Arena").transform.localScale.x * 50f)
+        {
+            //Debug.Log("Ring hit arena. Returning.");
+            Destroy(this.gameObject);
+        }
+
+        // Update the size of the AOE per its expansion rate.
+        // We divide by two because AOEs move based on radius, not diameter;
+        // this makes the speeds faster than for projectiles without this correction.
+        data.scale += (float)data.expansionSpeed * Time.deltaTime;
+        gameObject.transform.localScale = data.scale * Vector3.one;
+
+        // If the inner expansion speed is set, we must recompute the mesh- except if it's equal 
+        // to the outer expansion speed, which is the same as just scaling. Then we don't recompute.
+        if (Mathf.Abs((float)data.innerExpansionSpeed) > 0.01f && 
+            !Mathf.Approximately((float)data.expansionSpeed, (float)data.innerExpansionSpeed))
+        {
+            //Debug.Log("Separate inner update");
+            float ideal = ((float)data.innerExpansionSpeed / (float)data.expansionSpeed);
+            data.innerScale = data.innerScale - ((data.innerScale - ideal) * Time.deltaTime);
+            //Debug.Log(innerScale);
+
+            RecomputeMeshHole();
+            return;
+        }
+
+        // If we have a fixed width to maintain, we must recompute.
+        if (Mathf.Abs(data.fixedWidth) > 0.01f)
+        {
+            //Debug.Log("Fixed width update");
+            data.innerScale = (data.scale < data.fixedWidth) ? 0f : (data.scale - data.fixedWidth) / data.scale;
+
+            RecomputeMeshHole();
+            return;
+        }
+    }
+
+    public static AOEStructure New(Entity self)
+    {
+        // Create a new structure, and initialize it with default values.
+        AOEStructure structure = new AOEStructure(self);
+        return structure;
+    }
+    
     // Updates the 0 line for the AOE attack. Called when start or target change.
-    private void UpdateOrientation() {
+    private void UpdateOrientation()
+    {
         // Remove any height from the start and target vectors
-        Vector3 topDownSpawn = new Vector3(start.x, 0, start.z);
-        Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+        Vector3 topDownSpawn = new Vector3(data.start.x, 0, data.start.z);
+        Vector3 topDownTarget = new Vector3(data.target.x, 0, data.target.z);
 
         float degrees = Vector3.Angle(Vector3.forward, topDownTarget - topDownSpawn);
-        if (topDownTarget.x < 0) {
+        if (topDownTarget.x < 0)
+        {
             degrees = 360 - degrees;
         }
-        this.internalRotation = degrees;
+        data.internalRotation = degrees;
         Debug.Log("internal rotation: " + degrees);
 
         // Compute the final rotation
-        Quaternion rotation = Quaternion.AngleAxis(degrees + this.angleOffset, Vector3.up);
-        this.gameObject.transform.rotation = rotation;
-    }
-
-    public AOE SetAngleOffset(float degrees) {
-        this.angleOffset = degrees;
-        this.gameObject.transform.rotation = Quaternion.AngleAxis(degrees, Vector3.up);
-        UpdateOrientation();
-        return this;
-    }
-
-    public AOE SetSpeed(Speed speed)
-    {
-        this.expansionSpeed = speed;
-        return this;
-    }
-
-    public AOE SetFixedWidth(float width) {
-        this.innerScale = 0f;
-        this.innerExpansionSpeed = Speed.FROZEN;
-        this.fixedWidth = width;
-        RecomputeMeshHole();
-        return this;
-    }
-
-    public AOE SetInnerScale(float scale) {
-        this.innerScale = scale;
-        //this.innerExpansionSpeed = 0f;
-        this.fixedWidth = 0f;
-        RecomputeMeshHole();
-        return this;
-    }
-
-    public AOE SetInnerSpeed(Speed speed) {
-        //this.innerScale = 0f; // initial inner scale gives slightly different effects
-        this.innerExpansionSpeed = speed;
-        this.fixedWidth = 0f;
-        RecomputeMeshHole();
-        return this;
+        Quaternion rotation = Quaternion.AngleAxis(degrees + data.angleOffset, Vector3.up);
+        gameObject.transform.rotation = rotation;
     }
 
     /*
@@ -304,18 +349,18 @@ public class AOE : MonoBehaviour {
     {
         GameObject otherObject = other.gameObject;
         Entity otherEntity = otherObject.GetComponent<Entity>();
-        if (otherEntity != null && !otherEntity.IsInvincible() && otherEntity.GetFaction() != this.entity.GetFaction())
+        if (otherEntity != null && !otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
         {
             Vector3 playerPositionFlat = new Vector3(other.transform.position.x, 0f, other.transform.position.z);
 
             // Inside of the safe circle
-            if (playerPositionFlat.magnitude < innerScale * scale)
+            if (playerPositionFlat.magnitude < data.innerScale * data.scale)
             {
                 return;
             }
 
             // Outside the AOE attack (should be impossible)
-            if (playerPositionFlat.magnitude > scale)
+            if (playerPositionFlat.magnitude > data.scale)
             {
                 return;
             }
@@ -325,8 +370,8 @@ public class AOE : MonoBehaviour {
             if (playerPositionFlat.x < 0) {
                 degrees = 360 - degrees;
             }
-            degrees -= internalRotation;
-            degrees -= angleOffset;
+            degrees -= data.internalRotation;
+            degrees -= data.angleOffset;
             degrees = Mathf.Repeat(degrees, 360f);
 
             Debug.Log(degrees);
@@ -334,8 +379,8 @@ public class AOE : MonoBehaviour {
             int section = (int)(degrees / THETA_STEP);
             //Debug.Log("In section " + section);
 
-            if (regions[section]) {
-                Entity.DamageEntity(otherEntity, this.entity, damage);
+            if (data.regions[section]) {
+                Entity.DamageEntity(otherEntity, data.entity, damage);
             }
         }
     }
@@ -347,17 +392,17 @@ public class AOE : MonoBehaviour {
         List<Vector3> verticesList = new List<Vector3>();
         for (int i = 0; i < NUM_SECTIONS; i++)
         {
-            if (!regions[i]) {
+            if (!data.regions[i]) {
                 continue;
             }
 
             float theta1 = Mathf.Deg2Rad * (90f + (i * THETA_STEP));
             float theta2 = Mathf.Deg2Rad * (90f + ((i + 1) * THETA_STEP));
 
-            verticesList.Add(new Vector3(innerScale * Mathf.Cos(theta1), 0f, innerScale * Mathf.Sin(theta1)));
+            verticesList.Add(new Vector3(data.innerScale * Mathf.Cos(theta1), 0f, data.innerScale * Mathf.Sin(theta1)));
             verticesList.Add(new Vector3(Mathf.Cos(theta1), 0f, Mathf.Sin(theta1)));
 
-            verticesList.Add(new Vector3(innerScale * Mathf.Cos(theta2), 0f, innerScale * Mathf.Sin(theta2)));
+            verticesList.Add(new Vector3(data.innerScale * Mathf.Cos(theta2), 0f, data.innerScale * Mathf.Sin(theta2)));
             verticesList.Add(new Vector3(Mathf.Cos(theta2), 0f, Mathf.Sin(theta2)));
         }
         Vector3[] vertices = verticesList.ToArray();
