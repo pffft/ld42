@@ -190,9 +190,9 @@ namespace AI
             Teleport(CENTER).Wait(0.5f),
             ShootDeathHex(2f).Wait(1f),
             ShootDeathHex(1f).Wait(2f),
-            ShootArc(structure: New(self).MaxTime(0.25f)).Wait(1f),
-            ShootArc(structure: New(self).MaxTime(0.25f)).Wait(1f),
-            ShootArc(structure: New(self).MaxTime(0.25f)).Wait(0.75f)
+            ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(1f),
+            ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(1f),
+            ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(0.75f)
         );
 
         public static AISequence SPLIT_6 = new AISequence(
@@ -278,12 +278,12 @@ namespace AI
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * 6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * 6f)).Wait(0.1f));
                 }
                 sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
                 for (int j = 7; j < 15; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * 6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * 6f)).Wait(0.1f));
                 }
                 sequences.Add(SHOOT_360);
             }
@@ -291,17 +291,17 @@ namespace AI
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
                 }
                 sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
                 for (int j = 5; j < 10; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
                 }
                 sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
                 for (int j = 10; j < 15; j++)
                 {
-                    sequences.Add(ShootArc(4, structure: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
+                    sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f)).Wait(0.1f));
                 }
                 sequences.Add(SHOOT_360);
             }
