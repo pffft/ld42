@@ -35,17 +35,17 @@ namespace AI
         public static Vector3 WEST_CLOSE = new Vector3(-15f, BOSS_HEIGHT, 0);
         #endregion
 
-        public static AISequence Shoot1(Projectile.ProjectileStructure? structure=null)
+        public static AISequence Shoot1(Projectile.ProjectileStructure? skeleton=null)
         {
             return new AISequence(() =>
             {
                 Glare();
-                Projectile.ProjectileStructure struc = structure ?? Projectile.New(self);
+                Projectile.ProjectileStructure struc = skeleton ?? Projectile.New(self);
                 struc.Create();
             });
         }
 
-        public static AISequence Shoot3(Projectile.ProjectileStructure? structure=null)
+        public static AISequence Shoot3(Projectile.ProjectileStructure? skeleton=null)
         {
             return new AISequence(() =>
             {
@@ -53,14 +53,14 @@ namespace AI
 
                 for (int i = 0; i < 3; i++)
                 {
-                    Projectile.ProjectileStructure newStruc = structure ?? Projectile.New(self);
+                    Projectile.ProjectileStructure newStruc = skeleton ?? Projectile.New(self);
                     newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
                     newStruc.Create();
                 }
             });
         }
 
-        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile.ProjectileStructure? structure=null)
+        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile.ProjectileStructure? skeleton=null)
         {
             return new AISequence(() =>
             {
@@ -76,7 +76,7 @@ namespace AI
 
                 float step = 360f / density;
                 for (float i = from; i <= to; i += step) {
-                    Projectile.ProjectileStructure newStruc = structure ?? Projectile.New(self).Size(Size.MEDIUM);
+                    Projectile.ProjectileStructure newStruc = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
                     newStruc.AngleOffset(i).Create();
                 }
             });
@@ -91,13 +91,13 @@ namespace AI
             );
         }
 
-        public static AISequence ShootHexCurve(bool clockwise = true, Projectile.ProjectileStructure? structure=null)
+        public static AISequence ShootHexCurve(bool clockwise = true, Projectile.ProjectileStructure? skeleton=null)
         {
             return new AISequence(() =>
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    Projectile.ProjectileStructure struc = structure ?? Projectile.New(self);
+                    Projectile.ProjectileStructure struc = skeleton ?? Projectile.New(self);
 
                     float multiplier = clockwise ? 1f : -1f;
                     float curveSpeed = (float)struc.speed * multiplier * 2f;
@@ -147,10 +147,9 @@ namespace AI
             });
         }
 
-        // TODO: apply same changes to projectile.
         public static AISequence ShootAOE(AOE.AOEStructure structure)
         {
-            return new AISequence(() => { structure.Create(); });
+            return new AISequence(() => { Glare(); structure.Create(); });
         }
 
         public static AISequence Teleport(Vector3? target = null, int speed = 25)
