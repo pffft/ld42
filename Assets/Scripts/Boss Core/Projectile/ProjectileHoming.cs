@@ -26,7 +26,7 @@ namespace Projectiles
         }
         
         public override void CustomUpdate() {
-            Vector3 idealVelocity = velocity * (player.transform.position - transform.position).normalized;
+            Vector3 idealVelocity = ((float)data.speed) * (player.transform.position - transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, body.velocity, Vector3.up);
 
             float distance = Vector3.Distance(player.transform.position, transform.position);
@@ -65,9 +65,14 @@ namespace Projectiles
             homing.body = projectile.GetComponent<Rigidbody>();
             homing.wasClose = false;
             homing.curDivergence = 0f;
-            homing.homingScale = projectile.velocity / 7f;
+            homing.homingScale = (float)projectile.data.speed / 7f;
 
             return homing;
+        }
+
+        public static Projectile.ProjectileStructure Homing(this Projectile.ProjectileStructure structure) {
+            structure.type = Type.HOMING;
+            return structure;
         }
     }
 }

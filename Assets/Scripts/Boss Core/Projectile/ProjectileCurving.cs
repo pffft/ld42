@@ -27,14 +27,15 @@ namespace Projectiles
 
             if (leavesTrail)
             {
-                if (currentTime > count / numSpawners)
+                if (data.currentTime > count / numSpawners)
                 {
                     count++;
-                    Create(entity)
-                      .SetStart(transform.position)
-                      .SetMaxTime(maxTime - currentTime)
-                      .SetSize(Size.SMALL)
-                      .SetSpeed(Speed.FROZEN);
+                    New(data.entity)
+                        .SetStart(transform.position)
+                        .SetMaxTime(data.maxTime - data.currentTime)
+                        .SetSize(Size.SMALL)
+                        .SetSpeed(Speed.FROZEN)
+                        .Create();
                 }
             }
         }
@@ -50,6 +51,13 @@ namespace Projectiles
             curving.leavesTrail = leavesTrail;
 
             return curving;
+        }
+
+        public static Projectile.ProjectileStructure Curving(this Projectile.ProjectileStructure structure, float curveAmount, bool leavesTrail) 
+        {
+            structure.type = Type.CURVING;
+            structure._typeParameters = new object[] { curveAmount, leavesTrail };
+            return structure;
         }
     }
 }

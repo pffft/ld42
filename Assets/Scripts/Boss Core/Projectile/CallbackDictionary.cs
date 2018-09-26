@@ -6,35 +6,38 @@ namespace Projectiles
 {
     public static class CallbackDictionary
     {
-        public static ProjectileCallbackDelegate NOTHING = (self) => { };
+        public static ProjectileCallbackDelegate NOTHING = (self) => { Debug.Log("Test"); };
 
         public static ProjectileCallbackDelegate SPAWN_6_CURVING = (self) =>
         {
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.Create(self.entity)
+                Projectile.New(self.data.entity)
                           .SetStart(self.transform.position)
                           .SetTarget(body.velocity)
                           .SetAngleOffset(i * 60f)
                           .SetMaxTime(3f)
-                          .SetSpeed(self.speed)
-                          .Curving((float)self.speed * 2f, true);
+                          .SetSpeed(self.data.speed)
+                          .Curving((float)self.data.speed * 2f, true)
+                          .Create();
             }
         };
 
         public static ProjectileCallbackDelegate SPAWN_6 = (self) =>
         {
+            Debug.Log("SPAWN 6 called");
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.Create(self.entity)
+                Projectile.New(self.data.entity)
                           .SetStart(self.transform.position)
                           .SetTarget(body.velocity)
                           .SetAngleOffset(i * 60f)
                           .SetMaxTime(3f)
-                          .SetSpeed(self.speed)
-                          .Curving(0f, false);
+                          .SetSpeed(self.data.speed)
+                          .Curving(0f, false)
+                          .Create();
             }
         };
 
@@ -43,70 +46,75 @@ namespace Projectiles
         {
             //BossController.ShootWave(50).events[0].action();
             for (int i = 0; i < 50; i++) {
-                Projectile.Create(self.entity)
+                Projectile.New(self.data.entity)
                           .SetStart(self.transform.position)
                           .SetTarget(Vector3.forward)
                           .SetSize(Size.MEDIUM)
                           .SetSpeed(Speed.MEDIUM)
-                          .SetAngleOffset(i * (360f / 50f));
+                          .SetAngleOffset(i * (360f / 50f))
+                          .Create();
             }
         };
 
         public static ProjectileCallbackDelegate SPAWN_1_TOWARDS_PLAYER = (self) =>
         {
             Projectile
-                .Create(self.entity)
+                .New(self.data.entity)
                 .SetStart(self.transform.position)
                 .SetTarget(null)
-                .SetMaxTime(self.maxTime)
-                .SetSize(self.size)
-                .SetSpeed(Speed.SNIPE);
+                .SetMaxTime(self.data.maxTime)
+                .SetSize(self.data.size)
+                .SetSpeed(Speed.SNIPE)
+                .Create();
         };
 
         public static ProjectileCallbackDelegate SPAWN_1_HOMING_TOWARDS_PLAYER = (self) =>
         {
             Projectile
-                .Create(self.entity)
+                .New(self.data.entity)
                 .SetStart(self.transform.position)
                 .SetTarget(null)
-                .SetSize(self.size)
+                .SetSize(self.data.size)
                 .SetSpeed(Speed.SNIPE)
-                .SetMaxTime(self.maxTime)
+                .SetMaxTime(self.data.maxTime)
+                .Create()
                 .Homing();
         };
 
         public static ProjectileCallbackDelegate REVERSE = (self) =>
         {
             Projectile
-                .Create(self.entity)
+                .New(self.data.entity)
                 .SetStart(self.transform.position)
-                .SetTarget(self.start)
-                .SetMaxTime(self.maxTime)
-                .SetSize(self.size)
-                .SetSpeed(self.speed);
+                .SetTarget(self.data.start)
+                .SetMaxTime(self.data.maxTime)
+                .SetSize(self.data.size)
+                .SetSpeed(self.data.speed)
+                .Create();
         };
 
         public static ProjectileCallbackDelegate REVERSE_FASTER = (self) =>
         {
-            if (self.speed == Speed.LIGHTNING)
+            if (self.data.speed == Speed.LIGHTNING)
             {
                 return;
             }
 
-            Speed currentSpeed = self.speed;
+            Speed currentSpeed = self.data.speed;
             Speed[] speeds = (Speed[])System.Enum.GetValues(currentSpeed.GetType());
             Speed nextSpeed = speeds[System.Array.IndexOf(speeds, currentSpeed) + 1];
 
             Debug.Log("New speed: " + nextSpeed);
 
             Projectile
-                .Create(self.entity)
+                .New(self.data.entity)
                 .SetStart(self.transform.position)
-                .SetTarget(self.start)
-                .SetSize(self.size)
+                .SetTarget(self.data.start)
+                .SetSize(self.data.size)
                 .SetSpeed(nextSpeed)
                 .SetMaxTime(2f * 1.5f * (float)Speed.FAST / (float)nextSpeed)
-                .OnDestroyTimeout(REVERSE_FASTER);
+                .OnDestroyTimeout(REVERSE_FASTER)
+                .Create();
         };
     }
 }

@@ -35,187 +35,77 @@ namespace AI
         public static Vector3 WEST_CLOSE = new Vector3(-15f, BOSS_HEIGHT, 0);
         #endregion
 
-        public static AISequence Shoot1(Vector3? target = null, float angleOffset = 0f, float maxTime = 10f, Speed speed = Speed.MEDIUM, Size size = Size.SMALL, Type type = Type.BASIC)
+        public static AISequence Shoot1(Projectile.ProjectileStructure? structure=null)
         {
             return new AISequence(() =>
             {
                 Glare();
-
-                Projectile basicProjectile = Projectile.Create(self)
-                                                       .SetTarget(target)
-                                                       .SetAngleOffset(angleOffset)
-                                                       .SetMaxTime(maxTime)
-                                                       .SetSpeed(speed)
-                                                       .SetSize(size);
-                switch (type)
-                {
-                    case Type.HOMING: basicProjectile.Homing(); break;
-                    case Type.CURVING: basicProjectile.Curving((float)speed * 2f, false); break;
-                    case Type.BASIC:
-                        break;
-                    case Type.INDESTRUCTIBLE:
-                        break;
-                    case Type.DEATHHEX:
-                        break;
-                }
+                Projectile.ProjectileStructure struc = structure ?? Projectile.New(self);
+                struc.Create();
             });
         }
 
-        public static AISequence Shoot3(Vector3? target = null, float angleOffset = 0f, float maxTime = 10f, Speed speed = Speed.MEDIUM, Size size = Size.SMALL, Type type = Type.BASIC)
+        public static AISequence Shoot3(Projectile.ProjectileStructure? structure=null)
         {
             return new AISequence(() =>
             {
                 Glare();
 
-                Projectile[] projectiles = new Projectile[3];
                 for (int i = 0; i < 3; i++)
                 {
-                    float offset = -30 + (30 * i) + angleOffset;
-                    projectiles[i] = Projectile.Create(self)
-                                               .SetTarget(target)
-                                               .SetAngleOffset(offset)
-                                               .SetMaxTime(maxTime)
-                                               .SetSpeed(speed)
-                                               .SetSize(size);
-                }
-
-                switch (type)
-                {
-                    case Type.HOMING: foreach (Projectile p in projectiles) { p.Homing(); } break;
-                    case Type.BASIC:
-                        break;
-                    case Type.INDESTRUCTIBLE:
-                        break;
-                    case Type.CURVING:
-                        break;
-                    case Type.DEATHHEX:
-                        break;
+                    Projectile.ProjectileStructure newStruc = structure ?? Projectile.New(self);
+                    newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
+                    newStruc.Create();
                 }
             });
         }
 
-        // Deprecated; should be a call to ShootArc.
-        public static AISequence ShootWave(int amount = 1, float arcWidth = 360f, float angleOffset = 0f, float maxTime = 10f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, Vector3? target = null)
+        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile.ProjectileStructure? structure=null)
         {
             return new AISequence(() =>
             {
                 Glare();
 
-
-                float halfArcWidth = -arcWidth / 2f;
-
-                for (int i = 0; i < amount; i++)
-                {
-
-                //Vector3 source = instance.transform.position;
-                //Vector3 sink = target ?? player.transform.position;
-                Vector3 direction = instance.transform.position - player.transform.position;
-
-                    float offset = halfArcWidth + angleOffset + (i * (arcWidth / amount));
-
-                    Projectile projectile = Projectile.Create(self)
-                                                      .SetTarget(target)
-                                                      .SetAngleOffset(offset)
-                                                      .SetMaxTime(maxTime)
-                                                      .SetSpeed(speed)
-                                                      .SetSize(size);
-
-                    switch (type)
-                    {
-                        case Type.HOMING: projectile.Homing(); break;
-                        case Type.BASIC:
-                            break;
-                        case Type.INDESTRUCTIBLE:
-                            break;
-                        case Type.CURVING:
-                            break;
-                        case Type.DEATHHEX:
-                            break;
-                    }
-                }
-            });
-        }
-
-        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, float maxTime = 10f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM, Type type = Type.BASIC, Vector3? target = null)
-        {
-            return new AISequence(() =>
-            {
-                Glare();
-
-            // Ensure that "from" is always less than "to".
-            if (to < from)
+                // Ensure that "from" is always less than "to".
+                if (to < from)
                 {
                     float temp = from;
                     from = to;
                     to = temp;
                 }
 
-
-            //Vector3 source = instance.transform.position;
-            Vector3 sink = target ?? player.transform.position;
-
                 float step = 360f / density;
-                for (float i = from; i <= to; i += step)
-                {
-                    Projectile projectile = Projectile.Create(self)
-                                                      .SetTarget(sink)
-                                                      .SetAngleOffset(i)
-                                                      .SetMaxTime(maxTime)
-                                                      .SetSpeed(speed)
-                                                      .SetSize(size);
-                    switch (type)
-                    {
-                        case Type.HOMING: projectile.Homing(); break;
-                        case Type.BASIC:
-                            break;
-                        case Type.INDESTRUCTIBLE:
-                            break;
-                        case Type.CURVING:
-                            break;
-                        case Type.DEATHHEX:
-                            break;
-                    }
+                for (float i = from; i <= to; i += step) {
+                    Projectile.ProjectileStructure newStruc = structure ?? Projectile.New(self).SetSize(Size.MEDIUM);
+                    newStruc.SetAngleOffset(i).Create();
                 }
             });
         }
 
         // Deprecated; can be created from two merged ShootArc calls.
-        public static AISequence ShootWall(int amount = 30, float arcWidth = 120, float angleOffset = 0, int exceptMin = 7, int exceptMax = 20, Vector3? target = null)
+        public static AISequence ShootWall(float angleOffset)
         {
-            return new AISequence(0, () =>
-            {
-                for (int i = 0; i < amount; i++)
-                {
-                    if (i >= exceptMin && i < exceptMax)
-                    {
-                        continue;
-                    }
-                    float offset = (-arcWidth / 2) + angleOffset + (i * (arcWidth / amount));
-                    Projectile.Create(self)
-                              .SetTarget(target)
-                              .SetAngleOffset(offset)
-                              .SetSpeed(Speed.SLOW);
-                }
-            });
+            return AISequence.Merge(
+                ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, Projectile.New(self).SetSpeed(Speed.SLOW)),
+                ShootArc(100, angleOffset + 20, angleOffset + 60, Projectile.New(self).SetSpeed(Speed.SLOW))
+            );
         }
 
-
-        public static AISequence ShootHexCurve(bool clockwise, Vector3? target = null, float angleOffset = 0f, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
+        public static AISequence ShootHexCurve(bool clockwise = true, Projectile.ProjectileStructure? structure=null)
         {
             return new AISequence(() =>
             {
-                float multiplier = clockwise ? 1f : -1f;
-                float curveSpeed = (float)speed * multiplier * 2f;
-                float maxTime = 3f;
                 for (int i = 0; i < 6; i++)
                 {
-                    Projectile.Create(self)
-                              .SetTarget(target ?? SOUTH_CLOSE)
-                              .SetAngleOffset(angleOffset + (i * multiplier * 60))
-                              .SetMaxTime(maxTime)
-                              .SetSpeed(speed)
-                              .SetSize(size)
-                              .Curving(curveSpeed, true);
+                    Projectile.ProjectileStructure struc = structure ?? Projectile.New(self);
+
+                    float multiplier = clockwise ? 1f : -1f;
+                    float curveSpeed = (float)struc.speed * multiplier * 2f;
+
+                    struc.SetAngleOffset(struc.angleOffset + (i * multiplier * 60))
+                         .SetMaxTime(3f)
+                         .Create()
+                         .Curving(curveSpeed, true);
                 }
             });
         }
@@ -231,11 +121,12 @@ namespace AI
                 for (int i = 0; i < amount; i++)
                 {
                     Vector3 spawn = instance.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
-                    Projectile.Create(self)
+                    Projectile.New(self)
                               .SetStart(spawn)
                               .SetTarget(spawn + targetPos)
                               .SetSpeed(speed)
-                              .SetSize(size);
+                              .SetSize(size)
+                              .Create();
                 }
             });
         }
@@ -246,10 +137,11 @@ namespace AI
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    Projectile.Create(self)
+                    Projectile.New(self)
                               .SetTarget(player.transform.position)
                               .SetAngleOffset(i * 60f)
                               .SetMaxTime(maxTime)
+                              .Create()
                               .DeathHex();
                 }
             });

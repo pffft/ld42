@@ -13,27 +13,162 @@ namespace Projectiles
 
     public class Projectile : MonoBehaviour
     {
-        public Entity entity;
+        public struct ProjectileStructure {
+            public Entity entity;
 
-        // Used internally for the builder notation
-        public Vector3 start;
-        public Vector3 target;
-        public float angleOffset;
+            // Used internally for the builder notation
+            public Vector3? preStart;
+            public Vector3 start;
+            public Vector3? preTarget;
+            public Vector3 target;
+            public float angleOffset;
 
-        public Speed speed;
-        public Size size;
-        public Type type;
+            public Speed speed;
+            public Size size;
+            public Type type;
+            public object[] _typeParameters;
 
-        public float currentTime;
-        public float maxTime;
+            public float currentTime;
+            public float maxTime;
 
-        public float damage;
-        public float velocity;
+            public float damage;
 
-        public static Material blueMaterial;
-        public static Material orangeMaterial;
-        public static Material greenMaterial;
-        public static Material purpleMaterial;
+            #region callbacks
+            /*
+             * Called after object is destroyed due to time limit.
+             */
+            public ProjectileCallbackDelegate OnDestroyTimeoutImpl;
+
+            public ProjectileStructure OnDestroyTimeout(ProjectileCallbackDelegate deleg)
+            {
+                this.OnDestroyTimeoutImpl = deleg;
+                return this;
+            }
+
+            /*
+             * Called after object is destroyed due to hitting the arena.
+             */
+            public ProjectileCallbackDelegate OnDestroyOutOfBoundsImpl;
+
+            public ProjectileStructure OnDestroyOutOfBounds(ProjectileCallbackDelegate deleg)
+            {
+                this.OnDestroyOutOfBoundsImpl = deleg;
+                return this;
+            }
+
+            /*
+             * Called when the object hits the player
+             */
+            public ProjectileCallbackDelegate OnDestroyCollisionImpl;
+
+            public ProjectileStructure OnDestroyCollision(ProjectileCallbackDelegate deleg)
+            {
+                this.OnDestroyCollisionImpl = deleg;
+                return this;
+            }
+            #endregion
+
+            public ProjectileStructure(Entity entity) {
+                this.entity = entity;
+
+                this.preStart = null;
+                this.start = Vector3.zero;
+                this.preTarget = null;
+                this.target = Vector3.zero;
+                this.angleOffset = 0f;
+
+                this.speed = Speed.MEDIUM;
+                this.size = Size.SMALL;
+                this.type = Type.BASIC;
+                this._typeParameters = null;
+
+                this.currentTime = 0f;
+                this.maxTime = 10f;
+
+                this.damage = 5f;
+
+                OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
+                OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
+                OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
+            }
+
+            // Builder method
+            public ProjectileStructure SetStart(Vector3? start)
+            {
+                this.preStart = start;
+                return this;
+            }
+
+            // Builder method
+            public ProjectileStructure SetTarget(Vector3? target)
+            {
+                this.preTarget = target;
+                return this;
+            }
+
+            // Builder method
+            public ProjectileStructure SetAngleOffset(float offsetDegrees)
+            {
+                this.angleOffset = offsetDegrees;
+                return this;
+            }
+
+            // Builder method
+            public ProjectileStructure SetMaxTime(float seconds)
+            {
+                this.maxTime = seconds;
+                return this;
+            }
+
+            // Builder method
+            public ProjectileStructure SetSpeed(Speed speed)
+            {
+                this.speed = speed;
+                return this;
+            }
+
+            // Builder method
+            public ProjectileStructure SetSize(Size size)
+            {
+                this.size = size;
+                return this;
+            }
+
+            // Generates a new GameObject based on this structure.
+            public Projectile Create()
+            {
+                // Create new GameObject
+                GameObject newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Projectile"));
+                newObj.SetActive(false); // hack- set inactive so we can assign data for use on awake
+
+                // Create a new Projectile component
+                Projectile projectile = newObj.AddComponent<Projectile>();
+                projectile.data = this;
+
+                // Assign and init the RigidBody (or create one if it doesn't exist)
+                Rigidbody body = newObj.GetComponent<Rigidbody>();
+                if (body == null)
+                {
+                    body = newObj.AddComponent<Rigidbody>();
+                }
+                body.useGravity = false;
+
+                // Assign the type with any parameters that were forced in.
+                switch(type) {
+                    case Type.BASIC: break;
+                    case Type.CURVING: projectile.Curving((float)_typeParameters[0], (bool)_typeParameters[1]); break;
+                    case Type.DEATHHEX: projectile.DeathHex(); break;
+                    case Type.HOMING: projectile.Homing(); break;
+                    case Type.INDESTRUCTIBLE: break;
+                }
+
+                newObj.SetActive(true);
+                return projectile;
+            }
+
+        }
+
+        public ProjectileStructure data;
 
         /*
          * Creates a default Projectile component for the builder notation.
@@ -41,65 +176,21 @@ namespace Projectiles
          * of 10. It will start at the entity's position and aim at the player
          * (if the entity is the boss), or else aim forward (for the player).
          */
-        public static Projectile Create(Entity entity)
+        public static ProjectileStructure New(Entity entity) {
+            return new ProjectileStructure(entity);
+        }
+
+        public void Awake()
         {
-            // Create new GameObject
-            GameObject newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Projectile"));
+            // Sets start
+            Debug.Log("Is data entity null?: " + (data.entity == null) + " type is " + GetType());
+            data.start = data.preStart ?? data.entity.transform.position;
 
-            // Default start and target
-            Vector3 startPosition = entity.transform.position;
+            // Sets target
             Vector3 targetPosition;
-            if (entity.name.Equals(BossController.BOSS_NAME)) {
-                // TODO cache me
-                targetPosition = BossController.isPlayerLocked ? 
-                   BossController.playerLockPosition : 
-                   GameObject.Find("Player").transform.position;
-            } else {
-                targetPosition = Vector3.forward;
-            }
-
-            // Create a new Projectile component
-            Projectile projectile = newObj.AddComponent<Projectile>();
-
-            // Assign and init the RigidBody (or create one if it doesn't exist)
-            Rigidbody body = newObj.GetComponent<Rigidbody>();
-            if (body == null)
+            if (data.preTarget == null)
             {
-                body = newObj.AddComponent<Rigidbody>();
-            }
-            body.useGravity = false;
-
-            // Set up basic projectile information
-            projectile.entity = entity;
-            projectile.currentTime = 0;
-            projectile.damage = 5f;
-
-            // Set defaults.
-            return projectile
-                .SetStart(startPosition)
-                .SetTarget(targetPosition)
-                .SetAngleOffset(0f)
-                .SetMaxTime(10f)
-                .SetSpeed(Speed.MEDIUM)
-                .SetSize(Size.SMALL);
-        }
-
-        #region Builder Methods
-
-        // Builder method
-        public Projectile SetStart(Vector3? start) 
-        {
-            this.start = start ?? entity.transform.position;
-            UpdateOrientationAndVelocity();
-            return this;
-        }
-
-        // Builder method
-        public Projectile SetTarget(Vector3? target)
-        {
-            Vector3 targetPosition;
-            if (target == null) {
-                if (entity.name.Equals(BossController.BOSS_NAME))
+                if (data.entity.name.Equals(BossController.BOSS_NAME))
                 {
                     // TODO cache me
                     targetPosition = BossController.isPlayerLocked ?
@@ -110,40 +201,16 @@ namespace Projectiles
                 {
                     targetPosition = Vector3.forward;
                 }
-            } else {
-                targetPosition = target.Value;
             }
+            else
+            {
+                targetPosition = data.preTarget.Value;
+            }
+            data.target = targetPosition;
 
-            this.target = targetPosition;
-            UpdateOrientationAndVelocity();
-            return this;
-        }
-
-        // Builder method
-        public Projectile SetAngleOffset(float offsetDegrees) {
-            this.angleOffset = offsetDegrees;
-            UpdateOrientationAndVelocity();
-            return this;
-        }
-
-        // Builder method
-        public Projectile SetMaxTime(float seconds) {
-            this.maxTime = seconds;
-            return this;
-        }
-
-        // Builder method
-        public Projectile SetSpeed(Speed speed) {
-            this.speed = speed;
-            UpdateOrientationAndVelocity();
-            return this;
-        }
-
-        // Builder method
-        public Projectile SetSize(Size size) {
-            this.size = size;
-            gameObject.transform.localScale = SizeToScale(size) * Vector3.one;
-            switch (size)
+            // Sets size (and assigns default material)
+            gameObject.transform.localScale = SizeToScale(data.size) * Vector3.one;
+            switch (data.size)
             {
                 case Size.TINY:
                 case Size.SMALL:
@@ -161,33 +228,34 @@ namespace Projectiles
                     break;
             }
 
-            return this;
+            UpdateOrientationAndVelocity();
+
+            CustomAwake();
         }
+
+        public virtual void CustomAwake() { }
+
 
         /* Updates this Projectile's orientation and velocity. Called when the start,
          * target, angleOffset, or speed are changed using the builder methods.
          */
         private void UpdateOrientationAndVelocity()
         {
-            Vector3 start = this.start;
-
             // Remove any height from the start and target vectors
-            Vector3 topDownSpawn = new Vector3(start.x, 0, start.z);
-            Vector3 topDownTarget = new Vector3(target.x, 0, target.z);
+            Vector3 topDownSpawn = new Vector3(data.start.x, 0, data.start.z);
+            Vector3 topDownTarget = new Vector3(data.target.x, 0, data.target.z);
 
             // Add in rotation offset from the angleOffset parameter
-            Quaternion offset = Quaternion.AngleAxis(angleOffset, Vector3.up);
+            Quaternion offset = Quaternion.AngleAxis(data.angleOffset, Vector3.up);
 
             // Compute the final rotation
+            // TODO update this to be rotation around the up axis to fix 180 degree bug
             Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
 
-            this.gameObject.transform.position = start;
+            this.gameObject.transform.position = data.start;
             this.gameObject.transform.rotation = rotation;
-            this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)speed);
-            this.velocity = (float)speed;
+            this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
         }
-
-        #endregion
 
         /*
          * A helper function that retuns the local scale of a projectile, given
@@ -200,56 +268,22 @@ namespace Projectiles
 
         void Update()
         {
-            currentTime += Time.deltaTime;
+            data.currentTime += Time.deltaTime;
 
-            if (currentTime >= maxTime)
+            if (data.currentTime >= data.maxTime)
             {
-                OnDestroyTimeoutImpl(this);
+                data.OnDestroyTimeoutImpl(this);
                 Destroy(this.gameObject);
             }
 
             if (transform.position.magnitude > 100f)
             {
-                OnDestroyOutOfBoundsImpl(this);
+                data.OnDestroyOutOfBoundsImpl(this);
                 Destroy(this.gameObject);
             }
 
             CustomUpdate();
         }
-
-        #region Event Callbacks
-
-        /*
-         * Called after object is destroyed due to time limit.
-         */
-        public ProjectileCallbackDelegate OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
-
-        public virtual Projectile OnDestroyTimeout(ProjectileCallbackDelegate deleg) {
-            this.OnDestroyTimeoutImpl = deleg;
-            return this;
-        }
-
-        /*
-         * Called after object is destroyed due to hitting the arena.
-         */
-        public ProjectileCallbackDelegate OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
-
-        public virtual Projectile OnDestroyOutOfBounds(ProjectileCallbackDelegate deleg) {
-            this.OnDestroyOutOfBoundsImpl = deleg;
-            return this;
-        }
-
-        /*
-         * Called when the object hits the player
-         */
-        public ProjectileCallbackDelegate OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
-
-        public virtual Projectile OnDestroyCollision(ProjectileCallbackDelegate deleg) {
-            this.OnDestroyCollisionImpl = deleg;
-            return this;
-        }
-
-        #endregion
 
         /*
          * Called at the end of every frame on update.
@@ -266,11 +300,11 @@ namespace Projectiles
             Entity otherEntity = otherObject.GetComponent<Entity>();
             if (otherEntity != null)
             {
-                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != this.entity.GetFaction())
+                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
                 {
                     Debug.Log("Projectile collided, should apply damage");
-                    Entity.DamageEntity(otherEntity, this.entity, damage);
-                    OnDestroyCollisionImpl(this);
+                    Entity.DamageEntity(otherEntity, data.entity, data.damage);
+                    data.OnDestroyCollisionImpl(this);
                     Destroy(this.gameObject);
                 }
             }
@@ -292,18 +326,13 @@ namespace Projectiles
          * This method is used by extension methods to help cast to a given type.
         */
         public T CastTo<T>() where T : Projectile {
+            gameObject.SetActive(false);
             T other = gameObject.AddComponent<T>();
 
             // Copy the data over
-            other.entity = entity;
-
-            other.speed = speed;
-            other.size = size;
-            other.currentTime = 0;
-            other.maxTime = maxTime;
-
-            other.damage = damage;
-            other.velocity = velocity;
+            //other.data = new ProjectileStructure();
+            other.data = this.data;
+            gameObject.SetActive(true);
 
             // Assign a different, custom material (if applicable)
             Material customMaterial = other.GetCustomMaterial();

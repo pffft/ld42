@@ -39,10 +39,8 @@ namespace AI
             .AddSequence(10, SHOOT3_WAVE3)
             .AddSequence(10, SHOOT_2_WAVES.Times(5))
             .AddSequence(10, HEX_CURVE_INTRO)
-            //.AddSequence(10, BIG_HOMING_STRAFE)
             .AddSequence(10, DOUBLE_HEX_CURVE)
             .AddSequence(10, HOMING_STRAFE_WAVE_SHOOT.Times(2))
-            //.AddSequence(10, DEATH_HEX)
             .AddSequence(10, SWEEP)
             .AddSequence(10, SWEEP_BACK_AND_FORTH)
             .AddSequence(10, SWEEP_BACK_AND_FORTH_MEDIUM)
@@ -56,8 +54,9 @@ namespace AI
             .AddSequence(10, WAVE_REVERSE) // maybe add a new color for reversal attacks
             .AddSequence(10, WAVE_REVERSE_TARGET)
             .AddSequence(10, WAVE_REVERSE_TARGET_HOMING) // is this too hard? 
-                                                         //.AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
-            .AddScriptedSequence(5, JUMP_ROPE_FAST);
+            .AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
+            .AddScriptedSequence(5, JUMP_ROPE_FAST)
+            ;
 
         static AIPhase() {
             if (BossController.insaneMode)

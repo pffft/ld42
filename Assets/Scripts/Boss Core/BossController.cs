@@ -89,8 +89,8 @@ public class BossController : MonoBehaviour
             AOE.Create(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(12);
         }));
         */
-        eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(6)).Wait(10f));
-        eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-120, 120).SetFixedWidth(6)).Wait(10f));
+        //eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(6)).Wait(10f));
+        //eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-120, 120).SetFixedWidth(6)).Wait(10f));
 
         Profiler.EndSample();
     }
