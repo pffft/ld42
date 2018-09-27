@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using CombatCore;
 using UnityEngine;
 
+using UnityEngine.Profiling;
+
 namespace Projectiles
 {
     /*
@@ -170,6 +172,17 @@ namespace Projectiles
 
         public ProjectileStructure data;
 
+        public static Material blueMaterial;
+        public static Material orangeMaterial;
+        public static Material orangeRedMaterial;
+
+        static Projectile()
+        {
+            blueMaterial = Resources.Load<Material>("Art/Materials/BlueTransparent");
+            orangeMaterial = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+            orangeRedMaterial = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
+        }
+
         /*
          * Creates a default Projectile component for the builder notation.
          * By default, this is a small, medium speed projectile with a max life
@@ -213,17 +226,17 @@ namespace Projectiles
             {
                 case Size.TINY:
                 case Size.SMALL:
-                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/BlueTransparent");
+                    gameObject.GetComponent<MeshRenderer>().material = blueMaterial;
                     break;
                 case Size.MEDIUM:
-                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                    gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
                     break;
                 case Size.LARGE:
                 case Size.HUGE:
-                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
+                    gameObject.GetComponent<MeshRenderer>().material = orangeRedMaterial;
                     break;
                 default:
-                    gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                    gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
                     break;
             }
 
@@ -267,6 +280,7 @@ namespace Projectiles
 
         void Update()
         {
+            Profiler.BeginSample("Projectile update loop");
             data.currentTime += Time.deltaTime;
 
             if (data.currentTime >= data.maxTime)
@@ -281,7 +295,10 @@ namespace Projectiles
                 Destroy(this.gameObject);
             }
 
+            Profiler.BeginSample("Projectile custom update");
             CustomUpdate();
+            Profiler.EndSample();
+            Profiler.EndSample();
         }
 
         /*
