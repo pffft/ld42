@@ -87,7 +87,7 @@ namespace Projectiles
                 this.currentTime = 0f;
                 this.maxTime = 10f;
 
-                this.damage = 5f;
+                this.damage = ((float)size + 0.5f) * 2f;
 
                 OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
                 OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
@@ -133,6 +133,7 @@ namespace Projectiles
             public ProjectileStructure Size(Size size)
             {
                 this.size = size;
+                this.damage = ((float)size + 0.5f) * 2f;
                 return this;
             }
 
@@ -313,16 +314,25 @@ namespace Projectiles
         public virtual void OnTriggerEnter(Collider other)
         {
             GameObject otherObject = other.gameObject;
-            Entity otherEntity = otherObject.GetComponent<Entity>();
+            Entity otherEntity = otherObject.GetComponentInParent<Entity>();
             if (otherEntity != null)
             {
                 if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
                 {
-                    Debug.Log("Projectile collided, should apply damage");
+                    //Debug.Log("Projectile collided, should apply damage");
+                    Debug.Log("Hit shield for " + data.damage + " damage!");
                     Entity.DamageEntity(otherEntity, data.entity, data.damage);
                     data.OnDestroyCollisionImpl(this);
                     Destroy(this.gameObject);
                 }
+            } else {
+                if (otherObject.name.Equals("Shield Down")) {
+                    Debug.Log("Hit shield for " + data.damage + " damage!");
+                    Entity.DamageEntity(GameObject.Find("Player").GetComponent<Entity>(), data.entity, data.damage);
+                    Destroy(this.gameObject);
+                }
+                //Debug.Log("Hit a wall or something");
+                //Destroy(this.gameObject);
             }
         }
 

@@ -8,7 +8,7 @@ namespace Projectiles
     public class ProjectileHoming : Projectile
     {
 
-        public GameObject player;
+        public GameObject targetObject;
         public Rigidbody body;
 
         public float curDivergence;
@@ -26,10 +26,10 @@ namespace Projectiles
         }
         
         public override void CustomUpdate() {
-            Vector3 idealVelocity = ((float)data.speed) * (player.transform.position - transform.position).normalized;
+            Vector3 idealVelocity = ((float)data.speed) * (targetObject.transform.position - transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, body.velocity, Vector3.up);
 
-            float distance = Vector3.Distance(player.transform.position, transform.position);
+            float distance = Vector3.Distance(targetObject.transform.position, transform.position);
 
             if (!wasClose && distance < 10f)
             {
@@ -61,7 +61,7 @@ namespace Projectiles
         {
             ProjectileHoming homing = projectile.CastTo<ProjectileHoming>();
 
-            homing.player = GameObject.Find("Player");
+            homing.targetObject = projectile.data.entity.GetFaction() == Entity.Faction.enemy? GameObject.Find("Player") : GameObject.Find("Boss");
             homing.body = projectile.GetComponent<Rigidbody>();
             homing.wasClose = false;
             homing.curDivergence = 0f;

@@ -16,7 +16,7 @@ namespace CombatCore.StatusComponents
 
 		public override void OnUpdate(Entity subject, float time)
 		{
-			Ability a = subject.GetAbility ("Reflect"), b = subject.GetAbility ("Shield Throw");
+			Ability a = subject.GetAbility ("Reflect"), b = subject.GetAbility ("Throw");
 			if (a != null && b != null)
 			{
 				if (a.cooldownCurr <= 0f && b.cooldownCurr <= 0f)

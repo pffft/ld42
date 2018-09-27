@@ -26,6 +26,24 @@ namespace CombatCore
 				1,
 				float.PositiveInfinity,
 				new Exhausted ()));
+
+            Put(new Status(
+                "ShieldRegen",
+                "You have the shield, and so it regenerates",
+                null,
+                DecayType.communal,
+                1,
+                float.PositiveInfinity
+            ));
+
+            Put(new Status(
+                "yaintgotshield",
+                "YAIN'T GOT NO GOT DAM SHEILD MANG",
+                null,
+                DecayType.communal,
+                1,
+                float.PositiveInfinity
+            ));
 		}
 	}
 }

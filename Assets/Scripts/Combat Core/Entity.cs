@@ -227,6 +227,14 @@ namespace CombatCore
 		}
 
 		// Either a status naturally ran out, or it is being manually removed
+        public void RemoveStatus(string name) {
+            if (HasStatus(name)) {
+                Status s;
+                statuses.TryGetValue(name, out s);
+                RemoveStatus(s);
+            }
+        }
+
 		public void RemoveStatus(Status s)
 		{
 			s.OnRevert (this);

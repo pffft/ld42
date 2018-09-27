@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
-	private const string ABILITY_1 = "Dash", ABILITY_2 = "Shield Throw", ABILITY_3 = "Reflect";
+	private const string ABILITY_1 = "Dash", ABILITY_2 = "Throw", ABILITY_3 = "Block";
 
 	[SerializeField]
 	private float dashRange;
@@ -160,5 +160,12 @@ public class Controller : MonoBehaviour
 
 		UnityEditor.Handles.color = Color.red;
 		UnityEditor.Handles.DrawWireArc (new Vector3(transform.position.x, 0f, transform.position.z), Vector3.up, Vector3.forward, 360f, dashRange);
+
+        GameObject shield = GameObject.Find("Shield Down");
+        if (shield != null)
+        {
+            UnityEditor.Handles.color = Color.blue;
+            UnityEditor.Handles.DrawWireArc(shield.transform.position, Vector3.up, Vector3.forward, 360f, 5f);
+        }
 	}
 }

@@ -102,7 +102,7 @@ public class BossController : MonoBehaviour
     void Update()
     {
         eventQueue.Update();
-        #if true
+        #if false
         if (eventQueue.Empty())
         {
             eventQueue.Add(phase.GetNext());

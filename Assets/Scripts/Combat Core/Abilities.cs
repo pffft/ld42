@@ -31,21 +31,21 @@ namespace CombatCore
 			);
 
 			Put (new Ability (
-				"Shield Throw",
+				"Throw",
 				"Throws a shield",
 				null,
 				0.5f,
 				0,
-				PlayerShoot)
+                PlayerThrow)
 			);
 
 			Put (new Ability (
-				"Reflect",
-				"Provides a short period of reflection",
+				"Block",
+				"Drops a protective shield",
 				null,
 				1f,
 				0,
-				PlayerReflect)
+                PlayerBlock)
 			);
 		}
 
@@ -64,29 +64,88 @@ namespace CombatCore
 			Vector3 targetPos = subject.transform.position + dir.normalized * Mathf.Min (range, dir.magnitude);
 			Controller c = subject.GetComponent<Controller> ();
 			c.StartCoroutine (c.Dashing (targetPos));
+
+            if (subject.HasStatus("ShieldRegen")) {
+                subject.RemoveStatus(Status.Get("ShieldRegen"));
+            }
+
 			return true;
 		}
 
-		private static bool PlayerShoot(Entity subject, Vector3 targetPosition, params object[] args)
-		{
-            Debug.Log ("PlayerShoot");
+        // TODO: this is a basic stub for testing
+        // this needs to throw the shield model (+animation)
+        private static bool PlayerThrow(Entity subject, Vector3 targetPosition, params object[] args) 
+        {
+            Debug.Log("Player shield throw");
+
+            // Can't throw the shield if it's already out!
+            if (subject.HasStatus("Shield Placed"))
+            {
+                // If we're tied to the shield, then reclaim it
+                if (subject.HasStatus("ShieldRegen"))
+                {
+                    Debug.Log("Tied to shield, reclaiming it");
+                    subject.RemoveStatus("Shield Placed");
+                    subject.RemoveStatus("ShieldRegen");
+                    return true;
+                }
+                else if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f)
+                {
+                    Debug.Log("Close to shield, reclaiming it");
+                    // If we're close enough to the shield, then reclaim it
+                    subject.RemoveStatus("Shield Placed");
+                    return true;
+                }
+                else
+                {
+                    Debug.Log("Too far to reclaim shield");
+                    return false;
+                }
+            }
+
+            if (subject.HasStatus("yaintgotshield")) {
+                if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f) {
+                    Debug.Log("Close to shield, reclaiming it");
+                    subject.RemoveStatus("yaintgotshield");
+                    return true;
+                }
+                Debug.Log("Shield is already thrown. Go pick it up!");
+                return false;
+            }
+
+            Debug.Log("YEET");
             Projectile.New(subject)
                       .Target(targetPosition)
                       .MaxTime(2f)
                       .Speed(BossCore.Speed.VERY_FAST)
+                      .Size(Size.MEDIUM)
+                      .Homing()
                       .Create();
+            subject.AddStatus(Status.Get("yaintgotshield"));
 
-			//TODO throw shield, player abilities disabled while shield is thrown
+            return true;
 
-			return true;
-		}
+        }
 
-		private static bool PlayerReflect(Entity subject, Vector3 targetPosition, params object[] args)
-		{
-			Debug.Log ("PlayerReflect");
-			subject.AddStatus (new Status ("Reflecting", "", null, Status.DecayType.communal, 1, 0.25f, new StatusComponents.Reflecting()));
-			return true;
-		}
+        // TODO: this is a basic stub for testing
+        // this needs a better model for the blocking shield
+        private static bool PlayerBlock(Entity subject, Vector3 targetPosition, params object[] args) 
+        {
+            Debug.Log("PlayerBlock");
+            Debug.Log("Aiming at " + targetPosition);
+            Debug.Log("Degrees: " + Vector3.Angle(Vector3.forward, targetPosition - subject.transform.position));
+            subject.AddStatus(Status.Get("ShieldRegen"));
+            subject.AddStatus(
+                new Status("Shield Placed",
+                           "The shield has been placed down",
+                           null,
+                           Status.DecayType.communal,
+                           1,
+                           float.PositiveInfinity,
+                           new StatusComponents.ShieldPlaced(targetPosition)
+                ));
+            return true;
+        }
 		#endregion
 	}
 }
