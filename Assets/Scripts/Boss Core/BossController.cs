@@ -77,6 +77,7 @@ public class BossController : MonoBehaviour
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
         phase = AIPhase.PHASE1;
+        //phase = AIPhase.PHASE_TEST;
         //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
 
         /*

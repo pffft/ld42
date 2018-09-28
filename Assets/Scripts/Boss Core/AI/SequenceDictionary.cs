@@ -419,7 +419,7 @@ namespace AI
             PlayerLock(false)
             );
 
-        public static AISequence RANDOM_200_WAVE = new AISequence(5, () => {
+        public static AISequence RANDOM_200_WAVE = new AISequence(7, () => {
             List<AISequence> sequences = new List<AISequence>();
             for (int j = 0; j < 200; j++) {
                 switch (Random.Range(0, 3))
@@ -587,6 +587,21 @@ namespace AI
             //Shoot1(size: Size.TINY, speed: Speed.VERY_FAST, angleOffset: -20f).Wait(0.1f).Times(30)
             //Shoot3(speed: Speed.FAST, size: Size.SMALL).Wait(0.1f).Times(60)
             //Shoot1(size: Size.TINY, speed: Speed.VERY_FAST).Wait(0.25f).Times(6).Then(Shoot1(size: Size.MEDIUM, speed: Speed.FAST, type: Type.HOMING).Wait(0.25f)).Times(4)
+        );
+
+        public static AISequence SHOOT_2_WAVES_45 = new AISequence(
+            4f,
+            Teleport().Wait(0.25f),
+            ShootArc(4, -45f, 45f, New(self).Size(Size.LARGE).Speed(Speed.MEDIUM_SLOW).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(2f)
+        );
+
+        public static AISequence SHOOT_4_WAVES_BEHIND = new AISequence(
+            5.5f,
+            Teleport(CENTER).Wait(0.5f),
+            Shoot1(New(self).Size(Size.LARGE).Speed(Speed.MEDIUM_SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(220f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(0.5f),
+            Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(200f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(0.5f),
+            Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(160f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(0.5f),
+            Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(140f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(5f)
         );
 
         public static AISequence AOE_TEST = new AISequence(

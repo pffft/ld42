@@ -35,6 +35,10 @@ namespace AI
         eventQueue.AddSequence(AISequence.JUMP_ROPE_SLOW_CIRCLES);
         */
 
+        public static AIPhase PHASE_TEST = new AIPhase()
+            .AddSequence(1, SHOOT_4_WAVES_BEHIND)
+            ;
+
         public static AIPhase PHASE1 = new AIPhase()
             .AddSequence(10, SHOOT3_WAVE3)
             .AddSequence(10, SHOOT_2_WAVES.Times(5))
@@ -58,6 +62,8 @@ namespace AI
             .AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
             .AddSequence(10, FOUR_WAY_SWEEP_WITH_HOMING)
             .AddSequence(10, RANDOM_200_WAVE)
+            .AddSequence(10, SHOOT_2_WAVES_45)
+            .AddSequence(10, SHOOT_4_WAVES_BEHIND)
             ;
 
         static AIPhase() {

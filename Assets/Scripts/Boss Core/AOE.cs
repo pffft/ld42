@@ -71,7 +71,7 @@ public class AOE : MonoBehaviour {
             this.target = Vector3.zero;
             this.internalRotation = 0f;
             this.angleOffset = 0f;
-            this.innerScale = 0.9f;
+            this.innerScale = 0.95f;
             this.scale = 1f;
             this.innerExpansionSpeed = BossCore.Speed.MEDIUM;
             this.expansionSpeed = BossCore.Speed.MEDIUM;
