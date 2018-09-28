@@ -43,9 +43,9 @@ namespace CombatCore
 				"Block",
 				"Drops a protective shield",
 				null,
-				1f,
-				0,
-                PlayerBlock)
+                cooldownMax: 3f,
+				chargesMax: 0,
+                effect: PlayerBlock)
 			);
 		}
 
@@ -135,15 +135,10 @@ namespace CombatCore
             Debug.Log("Aiming at " + targetPosition);
             Debug.Log("Degrees: " + Vector3.Angle(Vector3.forward, targetPosition - subject.transform.position));
             subject.AddStatus(Status.Get("ShieldRegen"));
-            subject.AddStatus(
-                new Status("Shield Placed",
-                           "The shield has been placed down",
-                           null,
-                           Status.DecayType.communal,
-                           1,
-                           float.PositiveInfinity,
-                           new StatusComponents.ShieldPlaced(targetPosition)
-                ));
+
+            Status shieldPlacedStatus = Status.Get("Shield Placed");
+            shieldPlacedStatus.GetComponent<StatusComponents.ShieldPlaced>().SetTarget(targetPosition);
+            subject.AddStatus(shieldPlacedStatus);
             return true;
         }
 		#endregion

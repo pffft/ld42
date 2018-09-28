@@ -280,7 +280,7 @@ public class AOE : MonoBehaviour {
 
         // Hit the arena walls
         // should be "innerscale"- what about AOE attacks without hole in center?
-        if (data.scale > GameObject.Find("Arena").transform.localScale.x * 50f)
+        if (data.scale > GameObject.Find("Arena").transform.localScale.x * 2f * 50f)
         {
             //Debug.Log("Ring hit arena. Returning.");
             Destroy(this.gameObject);

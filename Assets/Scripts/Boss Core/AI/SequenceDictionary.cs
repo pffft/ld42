@@ -22,7 +22,7 @@ namespace AI
         #region Building Block Sequences
 
         public static AISequence SHOOT_360 = new AISequence(
-            ShootArc()
+            ShootAOE(AOE.New(self).On(0, 360).FixedWidth(3f))
         );
 
         /*
@@ -88,7 +88,7 @@ namespace AI
          * Shoots a medium-slow 360, then strafes 60 degrees.
          */
         public static AISequence SLOW_WAVE_CIRCLE = new AISequence(
-            ShootArc(75, 0f, 360f, New(self).Speed(Speed.MEDIUM_SLOW).Size(Size.LARGE)),
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM_SLOW).FixedWidth(5f)),
             Strafe(true, 60f, 50).Wait(0.5f)
         );
 
@@ -112,7 +112,7 @@ namespace AI
         */
 
         public static AISequence LINE_CIRCLE_STRAFE_60 = new AISequence(
-            ShootArc(75, 0f, 360f, New(self).Speed(Speed.SLOW).Size(Size.LARGE))
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM_SLOW).FixedWidth(5f))
             .Wait(0.1f),
             Strafe(true, 30f, 50)
             .Wait(0.3f),
@@ -127,7 +127,8 @@ namespace AI
         /*
          * 40 basic bullets, with a 360 wave at the start, middle, and end.
          */
-        public static AISequence SHOOT3_WAVE3 = new AISequence(3, 
+        public static AISequence SHOOT3_WAVE3 = new AISequence(
+            3, 
             Teleport().Wait(0.5f),
             SHOOT_360,
             Shoot3().Wait(0.1f).Times(20),
@@ -139,9 +140,9 @@ namespace AI
         public static AISequence HEX_CURVE_INTRO = new AISequence(
             4, 
             ShootHexCurve(true),
-            ShootArc().Wait(2.5f),
+            SHOOT_360.Wait(2.5f),
             ShootHexCurve(false),
-            ShootArc().Wait(2.5f),
+            SHOOT_360.Wait(2.5f),
             ShootHexCurve(true),
             SHOOT_360,
             ShootHexCurve(false).Wait(1f),
@@ -165,7 +166,7 @@ namespace AI
             Teleport(CENTER).Wait(1.5f),
             PlayerLock(true),
             ShootHexCurve(true),
-            ShootArc().Wait(0.5f),
+            SHOOT_360.Wait(0.5f),
             ShootHexCurve(true, New(self).AngleOffset(30f)).Wait(0.5f),
             SHOOT_360.Wait(1f),
             SHOOT_360.Wait(1f),
@@ -236,13 +237,13 @@ namespace AI
             4, 
             CameraMove(false, new Vector3(0, 17.5f, -35)).Wait(1f),
             Teleport(WEST_FAR, 35),
-            ShootLine(50, 100f, speed: Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
             Teleport(EAST_FAR, 35),
-            ShootLine(50, 100f, speed: Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
             Teleport(WEST_FAR, 35),
-            ShootLine(50, 100f, speed: Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
             Teleport(EAST_FAR, 35),
-            ShootLine(50, 100f, speed: Speed.SNIPE),
+            ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
             CameraMove(true)
         );
 
@@ -418,7 +419,7 @@ namespace AI
             PlayerLock(false)
             );
 
-        public static AISequence RANDOM_200_WAVE = new AISequence(8, () => {
+        public static AISequence RANDOM_200_WAVE = new AISequence(5, () => {
             List<AISequence> sequences = new List<AISequence>();
             for (int j = 0; j < 200; j++) {
                 switch (Random.Range(0, 3))
@@ -601,29 +602,31 @@ namespace AI
         );
 
         public static AISequence AOE_131_MEDIUM = new AISequence(
+            Teleport().Wait(0.5f),
             PlayerLock(true),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(10)).Wait(0.38f),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
-            PlayerLock(false)
+            PlayerLock(false).Wait(1f)
         );
 
         public static AISequence AOE_131_FAST = new AISequence(
+            Teleport().Wait(0.5f),
             PlayerLock(true),
             ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, 60).FixedWidth(5)).Wait(0.135f),
             ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(10)).Wait(0.27f),
             ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, 60).FixedWidth(5)).Wait(0.135f),
-            PlayerLock(false)
+            PlayerLock(false).Wait(1f)
         );
 
 
         public static AISequence AOE_131_MEDIUM_LONG = new AISequence(
-            Teleport(),
+            Teleport().Wait(0.5f),
             PlayerLock(true),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(20)).Wait(0.76f),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
-            PlayerLock(false)
+            PlayerLock(false).Wait(1f)
         );
 
         #endregion

@@ -14,8 +14,10 @@ namespace CombatCore.StatusComponents
         private GameObject _shield;
         private bool isAttached;
 
-        public ShieldPlaced(Vector3 targetPos) {
+
+        public ShieldPlaced SetTarget(Vector3 targetPos) {
             this.target = targetPos;
+            return this;
         }
 
         public override void OnApply(Entity subject)
@@ -45,7 +47,7 @@ namespace CombatCore.StatusComponents
                 OnShieldsDown(subject);
             };
             shieldEntity.shieldsMax = 50f;
-            shieldEntity.shieldRegen = 25f;
+            //shieldEntity.shieldRegen = 25f;
             shieldEntity.shieldDelayMax = 0f;
             _shield.SetActive(true);
         }
@@ -53,9 +55,15 @@ namespace CombatCore.StatusComponents
         public override void OnShieldsDown(Entity subject)
         {
             subject.RemoveStatus(this.parent);
+            shield.GetComponent<Entity>().shieldRegen = 10f;
         }
 
-        public override void OnUpdate(Entity subject, float time)
+		public override void OnShieldsRecharged(Entity subject)
+        {
+            shield.GetComponent<Entity>().shieldRegen = 25f;
+		}
+
+		public override void OnUpdate(Entity subject, float time)
         {
 
             bool wasAttached = isAttached;
@@ -79,7 +87,7 @@ namespace CombatCore.StatusComponents
         {
             _shield.SetActive(false);
             subject.movespeed.Unlock();
-            subject.AddStatus(Status.Get("Exhausted"));
+            //subject.AddStatus(Status.Get("Exhausted"));
         }
     }
 }

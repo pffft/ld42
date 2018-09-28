@@ -37,6 +37,16 @@ namespace CombatCore
             ));
 
             Put(new Status(
+                "Shield Placed",
+                "The shield has been placed down",
+                null,
+                Status.DecayType.communal,
+                1,
+                float.PositiveInfinity,
+                new ShieldPlaced()
+              ));
+
+            Put(new Status(
                 "yaintgotshield",
                 "YAIN'T GOT NO GOT DAM SHEILD MANG",
                 null,

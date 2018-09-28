@@ -761,7 +761,7 @@ Prefab:
     - target: {fileID: 54192551803622862, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: m_Constraints
-      value: 112
+      value: 116
       objectReference: {fileID: 0}
     - target: {fileID: 1175291323482132, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
       propertyPath: m_Layer
@@ -869,6 +869,11 @@ Prefab:
     - target: {fileID: 136391611547437474, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54192551803622862, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+        type: 2}
+      propertyPath: m_UseGravity
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
