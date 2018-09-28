@@ -77,7 +77,7 @@ namespace AI
                 float step = 360f / density;
                 for (float i = from; i <= to; i += step) {
                     Projectile.ProjectileStructure newStruc = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
-                    newStruc.AngleOffset(i).Create();
+                    newStruc.AngleOffset(newStruc.angleOffset + i).Create();
                 }
             });
         }
