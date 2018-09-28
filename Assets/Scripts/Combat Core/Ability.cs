@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Reflection;
 namespace CombatCore
 {
 	[Serializable]
@@ -22,7 +21,6 @@ namespace CombatCore
 		public int ID { get { return id; } }
 
 		// The displayed name of this Ability
-		[SerializeField]
 		public readonly string name;
 
 		// The displayed description of this Ability
@@ -49,16 +47,24 @@ namespace CombatCore
 		private UseEffect effect;
 		public UseEffect Effect { get { return effect; } set { effect = value; } }
 
-		// Can this Ability be activated?
+		/// <summary>
+		/// Can this Ability be used?
+		/// </summary>
 		public bool available;
 
-		// Is this Ability's cooldown being updated?
+		/// <summary>
+		/// Is this Ability's cooldown being updated?
+		/// </summary>
 		public bool active;
 		#endregion
 
 		#region STATIC_METHODS
 
-		// Get an ability from the ability repository, ifex
+		/// <summary>
+		/// Get an ability from the ability repository, ifex
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		public static Ability Get(string name)
 		{
 			Ability a;
@@ -67,7 +73,10 @@ namespace CombatCore
 			return null;
 		}
 
-		// Add an ability to the ability repository
+		/// <summary>
+		/// Add an ability to the ability repository
+		/// </summary>
+		/// <param name="a"></param>
 		private static void Put(Ability a)
 		{
 			repository.Add (a.name, a.AssignID ());
@@ -97,15 +106,26 @@ namespace CombatCore
 		}
 		public Ability(Ability a) : this (a.name, a.desc, a.icon, a.cooldownMax, a.chargesMax, a.effect) { this.id = a.id; }
 
-		/* Instance Methods */
-
-		// Can this Ability be used?
+		/// <summary>
+		/// Can this Ability be used?
+		/// </summary>
+		/// <returns></returns>
 		public bool IsReady()
 		{
 			return (_cooldownCurr <= 0 || charges > 0) && active && available;
 		}
 
-		// Return the percentage of the cooldown that has been completed
+		/// <summary>
+		/// Sets the cooldown of this ability to 0
+		/// </summary>
+		public void MakeReady()
+		{
+			_cooldownCurr = 0f;
+		}
+
+		/// <summary>
+		/// Returns the percentage of the cooldown that remains
+		/// </summary>
 		public float CooldownPercentage
 		{
 			get
@@ -114,7 +134,10 @@ namespace CombatCore
 			}
 		}
 
-		// Update the cooldown in accordance with the time the last update took
+		/// <summary>
+		/// Update the cooldown in accordance with the time the last update took
+		/// </summary>
+		/// <param name="time"></param>
 		public void UpdateCooldown(float time)
 		{
 			if (!active)
@@ -133,7 +156,13 @@ namespace CombatCore
 			}
 		}
 
-		// Called to use the Ability
+		/// <summary>
+		/// Called to use the Ability
+		/// </summary>
+		/// <param name="subject"></param>
+		/// <param name="targetPosition"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
 		public bool Use(Entity subject, Vector3 targetPosition, params object[] args)
 		{
 			if (!IsReady ())
@@ -150,7 +179,6 @@ namespace CombatCore
 			return false;
 		}
 
-		// Equiv checks
 		public override bool Equals(object obj)
 		{
 			Ability other = (Ability)obj;
@@ -163,7 +191,6 @@ namespace CombatCore
 			return id;
 		}
 
-		// String representation
 		public override string ToString()
 		{
 			return name + "\n" +
@@ -174,7 +201,6 @@ namespace CombatCore
 				"Effect: " + effect.Method.ToString ();
 		}
 
-		// Setting of ID values
 		private Ability AssignID()
 		{
 			id = latestID++;

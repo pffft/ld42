@@ -47,7 +47,7 @@ namespace CombatCore
 		private readonly float initDuration;
 
 		// The components that make up this Status
-		private StatusComponent[] components;
+		private Dictionary<Type, StatusComponent> components;
 
 		// Event that fires when this status's duration completes
 		public event StatusEnded durationCompleted;
@@ -82,7 +82,7 @@ namespace CombatCore
 
 		#region INSTANCE_METHODS
 
-		public Status(string name, string desc, Sprite icon, DecayType dt, int stacksMax, float duration, params StatusComponent[] components)
+		public Status(string name, string desc, Sprite icon, DecayType dt, int stacksMax, float duration, params StatusComponent[] comps)
 		{
 			this.name = name;
 			this.desc = desc;
@@ -95,11 +95,14 @@ namespace CombatCore
 			this.stacksMax = stacksMax;
 			stacks = 1;
 
-			this.components = components;
-			for (int i = 0; i < components.Length; i++)
-				this.components[i].setParent (this).stacks = stacks;
+			components = new Dictionary<Type, StatusComponent> ();
+			foreach (StatusComponent sc in comps)
+			{
+				sc.setParent (this).stacks = stacks;
+				components.Add (sc.GetType (), sc);
+			}
 		}
-		public Status(Status s) : this (s.name, s.desc, s.icon, s.decayType, s.stacksMax, s.initDuration, s.components) { }
+		public Status(Status s) : this (s.name, s.desc, s.icon, s.decayType, s.stacksMax, s.initDuration, s.GetComponents()) { }
 		public Status(Status s, float duration) : this (s)
 		{
 			this.initDuration = duration;
@@ -115,7 +118,7 @@ namespace CombatCore
 			dStacks = Mathf.Clamp (dStacks, 0, stacksMax - stacks);
 			if (dStacks == 0)
 				return;
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 			{
 				sc.OnRevert (subject);
 				sc.stacks += dStacks;
@@ -159,13 +162,42 @@ namespace CombatCore
 
 		public float DurationPercentage { get { return duration / initDuration; } }
 
+		public T AddComponent<T>(T component) where T : StatusComponent
+		{
+			if (components.ContainsKey (typeof (T)))
+				throw new ArgumentException ("Component of type " + typeof (T).Name + " is already on status");
+
+			components.Add (typeof (T), component);
+			return component;
+		}
+
 		// Get a StatusComponent on this Status of type T
 		public T GetComponent<T>() where T : StatusComponent
 		{
-			foreach (StatusComponent sc in components)
-				if (sc.GetType () == typeof (T))
-					return (T)sc;
+			StatusComponent c;
+			if (components.TryGetValue (typeof (T), out c))
+			{
+				return (T)c;
+			}
 			return null;
+		}
+
+		public StatusComponent[] GetComponents()
+		{
+			StatusComponent[] components = new StatusComponent[this.components.Count];
+			int count = 0;
+			foreach (StatusComponent sc in this.components.Values)
+			{
+				components[count] = sc;
+				count++;
+			}
+
+			return components;
+		}
+
+		public bool RemoveComponent<T>() where T : StatusComponent
+		{
+			return components.Remove (typeof (T));
 		}
 
 		// --Hooks--
@@ -173,77 +205,77 @@ namespace CombatCore
 		// Called when this Status is first added to an Entity
 		public void OnApply(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnApply (subject);
 		}
 
 		// Called when this Status is removed from its subject
 		public void OnRevert(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnRevert (subject);
 		}
 
 		// Called every update cycle by the subject
 		public void OnUpdate(Entity subject, float time)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnUpdate (subject, time);
 		}
 
 		// Called whenever the subject takes damage
 		public void OnDamageTaken(Entity subject, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnDamageTaken (subject, attacker, rawDamage, calcDamage, damageApplied, hitShields);
 		}
 
 		// Called whenever the subject deals damage
 		public void OnDamageDealt(Entity subject, Entity victim, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnDamageDealt (subject, victim, rawDamage, calcDamage, damageApplied, hitShields);
 		}
 
 		// Called when the subject dies
 		public void OnDeath(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnDeath (subject);
 		}
 
 		// Called when the subject's shields fall to zero
 		public void OnShieldsDown(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnShieldsDown (subject);
 		}
 
 		// Called when the subject's shields are fully recharged
 		public void OnShieldsRecharged(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnShieldsRecharged (subject);
 		}
 
 		// Called when the subject enters a stunned state
 		public void OnStunned(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnStunned (subject);
 		}
 
 		// Called when the subject enters a rooted state
 		public void OnRooted(Entity subject)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnRooted (subject);
 		}
 
 		// Called when the subject is healed
 		public void OnHealed(Entity subject, float healAmount)
 		{
-			foreach (StatusComponent sc in components)
+			foreach (StatusComponent sc in components.Values)
 				sc.OnHealed (subject, healAmount);
 		}
 
@@ -264,7 +296,6 @@ namespace CombatCore
 			return base.GetHashCode ();
 		}
 
-		// String representation
 		public override string ToString()
 		{
 			return name + "\n" + desc + "\n" + duration.ToString ("#00.0") + " / " + initDuration.ToString ("#00.0");

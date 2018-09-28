@@ -30,14 +30,6 @@ namespace CombatCore
 		private float shieldDelay;
 		public float shieldDelayMax = 2f;
 
-		// Each reduces the damage taken from their respective damage types
-		public Stat physResist = new Stat (0, 0, 100);
-		public Stat elecResist = new Stat (0, 0, 100);
-		public Stat biolResist = new Stat (0, 0, 100);
-		public Stat cryoResist = new Stat (0, 0, 100);
-		public Stat pyroResist = new Stat (0, 0, 100);
-		public Stat voidResist = new Stat (0, 0, 100);
-
 		// The speed at which this Entity can move through the world
 		public Stat movespeed = new Stat (0, 0, 25);
 
@@ -415,10 +407,7 @@ namespace CombatCore
 		{
 			return combatTimer > 0f;
 		}
-		public bool IsFrozen()
-		{
-			return freezeProgress > (float)cryoResist.Value + 50f;
-		}
+
 		public bool SetInvincible(bool val)
 		{
 			if (val)
