@@ -5717,6 +5717,11 @@ Prefab:
       propertyPath: far clip plane
       value: 4000
       objectReference: {fileID: 0}
+    - target: {fileID: 20451642182706338, guid: 1cac6195606574b31be30813600757cc,
+        type: 2}
+      propertyPath: m_RenderingPath
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1cac6195606574b31be30813600757cc, type: 2}
   m_IsPrefabAsset: 0
@@ -7420,7 +7425,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: e8abd750775e9469c9e72526b4e0d534, type: 3}
+  - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
