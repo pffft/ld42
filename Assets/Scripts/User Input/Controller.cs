@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Controller : MonoBehaviour
@@ -15,14 +14,10 @@ public class Controller : MonoBehaviour
 	private Vector3 facePos;
 	private bool dashing;
 
-    private GameObject arena;
-
 	public void Awake()
 	{
 		physbody = GetComponent<Rigidbody> ();
 		self = GetComponent<CombatCore.Entity> ();
-        arena = GameObject.Find("Arena");
-
 		dashing = false;
 	}
 
@@ -40,7 +35,6 @@ public class Controller : MonoBehaviour
 		if (damageApplied)
 		{
 			CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage * 10f, rawDamage * 10f, rawDamage * 10f), 0.75f);
-			arena.transform.localScale = new Vector3 (self.HealthPerc, self.HealthPerc, self.HealthPerc);
 			self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
 		}
 	}

@@ -7,42 +7,54 @@ namespace CombatCore
 	[Serializable]
 	public struct Stat : ISerializable
 	{
-		/* Instance Vars and Accessors */
+		#region INSTANCE_VARS
 
 		// The imutable inital value of this Stat
 		[SerializeField]
-		private int baseValue;
+		private float baseValue;
 
 		// Added onto the base
-		private int addValue;
+		private float addValue;
 
 		// A multiplier applied to the base + add
 		private float multiValue;
 
 		// A value that can replace the calculated value
-		[SerializeField]
-		private int lockValue;
+		private float lockValue;
 
-		// Is this Stat locked to lockValue?
-		public bool locked;
+		private bool locked;
+		/// <summary>
+		/// Is this Stat locked to lockValue?
+		/// </summary>
+		public bool Locked
+		{
+			get { return locked; }
+			set
+			{
+				locked = value;
+				OnStatChanged ();
+			}
+		}
 
 		// A floor cap for value
 		private bool hasMin;
-		private int minValue;
+		private float minValue;
 
 		// A ceiling cap for value
 		private bool hasMax;
-		private int maxValue;
+		private float maxValue;
 
-		// The externally viewable value of this Stat
-		public int Value
+		/// <summary>
+		/// The calculated value of this stat, between min and max
+		/// </summary>
+		public float Value
 		{
 			get
 			{
 				if (locked)
 					return lockValue;
 
-				int tVal = calculatedValue;
+				float tVal = calculatedValue;
 
 				if (hasMin && tVal < minValue)
 					return minValue;
@@ -54,16 +66,16 @@ namespace CombatCore
 		}
 
 		// (bass + add) * mult
-		private int calculatedValue
+		private float calculatedValue
 		{
 			get
 			{
-				int aVal = baseValue + addValue;
-				return (int)(((float)aVal) * multiValue);
+				float aVal = baseValue + addValue;
+				return aVal * multiValue;
 			}
 		}
 
-		public int Min
+		public float Min
 		{
 			get
 			{
@@ -79,7 +91,7 @@ namespace CombatCore
 				OnStatChanged ();
 			}
 		}
-		public int Max
+		public float Max
 		{
 			get
 			{
@@ -94,16 +106,18 @@ namespace CombatCore
 				OnStatChanged ();
 			}
 		}
+		#endregion
 
-		/* Static Methods */
-		public static Stat operator +(Stat s, int value)
+		#region STATIC_METHODS
+
+		public static Stat operator +(Stat s, float value)
 		{
 			s.addValue += value;
 			s.OnStatChanged ();
 			return s;
 		}
 
-		public static Stat operator -(Stat s, int value)
+		public static Stat operator -(Stat s, float value)
 		{
 			s.addValue -= value;
 			s.OnStatChanged ();
@@ -123,33 +137,35 @@ namespace CombatCore
 			s.OnStatChanged ();
 			return s;
 		}
+		#endregion
 
-		/* Constructor(s) */
-		public Stat(int baseValue)
+		#region INSTANCE_METHODS
+
+		public Stat(float baseValue)
 		{
 			this.baseValue = baseValue;
 
-			addValue = 0;
+			addValue = 0f;
 
 			multiValue = 1f;
 
-			lockValue = 0;
+			lockValue = 0f;
 			locked = false;
 
 			hasMin = false;
-			minValue = 0;
+			minValue = 0f;
 
 			hasMax = false;
-			maxValue = 0;
+			maxValue = 0f;
 
 			statModified = null;
 		}
-		public Stat(int baseValue, int minValue) : this (baseValue)
+		public Stat(float baseValue, float minValue) : this (baseValue)
 		{
 			this.hasMin = true;
 			this.minValue = minValue;
 		}
-		public Stat(int baseValue, int minValue, int maxValue) : this (baseValue)
+		public Stat(float baseValue, float minValue, float maxValue) : this (baseValue)
 		{
 			this.hasMin = true;
 			this.minValue = minValue;
@@ -159,28 +175,32 @@ namespace CombatCore
 		}
 		public Stat(SerializationInfo info, StreamingContext context) : this (0)
 		{
-			baseValue = info.GetInt32 ("base");
-			addValue = info.GetInt32 ("add");
-			multiValue = info.GetInt32 ("multi");
-			lockValue = info.GetInt32 ("lock");
+			baseValue = info.GetSingle ("base");
+			addValue = info.GetSingle ("add");
+			multiValue = info.GetSingle ("multi");
+			lockValue = info.GetSingle ("lock");
 			locked = info.GetBoolean ("locked");
 			hasMin = info.GetBoolean ("hasMin");
-			minValue = info.GetInt32 ("min");
+			minValue = info.GetSingle ("min");
 			hasMax = info.GetBoolean ("hasMax");
-			maxValue = info.GetInt32 ("max");
+			maxValue = info.GetSingle ("max");
 		}
 
-		/* Instance Methods */
-
-		// Modify the baseValue of this Stat
-		public void SetBase(int baseValue)
+		/// <summary>
+		/// Modify the baseValue of this Stat
+		/// </summary>
+		/// <param name="baseValue"></param>
+		public void SetBase(float baseValue)
 		{
 			this.baseValue = baseValue;
 			OnStatChanged ();
 		}
 
-		// Set the lockValue and indicate it should be used instead of the calculated value
-		public void LockTo(int lockValue)
+		/// <summary>
+		/// Set the lockValue and indicate it should be used instead of the calculated value
+		/// </summary>
+		/// <param name="lockValue"></param>
+		public void LockTo(float lockValue)
 		{
 			this.lockValue = lockValue;
 			locked = true;
@@ -188,40 +208,55 @@ namespace CombatCore
 			OnStatChanged ();
 		}
 
-		// Indicate the calculated value should be used for now
+		/// <summary>
+		/// Indicate the calculated value should be used for now
+		/// </summary>
 		public void Unlock()
 		{
 			locked = false;
 			OnStatChanged ();
 		}
 
-		// Remove the maximum limit on this Stat
+		/// <summary>
+		/// Remove the maximum limit on this Stat
+		/// </summary>
 		public void RemoveMax()
 		{
 			hasMax = false;
 			OnStatChanged ();
 		}
 
-		// Remove the maximum limit on this Stat
+		/// <summary>
+		/// Remove the maximum limit on this Stat
+		/// </summary>
 		public void RemoveMin()
 		{
 			hasMin = false;
 			OnStatChanged ();
 		}
 
-		// Used for resource bar type applications
+		/// <summary>
+		/// Set the add value to the max
+		/// </summary>
 		public void Maximize()
 		{
 			if (hasMax)
 				addValue = maxValue;
 		}
+
+		/// <summary>
+		/// Set the add value to the min
+		/// </summary>
 		public void Minimize()
 		{
 			if (hasMin)
 				addValue = minValue;
 		}
 
-		// Procs whenever some value changes in the Stat that may affect the value output
+		/// <summary>
+		/// Procs whenever some value changes in the Stat that may affect the value output
+		/// </summary>
+		/// <param name="s"></param>
 		public delegate void ChangedStat(Stat s);
 		public event ChangedStat statModified;
 		private void OnStatChanged()
@@ -230,7 +265,6 @@ namespace CombatCore
 				statModified (this);
 		}
 
-		// For serialization
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			info.AddValue ("base", baseValue);
@@ -243,5 +277,6 @@ namespace CombatCore
 			info.AddValue ("hasMax", hasMax);
 			info.AddValue ("max", maxValue);
 		}
+		#endregion
 	}
 }
