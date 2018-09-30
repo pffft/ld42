@@ -39,18 +39,8 @@ namespace CombatCore.StatusComponents
 
                 shieldEntity.tookDamage += (Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields) => {
 
-                    int localShieldStatus = (int)(victim.ShieldPerc * 5);
-                    if (Mathf.Abs(oldShieldStatus - localShieldStatus) < 0.01f)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        _shield.SetActive(false);
-                        _shield = shield.transform.GetChild(localShieldStatus).gameObject;
-                        _shield.SetActive(true);
-                        oldShieldStatus = localShieldStatus;
-                    }
+                    UpdateShieldAppearenceBecauseStreusIsAButt(victim);
+
                 };
                 shieldEntity.shieldsBroken += () => {
                     _shield.SetActive(false);
@@ -82,12 +72,29 @@ namespace CombatCore.StatusComponents
             _shield.SetActive(true);
         }
 
+        private void UpdateShieldAppearenceBecauseStreusIsAButt(Entity victim)
+        {
+            int localShieldStatus = Mathf.Min(4, (int)(victim.ShieldPerc * 5));
+            if (Mathf.Abs(oldShieldStatus - localShieldStatus) < 0.01f)
+            {
+                return;
+            }
+            else
+            {
+                _shield.SetActive(false);
+                _shield = shield.transform.GetChild(localShieldStatus).gameObject;
+                _shield.SetActive(true);
+                oldShieldStatus = localShieldStatus;
+            }
+        }
+
 		public override void OnUpdate(Entity subject, float time)
         {
 
             bool wasAttached = isAttached;
 
             if (subject.HasStatus("ShieldRegen")) {
+                UpdateShieldAppearenceBecauseStreusIsAButt(shieldEntity);
             } else {
                 isAttached = false;
             }

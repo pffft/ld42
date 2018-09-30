@@ -107,6 +107,7 @@ namespace CombatCore
                 if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f) {
                     Debug.Log("Close to shield, reclaiming it");
                     subject.RemoveStatus("yaintgotshield");
+                    GameObject.Find("HUD").GetComponent<HUD>().shieldAvailable = true;
                     return true;
                 }
                 Debug.Log("Shield is already thrown. Go pick it up!");
@@ -122,6 +123,7 @@ namespace CombatCore
                       .Homing()
                       .Create();
             subject.AddStatus(Status.Get("yaintgotshield"));
+            GameObject.Find("HUD").GetComponent<HUD>().shieldAvailable = false;
 
             return true;
 
