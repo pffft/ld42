@@ -140,6 +140,11 @@ public class Controller : MonoBehaviour
 		physbody.velocity = movementVector.normalized * self.movespeed.Value;
 	}
 
+	public Vector3 GetDashTargetPoint()
+	{
+		return facePos;
+	}
+
 	private void facePoint(Vector3 point)
 	{
 		Quaternion rot = Quaternion.LookRotation (point - transform.position, Vector3.up);
