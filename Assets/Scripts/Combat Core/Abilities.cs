@@ -43,7 +43,7 @@ namespace CombatCore
 				"Block",
 				"Drops a protective shield",
 				null,
-                cooldownMax: 3f,
+                cooldownMax: 1f,
 				chargesMax: 0,
                 effect: PlayerBlock)
 			);
