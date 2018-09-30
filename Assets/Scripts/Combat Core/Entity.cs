@@ -193,7 +193,11 @@ namespace CombatCore
 			{
 				shieldDelay = 0f;
 				shields += (shieldRegen * Time.deltaTime);
-				shields = shields > shieldsMax ? shieldsMax : shields;
+                if (shields >= shieldsMax)
+                {
+                    shields = shieldsMax;
+                    OnShieldsRecharged();
+                }
 			}
 		}
 

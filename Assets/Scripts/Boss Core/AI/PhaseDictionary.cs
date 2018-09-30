@@ -36,7 +36,7 @@ namespace AI
         */
 
         public static AIPhase PHASE_TEST = new AIPhase()
-            .AddSequence(1, SHOOT_4_WAVES_BEHIND)
+            .AddSequence(10, SWEEP)
             ;
 
         public static AIPhase PHASE1 = new AIPhase()

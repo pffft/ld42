@@ -131,6 +131,30 @@ namespace CombatCore
         // this needs a better model for the blocking shield
         private static bool PlayerBlock(Entity subject, Vector3 targetPosition, params object[] args) 
         {
+            if (subject.HasStatus("Shield Placed"))
+            {
+                // If we're tied to the shield, then reclaim it
+                if (subject.HasStatus("ShieldRegen"))
+                {
+                    Debug.Log("Tied to shield, reclaiming it");
+                    subject.RemoveStatus("Shield Placed");
+                    subject.RemoveStatus("ShieldRegen");
+                    return true;
+                }
+                else if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f)
+                {
+                    Debug.Log("Close to shield, reclaiming it");
+                    // If we're close enough to the shield, then reclaim it
+                    subject.RemoveStatus("Shield Placed");
+                    return true;
+                }
+                else
+                {
+                    Debug.Log("Too far to reclaim shield");
+                    return false;
+                }
+            }
+
             Debug.Log("PlayerBlock");
             Debug.Log("Aiming at " + targetPosition);
             Debug.Log("Degrees: " + Vector3.Angle(Vector3.forward, targetPosition - subject.transform.position));

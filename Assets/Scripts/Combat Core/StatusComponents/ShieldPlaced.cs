@@ -12,8 +12,10 @@ namespace CombatCore.StatusComponents
         private Vector3 target;
         private GameObject shield;
         private GameObject _shield;
+        private Entity shieldEntity;
         private bool isAttached;
 
+        private static float oldShieldStatus;
 
         public ShieldPlaced SetTarget(Vector3 targetPos) {
             this.target = targetPos;
@@ -33,7 +35,33 @@ namespace CombatCore.StatusComponents
             if (shield == null)
             {
                 shield = GameObject.Find("Shield Down");
-                _shield = shield.transform.GetChild(0).gameObject;
+                shieldEntity = shield.GetComponent<Entity>();
+
+                shieldEntity.tookDamage += (Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields) => {
+
+                    int localShieldStatus = (int)(victim.ShieldPerc * 5);
+                    if (Mathf.Abs(oldShieldStatus - localShieldStatus) < 0.01f)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        _shield.SetActive(false);
+                        _shield = shield.transform.GetChild(localShieldStatus).gameObject;
+                        _shield.SetActive(true);
+                        oldShieldStatus = localShieldStatus;
+                    }
+                };
+                shieldEntity.shieldsBroken += () => {
+                    _shield.SetActive(false);
+                    subject.RemoveStatus(this.parent);
+                    shield.GetComponent<Entity>().shieldRegen = 10f;
+                };
+                shieldEntity.shieldsRecharged += () =>
+                {
+                    Debug.Log("Shields recharged!");
+                    shield.GetComponent<Entity>().shieldRegen = 25f;
+                };
             }
             shield.transform.parent = GameObject.Find("Player").transform;
             shield.transform.position = subject.transform.position;
@@ -42,26 +70,17 @@ namespace CombatCore.StatusComponents
             //this.position = subject.transform.position;
             this.rotation = Quaternion.AngleAxis(degrees, Vector3.up);
 
-            Entity shieldEntity = shield.GetComponent<Entity>();
-            shieldEntity.shieldsBroken += () => {
-                OnShieldsDown(subject);
-            };
+
+            int shieldStatus = Mathf.Min(4, (int)(shieldEntity.ShieldPerc * 5));
+            Debug.Log(shieldStatus);
+            oldShieldStatus = shieldStatus;
+            _shield = shield.transform.GetChild(shieldStatus).gameObject;
+
             shieldEntity.shieldsMax = 50f;
             //shieldEntity.shieldRegen = 25f;
             shieldEntity.shieldDelayMax = 0f;
             _shield.SetActive(true);
         }
-
-        public override void OnShieldsDown(Entity subject)
-        {
-            subject.RemoveStatus(this.parent);
-            shield.GetComponent<Entity>().shieldRegen = 10f;
-        }
-
-		public override void OnShieldsRecharged(Entity subject)
-        {
-            shield.GetComponent<Entity>().shieldRegen = 25f;
-		}
 
 		public override void OnUpdate(Entity subject, float time)
         {
