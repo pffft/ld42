@@ -148,9 +148,7 @@ namespace AI
             ShootHexCurve(false).Wait(1f),
             SHOOT_360.Wait(1f),
             SHOOT_360.Wait(1.5f),
-            Teleport().Wait(0.5f),
-            HOMING_STRAFE_10.Times(12),
-            SHOOT_2_WAVES.Times(3)
+            Teleport().Wait(0.5f)
         );
 
         public static AISequence BIG_HOMING_STRAFE = new AISequence(
@@ -361,7 +359,7 @@ namespace AI
                     sequences.Add(Merge(
                         Shoot1(New(self).AngleOffset(i)),
                         Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
-                    ).Wait(0.01f));
+                    ).Wait(0.02f));
                 }
                 //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = -80; i < 80; i += 5)
@@ -374,7 +372,7 @@ namespace AI
                     sequences.Add(Merge(
                         Shoot1(New(self).AngleOffset(i)),
                         Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
-                    ).Wait(0.01f));
+                    ).Wait(0.02f));
                 }
                 return sequences.ToArray();
             }).Wait(0.75f),
@@ -397,14 +395,14 @@ namespace AI
                     sequences.Add(Merge(
                         Shoot1(New(self).AngleOffset(i)),
                         Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
-                    ).Wait(0.01f));
+                    ).Wait(0.02f));
                 }
                 for (int i = -80; i < 80; i += 5)
                 {
                     sequences.Add(Merge(
                         Shoot1(New(self).AngleOffset(i)),
                         Shoot1(New(self).AngleOffset(i).Size(Size.TINY).Speed(Speed.FAST))
-                    ).Wait(0.01f));
+                    ).Wait(0.02f));
                 }
                         //sequences.Add(Shoot1(speed: Speed.MEDIUM, size: Size.LARGE, type: Type.HOMING).Wait(0.01f));
                 for (int i = 80; i > -30; i -= 5)
@@ -412,7 +410,7 @@ namespace AI
                     sequences.Add(Merge(
                         Shoot1(New(self).AngleOffset(i)),
                         Shoot1(New(self).AngleOffset(i).Size(Size.MEDIUM).Speed(Speed.SLOW))
-                    ).Wait(0.01f));
+                    ).Wait(0.02f));
                 }
                 return sequences.ToArray();
             }).Wait(0.75f),
