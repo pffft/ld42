@@ -14,12 +14,15 @@ public class Controller : MonoBehaviour
 	private Vector3 facePos;
 	private bool dashing;
 
+    public static GameObject playerShield;
+
 	public void Awake()
 	{
 		physbody = GetComponent<Rigidbody> ();
 		self = GetComponent<CombatCore.Entity> ();
 		dashing = false;
-	}
+        playerShield = GameObject.Find("Shield Up");
+    }
 
 	public void Start()
 	{
@@ -51,14 +54,14 @@ public class Controller : MonoBehaviour
 				
 			}
 		}
-		if (Input.GetKey (KeyCode.Mouse0))
+        if (Input.GetButtonDown("Fire1"))
 		{
 			if (self.GetAbility (ABILITY_2).Use (self, facePos))
 			{
                 
 			}
 		}
-		if (Input.GetKey (KeyCode.Mouse1))
+		if (Input.GetButtonDown("Fire2"))
 		{
 			if (self.GetAbility (ABILITY_3).Use (self, facePos))
 			{

@@ -319,20 +319,11 @@ namespace Projectiles
             {
                 if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
                 {
-                    //Debug.Log("Projectile collided, should apply damage");
-                    Debug.Log("Hit shield for " + data.damage + " damage!");
+                    Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, data.entity, data.damage);
                     data.OnDestroyCollisionImpl(this);
                     Destroy(this.gameObject);
                 }
-            } else {
-                if (otherObject.name.Equals("Shield Down")) {
-                    Debug.Log("Hit shield for " + data.damage + " damage!");
-                    Entity.DamageEntity(GameObject.Find("Player").GetComponent<Entity>(), data.entity, data.damage);
-                    Destroy(this.gameObject);
-                }
-                //Debug.Log("Hit a wall or something");
-                //Destroy(this.gameObject);
             }
         }
 

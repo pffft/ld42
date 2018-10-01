@@ -602,18 +602,6 @@ namespace AI
             Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(140f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(5f)
         );
 
-        public static AISequence AOE_TEST = new AISequence(
-            3f,
-            new AISequence(() => {
-                AOE.New(self).AngleOffset(60f);
-            }).Wait(0.1f)
-        /*
-        new AISequence(() => {
-            AOE.Create(self, true).Speed(15f);
-        }).Wait(0.5f)
-        */
-        );
-
         public static AISequence AOE_131_MEDIUM = new AISequence(
             Teleport().Wait(0.5f),
             PlayerLock(true),
@@ -640,6 +628,29 @@ namespace AI
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(20)).Wait(0.76f),
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
             PlayerLock(false).Wait(1f)
+        );
+
+        // Testing if we can modify AOE attacks at runtime (the answer is a mind-numbing yes!)
+        public static AISequence AOE_TEST = new AISequence(
+            4f,
+            () =>  {
+                List<AISequence> sequences = new List<AISequence>();
+                AOE.AOEStructure a = AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360f);
+                AOE created = null;
+                sequences.Add(new AISequence(() => { created = a.Create(); }));
+                sequences.Add(Pause(2f));
+                sequences.Add(new AISequence(() => { created.data = created.data.InnerSpeed(Speed.FROZEN).Speed(Speed.FROZEN); }));
+                sequences.Add(Pause(10f));
+                return sequences.ToArray();
+            }
+        );
+
+        // This should be the same as above.
+        public static AISequence AOE_TEST_2 = new AISequence(
+            4f,
+            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360))
+            .Wait(2f)
+            .Speed(Speed.FROZEN)
         );
 
         #endregion

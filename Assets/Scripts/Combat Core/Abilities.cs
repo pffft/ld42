@@ -77,52 +77,19 @@ namespace CombatCore
         private static bool PlayerThrow(Entity subject, Vector3 targetPosition, params object[] args) 
         {
             Debug.Log("Player shield throw");
-
-            // Can't throw the shield if it's already out!
-            if (subject.HasStatus("Shield Placed"))
+            bool? shouldReturn = CheckValidity(subject);
+            if (shouldReturn.HasValue)
             {
-                // If we're tied to the shield, then reclaim it
-                if (subject.HasStatus("ShieldRegen"))
-                {
-                    Debug.Log("Tied to shield, reclaiming it");
-                    subject.RemoveStatus("Shield Placed");
-                    subject.RemoveStatus("ShieldRegen");
-                    return true;
-                }
-                else if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f)
-                {
-                    Debug.Log("Close to shield, reclaiming it");
-                    // If we're close enough to the shield, then reclaim it
-                    subject.RemoveStatus("Shield Placed");
-                    return true;
-                }
-                else
-                {
-                    Debug.Log("Too far to reclaim shield");
-                    return false;
-                }
+                return shouldReturn.Value;
             }
 
-            if (subject.HasStatus("yaintgotshield")) {
-                if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f) {
-                    Debug.Log("Close to shield, reclaiming it");
-                    subject.RemoveStatus("yaintgotshield");
-                    GameObject.Find("HUD").GetComponent<HUD>().shieldAvailable = true;
-                    return true;
-                }
-                Debug.Log("Shield is already thrown. Go pick it up!");
-                return false;
-            }
+            //Debug.Log("YEET");
 
-            Debug.Log("YEET");
-            Projectile.New(subject)
-                      .Target(targetPosition)
-                      .MaxTime(2f)
-                      .Speed(BossCore.Speed.VERY_FAST)
-                      .Size(Size.MEDIUM)
-                      .Homing()
-                      .Create();
-            subject.AddStatus(Status.Get("yaintgotshield"));
+            // Set up statuses and HUD 
+            Status shieldThrown = Status.Get("Shield Thrown");
+            shieldThrown.GetComponent<StatusComponents.ShieldThrown>().SetTarget(targetPosition);
+            subject.AddStatus(shieldThrown);
+
             GameObject.Find("HUD").GetComponent<HUD>().shieldAvailable = false;
 
             return true;
@@ -131,8 +98,28 @@ namespace CombatCore
 
         // TODO: this is a basic stub for testing
         // this needs a better model for the blocking shield
-        private static bool PlayerBlock(Entity subject, Vector3 targetPosition, params object[] args) 
+        private static bool PlayerBlock(Entity subject, Vector3 targetPosition, params object[] args)
         {
+            Debug.Log("Player Block");
+            bool? shouldReturn = CheckValidity(subject);
+            if (shouldReturn.HasValue)
+            {
+                return shouldReturn.Value;
+            }
+
+            Status shieldPlacedStatus = Status.Get("Shield Placed");
+            shieldPlacedStatus.GetComponent<StatusComponents.ShieldPlaced>().SetTarget(targetPosition);
+            subject.AddStatus(shieldPlacedStatus);
+
+            // Add shield regeneration when the shield is first placed
+            subject.AddStatus(Status.Get("ShieldRegen"));
+
+            return true;
+        }
+
+        private static bool? CheckValidity(Entity subject)
+        {
+            // The shield is placed (block active)
             if (subject.HasStatus("Shield Placed"))
             {
                 // If we're tied to the shield, then reclaim it
@@ -143,13 +130,14 @@ namespace CombatCore
                     subject.RemoveStatus("ShieldRegen");
                     return true;
                 }
+                // If we're not tied, but close to the shield, also reclaim it.
                 else if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f)
                 {
                     Debug.Log("Close to shield, reclaiming it");
-                    // If we're close enough to the shield, then reclaim it
                     subject.RemoveStatus("Shield Placed");
                     return true;
                 }
+                // Too far away.
                 else
                 {
                     Debug.Log("Too far to reclaim shield");
@@ -157,16 +145,23 @@ namespace CombatCore
                 }
             }
 
-            Debug.Log("PlayerBlock");
-            Debug.Log("Aiming at " + targetPosition);
-            Debug.Log("Degrees: " + Vector3.Angle(Vector3.forward, targetPosition - subject.transform.position));
-            subject.AddStatus(Status.Get("ShieldRegen"));
+            // The shield is thrown (throw active)
+            if (subject.HasStatus("Shield Thrown"))
+            {
+                if ((GameObject.Find("Thrown Shield").transform.position - subject.transform.position).magnitude < 5f)
+                {
+                    Debug.Log("Close to thrown shield, reclaiming it");
+                    subject.RemoveStatus("Shield Thrown");
+                    return true;
+                }
+                Debug.Log("Shield is currently thrown. Go pick it up!");
+                return false;
+            }
 
-            Status shieldPlacedStatus = Status.Get("Shield Placed");
-            shieldPlacedStatus.GetComponent<StatusComponents.ShieldPlaced>().SetTarget(targetPosition);
-            subject.AddStatus(shieldPlacedStatus);
-            return true;
+            return null;
         }
+
+
 		#endregion
 	}
 }

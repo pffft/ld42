@@ -24,6 +24,7 @@ namespace CombatCore.StatusComponents
 
         public override void OnApply(Entity subject)
         {
+            Controller.playerShield.SetActive(false);
             subject.movespeed.LockTo(10);
             this.isAttached = true;
 
@@ -38,9 +39,7 @@ namespace CombatCore.StatusComponents
                 shieldEntity = shield.GetComponent<Entity>();
 
                 shieldEntity.tookDamage += (Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields) => {
-
-                    UpdateShieldAppearenceBecauseStreusIsAButt(victim);
-
+                    UpdateShieldAppearence(victim);
                 };
                 shieldEntity.shieldsBroken += () => {
                     _shield.SetActive(false);
@@ -72,7 +71,7 @@ namespace CombatCore.StatusComponents
             _shield.SetActive(true);
         }
 
-        private void UpdateShieldAppearenceBecauseStreusIsAButt(Entity victim)
+        private void UpdateShieldAppearence(Entity victim)
         {
             int localShieldStatus = Mathf.Min(4, (int)(victim.ShieldPerc * 5));
             if (Mathf.Abs(oldShieldStatus - localShieldStatus) < 0.01f)
@@ -94,7 +93,7 @@ namespace CombatCore.StatusComponents
             bool wasAttached = isAttached;
 
             if (subject.HasStatus("ShieldRegen")) {
-                UpdateShieldAppearenceBecauseStreusIsAButt(shieldEntity);
+                UpdateShieldAppearence(shieldEntity);
             } else {
                 isAttached = false;
             }
@@ -113,6 +112,7 @@ namespace CombatCore.StatusComponents
         {
             _shield.SetActive(false);
             subject.movespeed.Unlock();
+            Controller.playerShield.SetActive(true);
             //subject.AddStatus(Status.Get("Exhausted"));
         }
     }

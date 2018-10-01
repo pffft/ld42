@@ -47,12 +47,13 @@ namespace CombatCore
               ));
 
             Put(new Status(
-                "yaintgotshield",
-                "YAIN'T GOT NO GOT DAM SHEILD MANG",
+                "Shield Thrown",
+                "You threw your shield at the boss!",
                 null,
                 DecayType.communal,
                 1,
-                float.PositiveInfinity
+                float.PositiveInfinity,
+                new ShieldThrown()
             ));
 		}
 	}

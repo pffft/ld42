@@ -230,7 +230,7 @@ public class AOE : MonoBehaviour {
     }
 
     // A reference containing the data we'll be using.
-    private AOEStructure data;
+    public AOEStructure data;
 
     // Initialize values to the latest ones- start and target, if null, should
     // be set to the live boss/player positions.
@@ -289,6 +289,7 @@ public class AOE : MonoBehaviour {
         // Update the size of the AOE per its expansion rate.
         // We divide by two because AOEs move based on radius, not diameter;
         // this makes the speeds faster than for projectiles without this correction.
+        //Debug.Log("Speed: " + data.expansionSpeed);
         data.scale += (float)data.expansionSpeed * Time.deltaTime;
         gameObject.transform.localScale = data.scale * Vector3.one;
 

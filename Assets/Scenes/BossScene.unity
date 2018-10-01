@@ -575,11 +575,11 @@ Prefab:
       objectReference: {fileID: 2100000, guid: 595fb6ee6d2874170b611f5de99c9e04, type: 2}
     - target: {fileID: 100002, guid: e8abd750775e9469c9e72526b4e0d534, type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: e8abd750775e9469c9e72526b4e0d534, type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: e8abd750775e9469c9e72526b4e0d534, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7550,6 +7550,21 @@ Prefab:
     - target: {fileID: 1361199117965970, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: shieldsMax
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: shieldRegen
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: shieldDelayMax
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}

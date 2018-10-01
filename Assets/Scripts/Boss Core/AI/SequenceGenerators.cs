@@ -147,9 +147,9 @@ namespace AI
             });
         }
 
-        public static AISequence ShootAOE(AOE.AOEStructure structure)
+        public static AOEAISequence ShootAOE(AOE.AOEStructure structure)
         {
-            return new AISequence(() => { Glare(); structure.Create(); });
+            return new AOEAISequence(structure);
         }
 
         public static AISequence Teleport(Vector3? target = null, int speed = 25)
