@@ -38,7 +38,7 @@ public class AOE : MonoBehaviour {
         // from "expansionSpeed". 
         internal float innerScale;
 
-        // Current scale. This relates exactly to the radius of the attack.
+        // Current scale. This is exactly equal to the world unit radius of the attack.
         internal float scale;
 
         // How fast the inner ring expands
@@ -56,6 +56,12 @@ public class AOE : MonoBehaviour {
 
         // The maximum lifetime of this attack
         internal float maxTime;
+
+        // How much damage this attack does.
+        internal float damage;
+
+        // How fast this guy rotates.
+        internal float rotationSpeed;
 
         public AOEStructure(Entity self)
         {
@@ -78,6 +84,8 @@ public class AOE : MonoBehaviour {
             this.fixedWidth = 0f;
             this.currentTime = 0f;
             this.maxTime = 100f;
+            this.damage = 5;
+            this.rotationSpeed = 0f;
         }
 
         public AOEStructure On(float from, float to)
@@ -150,15 +158,25 @@ public class AOE : MonoBehaviour {
             return this;
         }
 
+        public AOEStructure MaxTime(float time) {
+            this.maxTime = time;
+            return this;
+        }
+
         public AOEStructure Speed(Speed speed)
         {
             this.expansionSpeed = speed;
             return this;
         }
 
+        public AOEStructure Damage(float damage) {
+            this.damage = damage;
+            return this;
+        }
+
         public AOEStructure FixedWidth(float width)
         {
-            this.innerScale = 0f;
+            //this.innerScale = 0f;
             this.innerExpansionSpeed = BossCore.Speed.FROZEN;
             this.fixedWidth = width;
             return this;
@@ -177,6 +195,11 @@ public class AOE : MonoBehaviour {
             //this.innerScale = 0f; // initial inner scale gives slightly different effects
             this.innerExpansionSpeed = speed;
             this.fixedWidth = 0f;
+            return this;
+        }
+
+        public AOEStructure RotationSpeed(float speed) {
+            this.rotationSpeed = speed;
             return this;
         }
 
@@ -219,9 +242,6 @@ public class AOE : MonoBehaviour {
 
     // The height at which we render the AOE, so it doesn't clip the ground.
     private const float HEIGHT = 0.5f;
-
-    // How much damage this attack does (TODO make this a parameter; same for Projectiles)
-    private const float damage = 5f;
 
     // Every AOE has the same material, for now. We cache it here.
     private static readonly Material AOE_MATERIAL;
@@ -275,6 +295,7 @@ public class AOE : MonoBehaviour {
         data.currentTime += Time.deltaTime;
         if (data.currentTime > data.maxTime)
         {
+            //Debug.Log("Time is over!");
             Destroy(this.gameObject);
         }
 
@@ -293,29 +314,38 @@ public class AOE : MonoBehaviour {
         data.scale += (float)data.expansionSpeed * Time.deltaTime;
         gameObject.transform.localScale = data.scale * Vector3.one;
 
+        // Rotate it, if needed.
+        data.internalRotation += data.rotationSpeed * Time.deltaTime;
+        gameObject.transform.rotation = Quaternion.AngleAxis(data.internalRotation, Vector3.up);
+        //gameObject.transform.Rotate(Vector3.up, data.rotationSpeed * Time.deltaTime);
+
         // If the inner expansion speed is set, we must recompute the mesh- except if it's equal 
         // to the outer expansion speed, which is the same as just scaling. Then we don't recompute.
-        if (Mathf.Abs((float)data.innerExpansionSpeed) > 0.01f && 
+        if (Mathf.Abs((float)data.innerExpansionSpeed) > 0.01f &&
+            Mathf.Abs((float)data.expansionSpeed) > 0.01f &&
             !Mathf.Approximately((float)data.expansionSpeed, (float)data.innerExpansionSpeed))
         {
+            //Debug.Log("Separate inner AOE update");
             //Debug.Log("Separate inner update");
             float ideal = ((float)data.innerExpansionSpeed / (float)data.expansionSpeed);
             data.innerScale = data.innerScale - ((data.innerScale - ideal) * Time.deltaTime);
-            //Debug.Log(innerScale);
 
             RecomputeMeshHole();
             return;
         }
 
         // If we have a fixed width to maintain, we must recompute.
-        if (Mathf.Abs(data.fixedWidth) > 0.01f)
+        if (Mathf.Abs(data.fixedWidth) > 0.01f && Mathf.Abs(data.scale) > 0.01f)
         {
+            //Debug.Log("Fixed width AOE update");
             //Debug.Log("Fixed width update");
             data.innerScale = (data.scale < data.fixedWidth) ? 0f : (data.scale - data.fixedWidth) / data.scale;
 
             RecomputeMeshHole();
             return;
         }
+
+        //Debug.Log("Normal AOE update");
     }
 
     public static AOEStructure New(Entity self)
@@ -337,7 +367,7 @@ public class AOE : MonoBehaviour {
         {
             degrees = 360 - degrees;
         }
-        data.internalRotation = degrees;
+        data.internalRotation = degrees + data.angleOffset;
 
         // Compute the final rotation
         Quaternion rotation = Quaternion.AngleAxis(degrees + data.angleOffset, Vector3.up);
@@ -374,7 +404,6 @@ public class AOE : MonoBehaviour {
                 degrees = 360 - degrees;
             }
             degrees -= data.internalRotation;
-            degrees -= data.angleOffset;
             degrees = Mathf.Repeat(degrees, 360f);
             Debug.Log(degrees);
 
@@ -383,7 +412,7 @@ public class AOE : MonoBehaviour {
             //Debug.Log("In section " + section);
 
             if (data.regions[section]) {
-                Entity.DamageEntity(otherEntity, data.entity, damage);
+                Entity.DamageEntity(otherEntity, data.entity, data.damage);
             }
         }
     }

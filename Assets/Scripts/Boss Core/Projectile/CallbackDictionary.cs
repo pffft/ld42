@@ -10,6 +10,18 @@ namespace Projectiles
     {
         public static ProjectileCallbackDelegate NOTHING = (self) => { };
 
+        public static ProjectileCallbackDelegate FREEZE = (self) =>
+        {
+            Projectile
+                .New(self.data.entity)
+                .Start(self.transform.position)
+                .Target(null)
+                .MaxTime(5f)
+                .Size(self.data.size)
+                .Speed(Speed.FROZEN)
+                .Create();
+        };
+
         public static ProjectileCallbackDelegate SPAWN_6_CURVING = (self) =>
         {
             Rigidbody body = self.GetComponent<Rigidbody>();

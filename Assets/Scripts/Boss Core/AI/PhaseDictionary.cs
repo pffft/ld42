@@ -36,9 +36,10 @@ namespace AI
         */
 
         public static AIPhase PHASE_TEST = new AIPhase()
-            .AddSequence(10, AOE_TEST_2)
+            .AddSequence(10, AOE_TEST_3)
             ;
 
+        /*
         public static AIPhase PHASE1 = new AIPhase()
             .AddSequence(10, SHOOT3_WAVE3)
             .AddSequence(10, SHOOT_2_WAVES.Times(5))
@@ -87,5 +88,6 @@ namespace AI
             .AddSequence(10, RANDOM_200_WAVE)
             .AddSequence(10, CIRCLE_JUMP_ROPE)
             ;
+        */
     }
 }

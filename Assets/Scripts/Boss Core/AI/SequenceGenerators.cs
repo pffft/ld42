@@ -151,7 +151,7 @@ namespace AI
         {
             int index = AISequence.AddPayload();
             AISequence seq = null;
-            seq = new AISequence(() => { Glare(); AISequence.SetPayload(index, structure.Create()); });
+            seq = new AISequence(() => { Glare(); AISequence.SetPayload(index, new object[] { structure.Create() }); });
             seq.payloadID = index;
             return seq;
         }

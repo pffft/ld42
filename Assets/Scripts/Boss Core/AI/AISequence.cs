@@ -35,7 +35,7 @@ namespace AI
         public int? payloadID = null;
 
         private static int payloadCount;
-        private static Dictionary<int, object> payloads = new Dictionary<int, object>();
+        private static Dictionary<int, object[]> payloads = new Dictionary<int, object[]>();
 
         public static int AddPayload()
         {
@@ -43,7 +43,7 @@ namespace AI
             return payloadCount++;
         }
 
-        public static void SetPayload(int id, object payload)
+        public static void SetPayload(int id, object[] payload)
         {
             payloads[id] = payload;
         }
@@ -105,6 +105,23 @@ namespace AI
         #endregion
 
         #region Tools to build up AISequences
+
+        private static AIEvent BasicMerge(params AIEvent[] events) {
+            float minDuration = float.PositiveInfinity;
+            for (int i = 0; i < events.Length; i++) {
+                if (events[i].duration < minDuration) {
+                    minDuration = events[i].duration;
+                }
+            }
+
+            return new AIEvent(minDuration, () =>
+            {
+                for (int i = 0; i < events.Length; i++) {
+                    events[i].action();
+                }
+            });
+        }
+
         /*
          * Merges the given array of AISequences, and executes all of them concurrently.
          * 
@@ -116,6 +133,60 @@ namespace AI
          */
         public static AISequence Merge(params AISequence[] sequences)
         {
+            int[] indicies = new int[sequences.Length];
+            AIEvent[] events = new AIEvent[sequences.Length];
+            for (int i = 0; i < sequences.Length; i++) {
+                indicies[i] = 0;
+                events[i] = sequences[i].events[indicies[i]];
+            }
+
+            // Continuously go through the next events; merge any that start at the same time.
+            // Then remove them from processing. The merged event duration is equal to the minimum
+            // duration of all the events combined; this ensures all events can run as before.
+            List<AIEvent> finalEventsList = new List<AIEvent>();
+            while(true) {
+                AIEvent nextEvent = events[0];
+                for (int i = 0; i < events.Length; i++) {
+                    if (indicies[i] >= sequences[i].events.Length) {
+                        continue;
+                    }
+
+                    if (sequences[i].events[indicies[i]].startTime < nextEvent.startTime) {
+                        nextEvent = sequences[i].events[indicies[i]];
+                    }
+                }
+
+                List<AIEvent> eventsToMerge = new List<AIEvent>();
+                for (int i = 0; i < sequences.Length; i++)
+                {
+                    if (indicies[i] >= sequences[i].events.Length)
+                    {
+                        continue;
+                    }
+
+                    if (Mathf.Approximately(sequences[i].events[indicies[i]].startTime, nextEvent.startTime)) {
+                        eventsToMerge.Add(sequences[i].events[indicies[i]]);
+                        indicies[i]++;
+                    }
+                }
+
+                if (eventsToMerge.Count == 0) {
+                    break;
+                } else {
+                    finalEventsList.Add(BasicMerge(eventsToMerge.ToArray()));
+                }
+            }
+
+
+            // TODO: event start times are always -1 until eventQueue positions them. 
+            // Use their durations + 0 as first start time to figure out relative orders!
+            Debug.Log("Merge resulted in : ");
+            for (int i = 0; i < finalEventsList.Count; i++) {
+                Debug.Log("Element [" + i + "] start: " + finalEventsList[i].startTime + " duration: " + finalEventsList[i].duration);
+            }
+            return new AISequence(finalEventsList.ToArray());
+
+            /*
             return new AISequence(() =>
             {
                 for (int i = 0; i < sequences.Length; i++)
@@ -126,6 +197,7 @@ namespace AI
                     }
                 }
             });
+            */
         }
 
         public static AISequence Merge(List<AISequence> sequences)
@@ -136,7 +208,7 @@ namespace AI
         /*
          * Returns this AISequence repeated "times" number of times.
          */
-        public AISequence Times(int times)
+            public AISequence Times(int times)
         {
             if (times == 0)
             {
@@ -205,81 +277,215 @@ namespace AI
 
         #endregion
 
+        #region Dynamic object setters
+        public AISequence Start(Vector3 start)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data.start = start;
+                    }
+                    else if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data.start = start;
+                    }
+                }
+            }));
+        }
+
+        public AISequence Target(Vector3 target)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data.target = target;
+                    }
+                    else if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data.target = target;
+                    }
+                }
+            }));
+        }
+
+        public AISequence AngleOffset(float angle)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.AngleOffset(angle);
+                    }
+                    else if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data = projectile.data.AngleOffset(angle);
+                    }
+                }
+            }));
+        }
+
+        public AISequence MaxTime(float time)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.MaxTime(time);
+                    }
+                    else if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data = projectile.data.MaxTime(time);
+                    }
+                }
+            }));
+        }
+
+        public AISequence Damage(float damage)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.Damage(damage);
+                    }
+                    else if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data = projectile.data.Damage(damage);
+                    }
+                }
+            }));
+        }
+
         public AISequence SetSpeed(BossCore.Speed speed)
         {
             return Then(new AISequence(() =>
             {
-                if (payloadID == null)
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
                 {
-                    return;
-                }
-                else
-                {
-                    object payload = payloads[payloadID ?? -1];
-                    Debug.Log("Got payload: " + payload);
-                    /*
-                    if (payload is AOE || payload is Projectile)
+                    if (payload is AOE)
                     {
-                        try
-                        {
-                            FieldInfo info = payload.GetType().GetField("data");
-                            Debug.Log(info);
-                            System.Type type = info.FieldType;
-                            Debug.Log(type);
-                            MethodInfo method = type.GetMethod("Speed");
-                            Debug.Log(method);
-                            method.Invoke((AOE.AOEStructure)info.GetValue(payload), new object[] { speed });
-                        }
-                        catch (System.Exception e)
-                        {
-                            Debug.Log("hecced up" + e);
-                        }
+                        Debug.Log("Setting outer speed of " + payload + " to " + speed);
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.Speed(speed);
                     }
-                    */
+                    else if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data.Speed(speed);
+                    }
+                }
+            }));
+        }
 
+        public AISequence FixedWidth(float width)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
                     if (payload is AOE)
                     {
                         AOE aoe = payload as AOE;
-                        aoe.data = aoe.data.Speed(speed);
-                        aoe.data = aoe.data.InnerSpeed(speed);
-                        Debug.Log(aoe.data.expansionSpeed);
+                        aoe.data = aoe.data.FixedWidth(width);
                     }
                 }
-                /*
-                if (
-                {
-                }
-                else
-                {
-                    Debug.Log("Failed because type is: " + payload.GetType());
-                    return;
-                }
-                */
-            })).SetPayloadID(payloadID);
+            }));
 
-            /*
-            if (payload is AOE)
-            {
-                Debug.Log("SetSpeed called with AOE");
-                return Then(new AISequence(() =>
-                {
-                    AOE aoe = payload as AOE;
-                    aoe.data = aoe.data.Speed(speed);
-                    Debug.Log(aoe.data.expansionSpeed);
-                }));
-            }
-            else if (payload is Projectile)
-            {
-                return Then(new AISequence(() =>
-                {
-                    Projectile projectile = payload as Projectile;
-                }));
-            }
-            else
-            {
-                return this;
-            }
-            */
         }
+
+        public AISequence InnerSpeed(BossCore.Speed speed)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        Debug.Log("Setting inner speed of " + payload + " to " + speed);
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.InnerSpeed(speed);
+                    }
+                }
+            }));
+        }
+
+        public AISequence InnerScale(float scale)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.InnerScale(scale);
+                    }
+                }
+            }));
+        }
+
+        public AISequence RotationSpeed(float speed)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is AOE)
+                    {
+                        AOE aoe = payload as AOE;
+                        aoe.data = aoe.data.RotationSpeed(speed);
+                    }
+                }
+            }));
+        }
+
+        public AISequence SetSize(Size size)
+        {
+            return Then(new AISequence(() =>
+            {
+                object[] ps = payloads[payloadID ?? -1];
+                foreach (object payload in ps)
+                {
+                    if (payload is Projectile)
+                    {
+                        Projectile projectile = payload as Projectile;
+                        projectile.data.Size(size);
+                    }
+                }
+            }));
+        }
+        #endregion
     }
 }

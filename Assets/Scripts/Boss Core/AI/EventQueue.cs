@@ -25,31 +25,26 @@ namespace AI
         }
 
         /*
-         * Add a single event to the queue, as soon as possible.
+         * Add a single event to the queue as soon as possible.
          */
-        public void Add(float duration, AIEvent.Action action)
+        public void Add(AIEvent e)
         {
-
+            //Add(e.duration, e.action);
             if (BossController.insaneMode)
             {
-                duration = duration / 1.5f;
+                e.duration = e.duration / 1.5f;
             }
 
             // Schedule the event immediately if possible (internalTime), or if
             // there are other events on the queue already (lastTime > internalTime),
             // schedule the event as soon as possible.
             float start = Mathf.Max(internalTime, lastTime);
-            //float start = internalTime;
-            lastTime = start + duration;
-            events.Enqueue(new AIEvent(start, duration, action));
-        }
+            lastTime = start + e.duration;
 
-        /*
-         * Add a single event to the queue as soon as possible.
-         */
-        public void Add(AIEvent e)
-        {
-            Add(e.duration, e.action);
+            // Set the start of the event and add it
+            e.startTime = start;
+            Debug.Log("Setting start time to: " + start);
+            events.Enqueue(e);
         }
 
         /*
@@ -70,7 +65,7 @@ namespace AI
                     Debug.LogError("Found null event!");
                     continue;
                 }
-                Add(e.duration, e.action);
+                Add(e);
             }
         }
 
@@ -92,7 +87,7 @@ namespace AI
         {
             for (int i = 0; i < times; i++)
             {
-                Add(duration, action);
+                Add(new AIEvent(duration, action));
             }
         }
 

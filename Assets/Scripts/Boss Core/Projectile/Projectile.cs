@@ -123,6 +123,13 @@ namespace Projectiles
             }
 
             // Builder method
+            public ProjectileStructure Damage(float damage)
+            {
+                this.damage = damage;
+                return this;
+            }
+
+            // Builder method
             public ProjectileStructure Speed(BossCore.Speed speed)
             {
                 this.speed = speed;
