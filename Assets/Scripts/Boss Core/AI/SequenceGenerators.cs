@@ -147,9 +147,13 @@ namespace AI
             });
         }
 
-        public static AOEAISequence ShootAOE(AOE.AOEStructure structure)
+        public static AISequence ShootAOE(AOE.AOEStructure structure)
         {
-            return new AOEAISequence(structure);
+            int index = AISequence.AddPayload();
+            AISequence seq = null;
+            seq = new AISequence(() => { Glare(); AISequence.SetPayload(index, structure.Create()); });
+            seq.payloadID = index;
+            return seq;
         }
 
         public static AISequence Teleport(Vector3? target = null, int speed = 25)

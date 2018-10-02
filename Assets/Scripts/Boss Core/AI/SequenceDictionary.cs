@@ -649,8 +649,9 @@ namespace AI
         public static AISequence AOE_TEST_2 = new AISequence(
             4f,
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360))
-            .Wait(2f)
-            .Speed(Speed.FROZEN)
+            .Wait(1f)
+            .SetSpeed(Speed.FROZEN)
+            .Wait(10f)
         );
 
         #endregion

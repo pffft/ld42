@@ -23,7 +23,7 @@ namespace AI {
             return (AOEAISequence)base.Wait(seconds);
         }
 
-        public AOEAISequence Speed(Speed speed) {
+        public AOEAISequence SetSpeed(Speed speed) {
             return (AOEAISequence)Then(new AISequence(() =>
             {
                 aoe.data.Speed(speed);
