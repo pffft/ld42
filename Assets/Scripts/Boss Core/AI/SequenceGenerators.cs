@@ -37,12 +37,16 @@ namespace AI
 
         public static AISequence Shoot1(Projectile.ProjectileStructure? skeleton=null)
         {
-            return new AISequence(() =>
+            int index = AISequence.AddPayload();
+            AISequence seq = null;
+            seq = new AISequence(() =>
             {
                 Glare();
                 Projectile.ProjectileStructure struc = skeleton ?? Projectile.New(self);
-                struc.Create();
+                AISequence.SetPayload(index, new object[] { struc.Create() });
             });
+            seq.payloadID = index;
+            return seq;
         }
 
         public static AISequence Shoot3(Projectile.ProjectileStructure? skeleton=null)

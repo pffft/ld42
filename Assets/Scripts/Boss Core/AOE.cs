@@ -9,6 +9,8 @@ using UnityEngine.Profiling;
 
 public class AOE : MonoBehaviour {
 
+    public delegate void AOECallbackDelegate(AOE self);
+
     public struct AOEStructure
     {
 
@@ -63,6 +65,18 @@ public class AOE : MonoBehaviour {
         // How fast this guy rotates.
         internal float rotationSpeed;
 
+        // Whether or not this AOE is destroyed when it goes out of bounds.
+        internal bool shouldDestroyOnOutOfBounds;
+
+        #region callbacks
+        internal AOECallbackDelegate OnDestroyOutOfBoundsImpl;
+        public AOEStructure OnDestroyOutOfBounds(AOECallbackDelegate deleg)
+        {
+            this.OnDestroyOutOfBoundsImpl = deleg;
+            return this;
+        }
+        #endregion
+
         public AOEStructure(Entity self)
         {
             this.entity = self;
@@ -86,6 +100,10 @@ public class AOE : MonoBehaviour {
             this.maxTime = 100f;
             this.damage = 5;
             this.rotationSpeed = 0f;
+
+            this.shouldDestroyOnOutOfBounds = true;
+
+            this.OnDestroyOutOfBoundsImpl = AOECallbackDictionary.NOTHING;
         }
 
         public AOEStructure On(float from, float to)
@@ -303,8 +321,12 @@ public class AOE : MonoBehaviour {
         // should be "innerscale"- what about AOE attacks without hole in center?
         if (data.scale > (GameObject.Find("Arena").transform.localScale.x * 50f) + (data.start.magnitude))
         {
+            data.OnDestroyOutOfBoundsImpl(this);
+            if (data.shouldDestroyOnOutOfBounds)
+            {
+                Destroy(this.gameObject);
+            }
             //Debug.Log("Ring hit arena. Returning.");
-            Destroy(this.gameObject);
         }
 
         // Update the size of the AOE per its expansion rate.
@@ -405,7 +427,7 @@ public class AOE : MonoBehaviour {
             }
             degrees -= data.internalRotation;
             degrees = Mathf.Repeat(degrees, 360f);
-            Debug.Log(degrees);
+            //Debug.Log(degrees);
 
 
             int section = (int)(degrees / THETA_STEP);

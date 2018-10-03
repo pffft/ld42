@@ -43,8 +43,7 @@ namespace AI
 
             // Set the start of the event and add it
             e.startTime = start;
-            Debug.Log("Setting start time to: " + start);
-            events.Enqueue(e);
+            events.Enqueue(new AIEvent(e.startTime, e.duration, e.action));
         }
 
         /*

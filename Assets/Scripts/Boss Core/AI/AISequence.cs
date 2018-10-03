@@ -39,7 +39,6 @@ namespace AI
 
         public static int AddPayload()
         {
-            Debug.Log("Adding payload with ID: " + payloadCount);
             return payloadCount++;
         }
 
@@ -134,9 +133,11 @@ namespace AI
         public static AISequence Merge(params AISequence[] sequences)
         {
             int[] indicies = new int[sequences.Length];
+            float[] startTimes = new float[sequences.Length];
             AIEvent[] events = new AIEvent[sequences.Length];
             for (int i = 0; i < sequences.Length; i++) {
                 indicies[i] = 0;
+                startTimes[i] = 0;
                 events[i] = sequences[i].events[indicies[i]];
             }
 
@@ -145,14 +146,16 @@ namespace AI
             // duration of all the events combined; this ensures all events can run as before.
             List<AIEvent> finalEventsList = new List<AIEvent>();
             while(true) {
-                AIEvent nextEvent = events[0];
+                //AIEvent nextEvent = events[0];
+                float nextStartTime = float.PositiveInfinity;
                 for (int i = 0; i < events.Length; i++) {
                     if (indicies[i] >= sequences[i].events.Length) {
                         continue;
                     }
 
-                    if (sequences[i].events[indicies[i]].startTime < nextEvent.startTime) {
-                        nextEvent = sequences[i].events[indicies[i]];
+                    if (startTimes[i] < nextStartTime)
+                    {
+                        nextStartTime = startTimes[i];
                     }
                 }
 
@@ -164,7 +167,11 @@ namespace AI
                         continue;
                     }
 
-                    if (Mathf.Approximately(sequences[i].events[indicies[i]].startTime, nextEvent.startTime)) {
+                    if (Mathf.Approximately(startTimes[i], nextStartTime))
+                    {
+                        // Add duration of this event to the start time
+                        startTimes[i] += sequences[i].events[indicies[i]].duration;
+
                         eventsToMerge.Add(sequences[i].events[indicies[i]]);
                         indicies[i]++;
                     }
@@ -177,13 +184,6 @@ namespace AI
                 }
             }
 
-
-            // TODO: event start times are always -1 until eventQueue positions them. 
-            // Use their durations + 0 as first start time to figure out relative orders!
-            Debug.Log("Merge resulted in : ");
-            for (int i = 0; i < finalEventsList.Count; i++) {
-                Debug.Log("Element [" + i + "] start: " + finalEventsList[i].startTime + " duration: " + finalEventsList[i].duration);
-            }
             return new AISequence(finalEventsList.ToArray());
 
             /*
@@ -208,7 +208,7 @@ namespace AI
         /*
          * Returns this AISequence repeated "times" number of times.
          */
-            public AISequence Times(int times)
+        public AISequence Times(int times)
         {
             if (times == 0)
             {
@@ -239,11 +239,6 @@ namespace AI
             }
             newEvents[this.events.Length] = new AIEvent(duration, () => { });
 
-            if (payloadID != null)
-            {
-                Debug.Log("(wait) Payload: " + payloadID);
-            }
-
             return new AISequence(newEvents).SetPayloadID(payloadID);
 
         }
@@ -273,6 +268,15 @@ namespace AI
             }
 
             return new AISequence(newEvents).SetPayloadID(payloadID);
+        }
+
+        public static AISequence Either(params AISequence[] sequences)
+        {
+            return new AISequence(() =>
+            {
+                Debug.Log("EITHER");
+                return sequences[Random.Range(0, sequences.Length)];
+            });
         }
 
         #endregion
@@ -392,7 +396,6 @@ namespace AI
                 {
                     if (payload is AOE)
                     {
-                        Debug.Log("Setting outer speed of " + payload + " to " + speed);
                         AOE aoe = payload as AOE;
                         aoe.data = aoe.data.Speed(speed);
                     }
