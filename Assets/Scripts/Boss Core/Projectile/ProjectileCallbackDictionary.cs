@@ -57,7 +57,7 @@ namespace Projectiles
         // Spawns a wave at the death position.
         public static ProjectileCallbackDelegate SPAWN_WAVE = (self) =>
         {
-            AOE.New(self.data.entity).Start(self.transform.position).On(0, 360f).Create();
+            AOEs.AOE.New(self.data.entity).Start(self.transform.position).On(0, 360f).Create();
         };
 
         public static ProjectileCallbackDelegate SPAWN_1_TOWARDS_PLAYER = (self) =>

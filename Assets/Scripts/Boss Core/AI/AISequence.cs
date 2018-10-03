@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Projectiles;
-
-using System.Reflection;
+using AOEs;
 
 namespace AI
 {
@@ -53,6 +52,9 @@ namespace AI
             return this;
         }
 
+        private delegate AIEvent[] AIEventGenerator(AISequence self);
+        private AIEventGenerator GetEvents = (self) => { Debug.Log("Default GetEvents called"); return self.events; };
+
         #region Constructors
 
         // Used internally as a shortcut.
@@ -81,25 +83,35 @@ namespace AI
             List<AIEvent> eventsList = new List<AIEvent>();
             foreach (AISequence sequence in sequences)
             {
-                eventsList.AddRange(sequence.events);
+                //eventsList.AddRange(sequence.events);
+                eventsList.AddRange(sequence.GetEvents(sequence));
             }
             this.events = eventsList.ToArray();
         }
 
-
         /*
          * "Explodes" the generation function and adds all the elements to a single AISequence.
+         * TODO: this is in a delicate state- the "events" should be accessed using the new GetEvents
+         * delegate. Anything not using that will crash!
          */
-        public AISequence(GenerateSequences genFunction) : this(-1, genFunction()) { }
+        public AISequence(GenerateSequences genFunction) : this(-1, genFunction) { }
 
-        public AISequence(float difficulty, GenerateSequences genFunction) : this(difficulty, genFunction()) { }
+        public AISequence(float difficulty, GenerateSequences genFunction) {
+            this.difficulty = difficulty;
+            this.events = null;
+            this.GetEvents = (self) => SequentialMerge(genFunction()).events;
+        }
 
         /*
          * Executes the generation function and instantiates this AISequence as the result.
          */
-        public AISequence(GenerateSequence genFunction) : this(-1, genFunction()) { }
+        public AISequence(GenerateSequence genFunction) : this(-1, genFunction) { }
 
-        public AISequence(float difficulty, GenerateSequence genFunction) : this(difficulty, genFunction()) { }
+        public AISequence(float difficulty, GenerateSequence genFunction) {
+            this.difficulty = difficulty;
+            this.events = null;
+            this.GetEvents = (self) => genFunction().events;
+        }
 
         #endregion
 
@@ -124,16 +136,23 @@ namespace AI
         /*
          * Merges the given array of AISequences, and executes all of them concurrently.
          * 
-         * This is useful for chaining individual "Shoot1" methods together,
+         * At a basic level, this is useful for chaining individual "Shoot1" methods together,
          * or stitching various "ShootArc" methods.
          * 
-         * TODO: make this stitch more complex AISequences using their timings. do a zipper merge!
-         * this will allow things like having concurrent "Sweep" attacks in opposite directions.
+         * On a more complex scale, two separate sets of tasks can be executed in parallel.
          */
         public static AISequence Merge(params AISequence[] sequences)
         {
             int[] indicies = new int[sequences.Length];
             float[] startTimes = new float[sequences.Length];
+
+
+            // TODO finish implementing this
+            AIEvent[][] allEvents = new AIEvent[sequences.Length][];
+            for (int i = 0; i < sequences.Length; i++) {
+                allEvents[i] = sequences[i].GetEvents(sequences[i]);
+            }
+
             AIEvent[] events = new AIEvent[sequences.Length];
             for (int i = 0; i < sequences.Length; i++) {
                 indicies[i] = 0;
@@ -185,24 +204,32 @@ namespace AI
             }
 
             return new AISequence(finalEventsList.ToArray());
-
-            /*
-            return new AISequence(() =>
-            {
-                for (int i = 0; i < sequences.Length; i++)
-                {
-                    for (int j = 0; j < sequences[i].events.Length; j++)
-                    {
-                        sequences[i].events[j].action();
-                    }
-                }
-            });
-            */
         }
 
         public static AISequence Merge(List<AISequence> sequences)
         {
             return Merge(sequences.ToArray());
+        }
+
+        /*
+         * Returns the provided sequence array, but with every element merged in order
+         * respecting wait times. Used to collapse a list of exploded sequences from
+         * a Generator function into a single sequence.
+         */
+        private static AISequence SequentialMerge(AISequence[] sequences) {
+            if (sequences.Length == 0) {
+                return new AISequence(new AIEvent[0]);
+            }
+            if (sequences.Length == 1) {
+                return sequences[0];
+            }
+
+            AISequence sequential = sequences[0];
+            for (int i = 1; i < sequences.Length; i++)
+            {
+                sequential = sequential.Then(sequences[i]);
+            }
+            return sequential;
         }
 
         /*
@@ -232,12 +259,13 @@ namespace AI
          */
         public AISequence Wait(float duration)
         {
-            AIEvent[] newEvents = new AIEvent[this.events.Length + 1];
-            for (int i = 0; i < this.events.Length; i++)
+            AIEvent[] oldEvents = GetEvents(this);
+            AIEvent[] newEvents = new AIEvent[oldEvents.Length + 1];
+            for (int i = 0; i < oldEvents.Length; i++)
             {
-                newEvents[i] = this.events[i];
+                newEvents[i] = oldEvents[i];
             }
-            newEvents[this.events.Length] = new AIEvent(duration, () => { });
+            newEvents[oldEvents.Length] = new AIEvent(duration, () => { });
 
             return new AISequence(newEvents).SetPayloadID(payloadID);
 
@@ -275,7 +303,10 @@ namespace AI
             return new AISequence(() =>
             {
                 Debug.Log("EITHER");
-                return sequences[Random.Range(0, sequences.Length)];
+                //AISequence nextSeq = sequences[(int)((float)payloads[0][0] * sequences.Length)];
+                //return new AISequence(() => { Debug.Log("Either subsequence executed"); });
+                //initialAction = initialAction.Then(sequences[Random.Range(0, sequences.Length)]);
+                BossController.eventQueue.Add(sequences[Random.Range(0, sequences.Length)]);
             });
         }
 

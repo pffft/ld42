@@ -51,9 +51,25 @@ namespace AI
          */
         public void Add(AISequence sequence)
         {
+            Debug.Log("Adding sequence!");
             if (sequence.events == null)
             {
                 Debug.LogError("Sequence had null events!");
+                return;
+            }
+
+            if (sequence.generateSequence != null) {
+                Debug.Log("Unpacking single sequence.");
+                Add(sequence.generateSequence());
+                return;
+            }
+
+            if (sequence.generateSequences != null) {
+                AISequence[] sequences = sequence.generateSequences();
+                Debug.Log("Unpacked " + sequences.Length + " sequences.");
+                for (int i = 0; i < sequences.Length; i++) {
+                    Add(sequences[i]);
+                }
                 return;
             }
 
@@ -67,17 +83,6 @@ namespace AI
                 Add(e);
             }
         }
-
-        /*
-         * Adds a sequence with an additional delay afterwards.
-         */
-        /*
-        public void Add(float delay, AISequence sequence)
-        {
-            Add(sequence);
-            Add(delay, (AISequence)null);
-        }
-        */
 
         /*
          * Adds a single action "times" times to the queue.

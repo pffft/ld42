@@ -75,6 +75,8 @@ public class BossController : MonoBehaviour
     {
         Profiler.BeginSample("Initialize event queue");
 
+        AISequence.AddPayload();
+
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
         //phase = AIPhase.PHASE1;
         phase = AIPhase.PHASE_TEST;
