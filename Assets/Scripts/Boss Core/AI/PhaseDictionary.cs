@@ -37,6 +37,8 @@ namespace AI
 
         public static AIPhase PHASE_TEST = new AIPhase()
             .AddSequence(10, AOE_TEST_3)
+            .AddSequence(10, AOE_TEST_3_2)
+            .AddSequence(10, AOE_TEST_3_3)
             ;
 
         public static AIPhase PHASE1 = new AIPhase()

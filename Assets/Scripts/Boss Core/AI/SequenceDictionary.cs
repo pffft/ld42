@@ -728,6 +728,88 @@ namespace AI
             ).Wait(2f)
         );
 
+
+        public static AISequence AOE_TEST_3_2 = new AISequence(
+            5f,
+            Merge(
+                ShootAOE(AOE.New(self).Speed(Speed.SNAIL).InnerScale(0f).InnerSpeed(Speed.FROZEN).On(0, 360f).MaxTime(3.25f)).Wait(3.25f),
+
+                ShootAOE(AOE.New(self)
+                         .Speed(Speed.SNAIL)
+                         .InnerScale(0f)
+                         .InnerSpeed(Speed.FROZEN)
+                         .AngleOffset(45f)
+                         .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
+                         .On(-22.5f, 22.5f)
+                         .On(90 - 22.5f, 90 + 22.5f)
+                         .On(180 - 22.5f, 180 + 22.5f)
+                         .On(270 - 22.5f, 270 + 22.5f))
+                         .MaxTime(15f)
+                .Wait(3.25f).SetSpeed(Speed.FROZEN).InnerSpeed(Speed.FROZEN).Wait(1f).RotationSpeed(-45f),
+
+                ShootAOE(AOE.New(self)
+                         .Speed(Speed.SLOW)
+                         .InnerScale(0.6f)
+                         .InnerSpeed(Speed.SNAIL)
+                         .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
+                         .On(-22.5f, 22.5f)
+                         .On(90 - 22.5f, 90 + 22.5f)
+                         .On(180 - 22.5f, 180 + 22.5f)
+                         .On(270 - 22.5f, 270 + 22.5f))
+                         .MaxTime(15f)
+                .Wait(3.25f).SetSpeed(Speed.FROZEN).InnerSpeed(Speed.FROZEN).Wait(1f).RotationSpeed(45f),
+
+                //Pause(3.5f).Then(ShootArc(50, -60, 60, New(self).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)).Wait(1.5f).Times(6))
+                //Pause(3.5f).Then(ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-45, 45).MaxTime(1f)).Wait(1f).Times(10))
+                //Pause(3.5f).Then(Shoot1(New(self).Size(Size.MEDIUM).Speed(Speed.FAST)).AngleOffset(Random.Range(-10f, 10f)).Wait(0.25f).Times(40))
+
+                //Pause(4.5f).Then(ShootArc(100, -270, 15).Wait(0.5f).Times(20))
+                Pause(4.5f).Then(ShootArc(100, -10, 270).Wait(0.5f).Times(20))
+                //Pause(4.5f).Then(ShootArc(100, 45, 315, New(self).Speed(Speed.SLOW).Size(Size.LARGE)).Wait(0.5f).Times(20))
+
+            ).Wait(2f)
+        );
+
+        public static AISequence AOE_TEST_3_3 = new AISequence(
+            5f,
+            Merge(
+                ShootAOE(AOE.New(self).Speed(Speed.SNAIL).InnerScale(0f).InnerSpeed(Speed.FROZEN).On(0, 360f).MaxTime(3.25f)).Wait(3.25f),
+
+                ShootAOE(AOE.New(self)
+                         .Speed(Speed.SNAIL)
+                         .InnerScale(0f)
+                         .InnerSpeed(Speed.FROZEN)
+                         .AngleOffset(45f)
+                         .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
+                         .On(-22.5f, 22.5f)
+                         .On(90 - 22.5f, 90 + 22.5f)
+                         .On(180 - 22.5f, 180 + 22.5f)
+                         .On(270 - 22.5f, 270 + 22.5f))
+                         .MaxTime(15f)
+                .Wait(3.25f).SetSpeed(Speed.FROZEN).InnerSpeed(Speed.FROZEN).Wait(1f).RotationSpeed(-45f),
+
+                ShootAOE(AOE.New(self)
+                         .Speed(Speed.SLOW)
+                         .InnerScale(0.6f)
+                         .InnerSpeed(Speed.SNAIL)
+                         .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
+                         .On(-22.5f, 22.5f)
+                         .On(90 - 22.5f, 90 + 22.5f)
+                         .On(180 - 22.5f, 180 + 22.5f)
+                         .On(270 - 22.5f, 270 + 22.5f))
+                         .MaxTime(15f)
+                .Wait(3.25f).SetSpeed(Speed.FROZEN).InnerSpeed(Speed.FROZEN).Wait(1f).RotationSpeed(45f),
+
+                //Pause(3.5f).Then(ShootArc(50, -60, 60, New(self).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)).Wait(1.5f).Times(6))
+                //Pause(3.5f).Then(ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-45, 45).MaxTime(1f)).Wait(1f).Times(10))
+                //Pause(3.5f).Then(Shoot1(New(self).Size(Size.MEDIUM).Speed(Speed.FAST)).AngleOffset(Random.Range(-10f, 10f)).Wait(0.25f).Times(40))
+
+                //Pause(4.5f).Then(ShootArc(100, -270, 15).Wait(0.5f).Times(20))
+                //Pause(4.5f).Then(ShootArc(100, -10, 270).Wait(0.5f).Times(20)),
+                Pause(4.5f).Then(ShootArc(100, 45, 315, New(self).Speed(Speed.SLOW).Size(Size.LARGE)).Wait(0.5f).Times(20))
+
+            ).Wait(2f)
+        );
         #endregion
 
     }
