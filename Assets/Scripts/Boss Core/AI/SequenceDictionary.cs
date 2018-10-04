@@ -721,13 +721,9 @@ namespace AI
                 //Pause(3.5f).Then(ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-45, 45).MaxTime(1f)).Wait(1f).Times(10))
                 //Pause(3.5f).Then(Shoot1(New(self).Size(Size.MEDIUM).Speed(Speed.FAST)).AngleOffset(Random.Range(-10f, 10f)).Wait(0.25f).Times(40))
 
-                Either(
-                    Pause(4.5f).Then(ShootArc(100, -270, 15).Wait(0.5f).Times(20)),
-                    Pause(4.5f).Then(ShootArc(100, -10, 270).Wait(0.5f).Times(20)),
-                    Pause(4.5f).Then(ShootArc(100, 45, 315, New(self).Speed(Speed.SLOW).Size(Size.LARGE)).Wait(0.5f).Times(20))
-                ),
-
-                new AISequence(() => { Debug.Log("Merge called"); })
+                Pause(4.5f).Then(ShootArc(100, -270, 15).Wait(0.5f).Times(20))
+                //Pause(4.5f).Then(ShootArc(100, -10, 270).Wait(0.5f).Times(20)),
+                //Pause(4.5f).Then(ShootArc(100, 45, 315, New(self).Speed(Speed.SLOW).Size(Size.LARGE)).Wait(0.5f).Times(20))
 
             ).Wait(2f)
         );
