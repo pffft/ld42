@@ -732,6 +732,38 @@ namespace AI
             ).Wait(2f)
         );
 
+        private static AISequence SNIPER_FINAL_PHASE_TOP = new AISequence(
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(0.275f),
+            ShootAOE(AOE.New(self).On(-15, 15).Speed(Speed.MEDIUM).FixedWidth(20f).Target(SOUTH_FAR)).Wait(0.75f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(1.1f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(0.275f),
+            ShootAOE(AOE.New(self).On(-45, -15).On(15, 45).Speed(Speed.MEDIUM).FixedWidth(20f).Target(SOUTH_FAR)).Wait(0.75f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(1f)
+        );
+
+        private static AISequence SNIPER_FINAL_PHASE_ALL = new AISequence(
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(0f),
+            ShootAOE(AOE.New(self).Start(WEST_FAR).Target(EAST_FAR).On(-90, 90).Speed(Speed.FAST).FixedWidth(7f)).Wait(0.275f),
+            ShootAOE(AOE.New(self).On(-15, 15).Speed(Speed.MEDIUM).FixedWidth(20f).Target(SOUTH_FAR)).Wait(0.75f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(1.1f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(0f),
+            ShootAOE(AOE.New(self).Start(EAST_FAR).Target(WEST_FAR).On(-90, 90).Speed(Speed.FAST).FixedWidth(7f)).Wait(0.275f),
+            ShootAOE(AOE.New(self).On(-45, -15).On(15, 45).Speed(Speed.MEDIUM).FixedWidth(20f).Target(SOUTH_FAR)).Wait(0.75f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(1f)
+        );
+
+        public static AISequence SNIPER_FINAL_PHASE = new AISequence(
+            8,
+            Teleport(NORTH_FAR),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.SLOW).InnerSpeed(Speed.FROZEN).InnerScale(0f).Target(SOUTH_FAR).Material(new Material(Resources.Load<Material>("Art/Materials/PurpleTransparent"))))
+                 .Wait(2f).SetSpeed(Speed.FROZEN).InnerSpeed(Speed.FROZEN).Wait(1f),
+            new AISequence(
+                SNIPER_FINAL_PHASE_TOP.Times(2),
+                SNIPER_FINAL_PHASE_ALL.Times(2),
+                Shoot1(New(self).Speed(Speed.SNAIL).Size(Size.HUGE).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)).Wait(2.5f)
+            ).Times(3)
+        );
+
         #endregion
 
     }

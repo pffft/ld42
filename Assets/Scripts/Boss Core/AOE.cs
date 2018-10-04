@@ -68,6 +68,8 @@ public class AOE : MonoBehaviour {
         // Whether or not this AOE is destroyed when it goes out of bounds.
         internal bool shouldDestroyOnOutOfBounds;
 
+        internal Material material;
+
         #region callbacks
         internal AOECallbackDelegate OnDestroyOutOfBoundsImpl;
         public AOEStructure OnDestroyOutOfBounds(AOECallbackDelegate deleg)
@@ -104,6 +106,7 @@ public class AOE : MonoBehaviour {
             this.shouldDestroyOnOutOfBounds = true;
 
             this.OnDestroyOutOfBoundsImpl = AOECallbackDictionary.NOTHING;
+            this.material = AOE_MATERIAL;
         }
 
         public AOEStructure On(float from, float to)
@@ -221,6 +224,11 @@ public class AOE : MonoBehaviour {
             return this;
         }
 
+        public AOEStructure Material(Material material) {
+            this.material = material;
+            return this;
+        }
+
         public AOE Create()
         {
             // Set up the gameobject
@@ -234,7 +242,7 @@ public class AOE : MonoBehaviour {
             meshFilter.mesh = new Mesh();
 
             MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
-            meshRenderer.material = AOE_MATERIAL;
+            meshRenderer.material = material;
 
             CapsuleCollider collider = obj.AddComponent<CapsuleCollider>();
             collider.center = Vector3.zero;
