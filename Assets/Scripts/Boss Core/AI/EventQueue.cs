@@ -51,30 +51,29 @@ namespace AI
          */
         public void Add(AISequence sequence)
         {
-            Debug.Log("Adding sequence!");
+            Debug.Log("Adding aisequence");
+            // Recursively add children first.
+            AISequence[] children = sequence.GetChildren();
+            Debug.Log(children);
+            Debug.Log(children == null ? -1 : children.Length);
+            if (children != null)
+            {
+                Debug.Log("Children array is not null");
+                for (int i = 0; i < children.Length; i++)
+                {
+                    Add(children[i]);
+                }
+            }
+
             if (sequence.events == null)
             {
                 Debug.LogError("Sequence had null events!");
                 return;
             }
 
-            if (sequence.generateSequence != null) {
-                Debug.Log("Unpacking single sequence.");
-                Add(sequence.generateSequence());
-                return;
-            }
-
-            if (sequence.generateSequences != null) {
-                AISequence[] sequences = sequence.generateSequences();
-                Debug.Log("Unpacked " + sequences.Length + " sequences.");
-                for (int i = 0; i < sequences.Length; i++) {
-                    Add(sequences[i]);
-                }
-                return;
-            }
-
             foreach (AIEvent e in sequence.events)
             {
+                Debug.Log("Adding event");
                 if (e == null)
                 {
                     Debug.LogError("Found null event!");

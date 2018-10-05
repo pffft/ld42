@@ -17,6 +17,7 @@ namespace AI
     {
         // A list of events to execute.
         public AIEvent[] events;
+        private AISequence[] children;
 
         /*
          * A relative difficulty parameter. 
@@ -52,13 +53,21 @@ namespace AI
             return this;
         }
 
-        private delegate AIEvent[] AIEventGenerator(AISequence self);
-        private AIEventGenerator GetEvents = (self) => { Debug.Log("Default GetEvents called"); return self.events; };
+        private AISequence reference;
+
+        public delegate AISequence[] AISequenceGenerator();
+        public AISequenceGenerator GetChildren;
 
         #region Constructors
 
         // Used internally as a shortcut.
-        private AISequence(AIEvent[] events) { this.events = events; }
+        private AISequence(AIEvent[] events) { 
+            this.events = events; 
+            this.children = null;
+            this.difficulty = -1;
+
+            this.GetChildren = () => { return children; };
+        }
 
         /*
          * Creates a new singleton AISequence from the given Action.
@@ -70,6 +79,9 @@ namespace AI
         {
             this.difficulty = difficulty;
             this.events = new AIEvent[] { new AIEvent(0f, a) };
+            this.children = null;
+
+            this.GetChildren = () => { return children; };
         }
 
         /*
@@ -80,13 +92,10 @@ namespace AI
         public AISequence(float difficulty, params AISequence[] sequences)
         {
             this.difficulty = difficulty;
-            List<AIEvent> eventsList = new List<AIEvent>();
-            foreach (AISequence sequence in sequences)
-            {
-                //eventsList.AddRange(sequence.events);
-                eventsList.AddRange(sequence.GetEvents(sequence));
-            }
-            this.events = eventsList.ToArray();
+            this.events = new AIEvent[0];
+            this.children = sequences;
+
+            this.GetChildren = () => { return children; };
         }
 
         /*
@@ -98,8 +107,10 @@ namespace AI
 
         public AISequence(float difficulty, GenerateSequences genFunction) {
             this.difficulty = difficulty;
-            this.events = null;
-            this.GetEvents = (self) => SequentialMerge(genFunction()).events;
+            this.events = new AIEvent[0];
+            this.children = null;
+
+            this.GetChildren = () => genFunction();
         }
 
         /*
@@ -107,10 +118,13 @@ namespace AI
          */
         public AISequence(GenerateSequence genFunction) : this(-1, genFunction) { }
 
-        public AISequence(float difficulty, GenerateSequence genFunction) {
+        public AISequence(float difficulty, GenerateSequence genFunction)
+        {
             this.difficulty = difficulty;
-            this.events = null;
-            this.GetEvents = (self) => genFunction().events;
+            this.events = new AIEvent[0];
+            this.children = null;
+
+            this.GetChildren = () => new AISequence[] { genFunction() };
         }
 
         #endregion
@@ -145,13 +159,6 @@ namespace AI
         {
             int[] indicies = new int[sequences.Length];
             float[] startTimes = new float[sequences.Length];
-
-
-            // TODO finish implementing this
-            AIEvent[][] allEvents = new AIEvent[sequences.Length][];
-            for (int i = 0; i < sequences.Length; i++) {
-                allEvents[i] = sequences[i].GetEvents(sequences[i]);
-            }
 
             AIEvent[] events = new AIEvent[sequences.Length];
             for (int i = 0; i < sequences.Length; i++) {
@@ -239,18 +246,18 @@ namespace AI
         {
             if (times == 0)
             {
-                times = 1;
                 Debug.LogError("Cannot repeat sequence 0 times");
+                times = 1;
             }
-            AIEvent[] newEvents = new AIEvent[this.events.Length * times];
-            for (int i = 0; i < times; i++)
-            {
-                for (int j = 0; j < this.events.Length; j++)
-                {
-                    newEvents[(i * this.events.Length) + j] = this.events[j];
-                }
+            if (times == 1) {
+                return this;
             }
-            return new AISequence(newEvents).SetPayloadID(payloadID);
+
+            AISequence[] newSequences = new AISequence[times];
+            for (int i = 0; i < times; i++) {
+                newSequences[i] = this;
+            }
+            return new AISequence(newSequences).SetPayloadID(payloadID);
         }
 
         /*
@@ -259,16 +266,18 @@ namespace AI
          */
         public AISequence Wait(float duration)
         {
-            AIEvent[] oldEvents = GetEvents(this);
-            AIEvent[] newEvents = new AIEvent[oldEvents.Length + 1];
-            for (int i = 0; i < oldEvents.Length; i++)
+            return new AISequence(this, Pause(duration)).SetPayloadID(payloadID);
+
+            /*
+            AIEvent[] newEvents = new AIEvent[this.events.Length + 1];
+            for (int i = 0; i < this.events.Length; i++)
             {
-                newEvents[i] = oldEvents[i];
+                newEvents[i] = this.events[i];
             }
-            newEvents[oldEvents.Length] = new AIEvent(duration, () => { });
+            newEvents[this.events.Length] = new AIEvent(duration, () => { });
 
             return new AISequence(newEvents).SetPayloadID(payloadID);
-
+            */
         }
 
         /*
