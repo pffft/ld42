@@ -1,4 +1,5 @@
 ﻿using CombatCore;
+using System.Collections;
 using UnityEngine;
 
 public class BossHealthBar : MonoBehaviour
@@ -14,18 +15,26 @@ public class BossHealthBar : MonoBehaviour
 	private GameObject resourceBarPrefab;
 
 	[SerializeField]
-	private Color barColor;
+	private Color barColor = Color.red;
+
+	[SerializeField]
+	private Color barBackColor = Color.black;
 
 	[Range(0f, 250f)]
 	[SerializeField]
-	private float activeBarWidth;
+	private float activeBarWidth = 200f;
 
 	[Range (0f, 250f)]
 	[SerializeField]
-	private float inactiveBarWidth;
+	private float inactiveBarWidth = 10f;
+
+	[SerializeField]
+	private float phaseTransitionDuration = 1f;
 
 	private int activeBarIndex;
 	private ResourceBar activeBar;
+
+	private bool transitioning;
 
 	public void Start()
 	{
@@ -36,6 +45,7 @@ public class BossHealthBar : MonoBehaviour
 				GameObject barObj = Instantiate (resourceBarPrefab, gameObject.transform, false);
 				ResourceBar bar = barObj.GetComponent<ResourceBar> ();
 				bar.Front.color = barColor;
+				bar.Back.color = barBackColor;
 				bar.Front.fillAmount = 1f;
 				bar.Width = inactiveBarWidth;
 			}
@@ -46,25 +56,42 @@ public class BossHealthBar : MonoBehaviour
 		activeBar.Width = activeBarWidth;
 
 		target.died += PhaseCompleted;
+
+		transitioning = false;
 	}
 
 	public void Update()
 	{
-		if (Input.GetKeyDown (KeyCode.T))
-			Entity.DamageEntity (target, null, 10f, true);
-
 		activeBar.Front.fillAmount = target.HealthPerc;
 	}
 
 	private void PhaseCompleted()
 	{
-		activeBar.Front.fillAmount = 0f;
-		activeBar.Width = inactiveBarWidth;
+		if (!transitioning)
+			StartCoroutine (TransitionPhases ());
+	}
 
+	private IEnumerator TransitionPhases()
+	{
+		transitioning = true;
+
+		ResourceBar prevBar = activeBar;
 		activeBarIndex++;
 		activeBar = transform.GetChild (activeBarIndex).GetComponent<ResourceBar> ();
+		prevBar.Front.fillAmount = 0f;
 
-		activeBar.Width = activeBarWidth;
 		Entity.HealEntity (target, float.PositiveInfinity);
+
+		for (float dur = phaseTransitionDuration, initDur = dur; dur > 0f; dur -= Time.deltaTime)
+		{
+			prevBar.Width = Mathf.Lerp (inactiveBarWidth, activeBarWidth, dur / initDur);
+			activeBar.Width = Mathf.Lerp (activeBarWidth, inactiveBarWidth, dur / initDur);
+			yield return null;
+		}
+
+		prevBar.Width = inactiveBarWidth;
+		activeBar.Width = activeBarWidth;
+
+		transitioning = false;
 	}
 }
