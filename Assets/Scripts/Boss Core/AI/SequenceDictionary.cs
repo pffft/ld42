@@ -5,16 +5,13 @@ using UnityEngine;
 using static BossController;
 using static AI.SequenceGenerators;
 using static Projectiles.Projectile;
+using static World.Arena;
 using Projectiles;
 using AOEs;
 using BossCore;
 
 // TODO: move all boss controller sequences in here
 // make a JSON parser to make this job easier?
-//
-// TODO: Make the generators in BossController return an AIEvent, which then
-// can be extended using calls in the following format:
-// bc.Teleport().Wait(0.5f).Times(20);
 namespace AI
 {
     public partial class AISequence
@@ -38,42 +35,11 @@ namespace AI
         /*
          * Shoots two 60 degree waves with a 45 degree gap in the middle.
          */
-        public static AISequence SHOOT_WAVE_MIDDLE_GAP = AISequence.Merge(
+        public static AISequence SHOOT_WAVE_MIDDLE_GAP = 
+            new AISequence(
+            //Merge(
             ShootArc(150,  22.5f,  22.5f + 60f),
             ShootArc(150, -22.5f, -22.5f - 60f)
-        );
-
-        /*
-         * Fires a homing projectile, then strafes 5 degrees.
-         */
-        public static AISequence HOMING_STRAFE_5 = new AISequence(
-            Strafe(true, 5f, 100),
-            //Shoot1(type: Type.HOMING, size: Size.MEDIUM)
-            Shoot1(New(self).Size(Size.MEDIUM).Homing())
-        );
-
-        /*
-         * Fires a homing projectile, then strafes 10 degrees.
-         */
-        public static AISequence HOMING_STRAFE_10 = new AISequence(
-            Strafe(true, 10f, 50),
-            Shoot1(New(self).Size(Size.MEDIUM).Homing())
-        );
-
-        /*
-         * Fires a homing projectile, then strafes 15 degrees.
-         */
-        public static AISequence HOMING_STRAFE_15 = new AISequence(
-            Strafe(true, 15f, 30),
-            Shoot1(New(self).Size(Size.MEDIUM).Homing())
-        );
-
-        /*
-         * Fires a homing projectile, then strafes 65 degrees.
-         */
-        public static AISequence HOMING_STRAFE_65 = new AISequence(
-            Strafe(true, 65f, 50),
-            Shoot1(New(self).Size(Size.MEDIUM).Homing())
         );
 
         /*
@@ -91,25 +57,6 @@ namespace AI
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM_SLOW).FixedWidth(5f)),
             Strafe(true, 60f, 50).Wait(0.5f)
         );
-
-        /* 
-         * Shoots a slow 360 wave, strafes 30, fires a line at center, and strafes 30 again.
-         * Total strafe: 60 degrees.
-         */
-        /*
-        public static AISequence LINE_CIRCLE_STRAFE_60 = new AISequence(
-            ShootWave(75, 360f, 0f, speed: Speed.SLOW, size: Size.LARGE)
-            .Wait(0.1f)
-            .Then(
-                Strafe(true, 30f, 50))
-            .Wait(0.3f)
-            .Then(
-                ShootLine(50, 100f, Speed.VERY_FAST, Vector3.zero))
-            .Wait(0.2f)
-            .Then(
-                Strafe(true, 30f, 50))
-        );
-        */
 
         public static AISequence LINE_CIRCLE_STRAFE_60 = new AISequence(
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM_SLOW).FixedWidth(5f))
@@ -154,9 +101,9 @@ namespace AI
         public static AISequence BIG_HOMING_STRAFE = new AISequence(
             CameraMove(false, new Vector3(0, 17.5f, -35f)).Wait(1f),
             Teleport(NORTH_FAR).Wait(1f),
-            HOMING_STRAFE_65.Times(10),
+            ShootHomingStrafe(strafeAmount: 65).Times(10),
             Teleport(NORTH_FAR).Wait(1f),
-            HOMING_STRAFE_15.Times(15),
+            ShootHomingStrafe(strafeAmount: 15).Times(15),
             CameraMove(true).Wait(2f)
         );
 
@@ -173,7 +120,7 @@ namespace AI
 
         public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(6.5f,
             Teleport().Wait(0.2f),
-            HOMING_STRAFE_15.Times(15),//.Wait(0.3f) // This is hard; adding wait is reasonable
+            ShootHomingStrafe(strafeAmount: 15).Times(15),//.Wait(0.3f) // This is hard; adding wait is reasonable
             SHOOT_2_WAVES.Times(2)
         );
 
@@ -635,7 +582,7 @@ namespace AI
             4f,
             () =>  {
                 List<AISequence> sequences = new List<AISequence>();
-                AOE.AOEStructure a = AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360f);
+                AOEData a = AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360f);
                 AOE created = null;
                 sequences.Add(new AISequence(() => { created = a.Create(); }));
                 sequences.Add(Pause(2f));
@@ -645,47 +592,73 @@ namespace AI
             }
         );
 
+        public static AISequence TELEGRAPH_CARDINAL = new AISequence(
+            4f,
+            Merge(
+                ShootArc(100, -7, 7, New(self).Target(SOUTH_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -7, 7, New(self).Target(WEST_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -7, 7, New(self).Target(NORTH_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -7, 7, New(self).Target(EAST_FAR)).Wait(0.2f).Times(3)
+            ),
+            Merge(
+                ShootArc(100, -15, 15, New(self).Target(SOUTH_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -15, 15, New(self).Target(WEST_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -15, 15, New(self).Target(NORTH_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -15, 15, New(self).Target(EAST_FAR)).Wait(0.2f).Times(3)
+            ),
+            Merge(
+                ShootArc(100, -25, 25, New(self).Target(SOUTH_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -25, 25, New(self).Target(WEST_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -25, 25, New(self).Target(NORTH_FAR)).Wait(0.2f).Times(3),
+                ShootArc(100, -25, 25, New(self).Target(EAST_FAR)).Wait(0.2f).Times(3)
+            )
+        );
+
         // This should be the same as above.
         public static AISequence AOE_TEST_2 = new AISequence(
-            4f,
+            6f,
+            TELEGRAPH_CARDINAL,
+
             ShootAOE(AOE.New(self)
                      .Speed(Speed.MEDIUM)
                      .InnerSpeed(Speed.SLOW)
                      .Target(Vector3.forward)
-                     .MaxTime(15f)
+                     .MaxTime(2f)
                      .On(-22.5f, 22.5f)
                      .On(90 - 22.5f, 90 + 22.5f)
                      .On(180 - 22.5f, 180 + 22.5f)
-                     .On(270 - 22.5f, 270 + 22.5f))
-            .Wait(2f)
-            .SetSpeed(Speed.FROZEN)
-            .InnerSpeed(Speed.FROZEN)
-            .RotationSpeed(20f)
-            .Wait(1.4f),
+                     .On(270 - 22.5f, 270 + 22.5f)
+                     .OnDestroyTimeout((self) => self.data.Clone().Freeze().RotationSpeed(20f).MaxTime(12.6f).Create())
+                     .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
+                    )
+            .Wait(3.2f),
+
 
             ShootAOE(AOE.New(self)
                      .Speed(Speed.FAST)
                      .InnerSpeed(Speed.SNAIL)
                      .Target(Vector3.forward)
-                     .MaxTime(11.6f)
+                     .MaxTime(1f)
                      .On(-22.5f, 22.5f)
                      .On(90 - 22.5f, 90 + 22.5f)
                      .On(180 - 22.5f, 180 + 22.5f)
-                     .On(270 - 22.5f, 270 + 22.5f))
-            .Wait(1f)
-            .SetSpeed(Speed.FROZEN)
-            .InnerSpeed(Speed.FROZEN)
-            .RotationSpeed(20f),
+                     .On(270 - 22.5f, 270 + 22.5f)
+                     .OnDestroyTimeout((self) => self.data.Clone().Freeze().RotationSpeed(20f).MaxTime(10.4f).Create())
+                    )
+            .Wait(1.2f),
+
             ShootAOE(AOE.New(self)
                      .Speed(Speed.FAST)
                      .InnerScale(0f)
-                     .MaxTime(10.6f)
+                     .MaxTime(0.6f)
                      .InnerSpeed(Speed.FROZEN)
                      .Target(Vector3.forward)
-                     .On(0, 360f))
-            .Wait(0.6f)
-            .SetSpeed(Speed.FROZEN),
-            ShootArc(100, 0, 360).Wait(1.5f).Times(6)
+                     .On(0, 360f)
+                     .OnDestroyTimeout((self) => self.data.Clone().Freeze().MaxTime(9.6f).Create())
+                    )
+            .Wait(0.6f),
+
+            ShootArc(100, 0, 360).Wait(1.5f).Times(6).Wait(5f)
         );
 
         /*

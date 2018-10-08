@@ -20,7 +20,7 @@ namespace Projectiles
                 .CastTo<ProjectileDeathHex>();
         }
 
-        public static Projectile.ProjectileStructure DeathHex(this Projectile.ProjectileStructure structure) {
+        public static ProjectileData DeathHex(this ProjectileData structure) {
             structure.type = Type.DEATHHEX;
             structure.OnDestroyTimeout(CallbackDictionary.SPAWN_6_CURVING);
             return structure;

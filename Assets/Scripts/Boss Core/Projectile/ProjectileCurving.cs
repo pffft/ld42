@@ -53,7 +53,7 @@ namespace Projectiles
             return curving;
         }
 
-        public static Projectile.ProjectileStructure Curving(this Projectile.ProjectileStructure structure, float curveAmount, bool leavesTrail) 
+        public static ProjectileData Curving(this ProjectileData structure, float curveAmount, bool leavesTrail) 
         {
             structure.type = Type.CURVING;
             structure._typeParameters = new object[] { curveAmount, leavesTrail };

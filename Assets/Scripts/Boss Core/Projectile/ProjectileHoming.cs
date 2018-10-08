@@ -70,7 +70,7 @@ namespace Projectiles
             return homing;
         }
 
-        public static Projectile.ProjectileStructure Homing(this Projectile.ProjectileStructure structure) {
+        public static ProjectileData Homing(this ProjectileData structure) {
             structure.type = Type.HOMING;
             return structure;
         }

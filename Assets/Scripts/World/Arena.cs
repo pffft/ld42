@@ -6,6 +6,30 @@ namespace World
 {
 	public class Arena : MonoBehaviour
 	{
+        #region Arena Location constants
+        public static readonly float BOSS_HEIGHT = 1.31f;
+        private static readonly float FAR = 45f;
+        private static readonly float MED = 30f;
+        private static readonly float CLOSE = 15f;
+
+        public static readonly Vector3 CENTER = new Vector3(0, BOSS_HEIGHT, 0);
+
+        public static readonly Vector3 NORTH_FAR = new Vector3(0f, BOSS_HEIGHT, FAR);
+        public static readonly Vector3 SOUTH_FAR = new Vector3(0f, BOSS_HEIGHT, -FAR);
+        public static readonly Vector3 EAST_FAR = new Vector3(45f, BOSS_HEIGHT, 0);
+        public static readonly Vector3 WEST_FAR = new Vector3(-45f, BOSS_HEIGHT, 0);
+
+        public static readonly Vector3 NORTH_MED = new Vector3(0f, BOSS_HEIGHT, MED);
+        public static readonly Vector3 SOUTH_MED = new Vector3(0f, BOSS_HEIGHT, -MED);
+        public static readonly Vector3 EAST_MED = new Vector3(30f, BOSS_HEIGHT, 0);
+        public static readonly Vector3 WEST_MED = new Vector3(-30f, BOSS_HEIGHT, 0);
+
+        public static readonly Vector3 NORTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, CLOSE);
+        public static readonly Vector3 SOUTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, -CLOSE);
+        public static readonly Vector3 EAST_CLOSE = new Vector3(15f, BOSS_HEIGHT, 0);
+        public static readonly Vector3 WEST_CLOSE = new Vector3(-15f, BOSS_HEIGHT, 0);
+        #endregion
+
 		[SerializeField]
 		private float adjustSpeed = 3f;
 

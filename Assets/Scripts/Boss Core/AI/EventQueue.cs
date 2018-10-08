@@ -51,14 +51,15 @@ namespace AI
          */
         public void Add(AISequence sequence)
         {
-            Debug.Log("Adding aisequence");
-            // Recursively add children first.
+            AIEvent[] coercedEvents = sequence.Flatten();
+            for (int i = 0; i < coercedEvents.Length; i++) {
+                Add(coercedEvents[i]);
+            }
+
+            /*
             AISequence[] children = sequence.GetChildren();
-            Debug.Log(children);
-            Debug.Log(children == null ? -1 : children.Length);
             if (children != null)
             {
-                Debug.Log("Children array is not null");
                 for (int i = 0; i < children.Length; i++)
                 {
                     Add(children[i]);
@@ -73,7 +74,7 @@ namespace AI
 
             foreach (AIEvent e in sequence.events)
             {
-                Debug.Log("Adding event");
+                //Debug.Log("Adding event");
                 if (e == null)
                 {
                     Debug.LogError("Found null event!");
@@ -81,6 +82,7 @@ namespace AI
                 }
                 Add(e);
             }
+            */
         }
 
         /*

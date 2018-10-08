@@ -12,46 +12,17 @@ namespace AI
 {
     public static class SequenceGenerators
     {
-
-        #region Arena Location constants
-        public static float BOSS_HEIGHT = 1.31f;
-        private static float FAR = 45f;
-        private static float MED = 30f;
-        private static float CLOSE = 15f;
-
-        public static Vector3 CENTER = new Vector3(0, BOSS_HEIGHT, 0);
-
-        public static Vector3 NORTH_FAR = new Vector3(0f, BOSS_HEIGHT, FAR);
-        public static Vector3 SOUTH_FAR = new Vector3(0f, BOSS_HEIGHT, -FAR);
-        public static Vector3 EAST_FAR = new Vector3(45f, BOSS_HEIGHT, 0);
-        public static Vector3 WEST_FAR = new Vector3(-45f, BOSS_HEIGHT, 0);
-
-        public static Vector3 NORTH_MED = new Vector3(0f, BOSS_HEIGHT, MED);
-        public static Vector3 SOUTH_MED = new Vector3(0f, BOSS_HEIGHT, -MED);
-        public static Vector3 EAST_MED = new Vector3(30f, BOSS_HEIGHT, 0);
-        public static Vector3 WEST_MED = new Vector3(-30f, BOSS_HEIGHT, 0);
-
-        public static Vector3 NORTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, CLOSE);
-        public static Vector3 SOUTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, -CLOSE);
-        public static Vector3 EAST_CLOSE = new Vector3(15f, BOSS_HEIGHT, 0);
-        public static Vector3 WEST_CLOSE = new Vector3(-15f, BOSS_HEIGHT, 0);
-        #endregion
-
-        public static AISequence Shoot1(Projectile.ProjectileStructure? skeleton=null)
+        public static AISequence Shoot1(ProjectileData skeleton=null)
         {
-            int index = AISequence.AddPayload();
-            AISequence seq = null;
-            seq = new AISequence(() =>
+            return new AISequence(() =>
             {
                 Glare();
-                Projectile.ProjectileStructure struc = skeleton ?? Projectile.New(self);
-                AISequence.SetPayload(index, new object[] { struc.Create() });
+                ProjectileData struc = skeleton ?? Projectile.New(self);
+                struc.Create();
             });
-            seq.payloadID = index;
-            return seq;
         }
 
-        public static AISequence Shoot3(Projectile.ProjectileStructure? skeleton=null)
+        public static AISequence Shoot3(ProjectileData skeleton=null)
         {
             return new AISequence(() =>
             {
@@ -59,14 +30,14 @@ namespace AI
 
                 for (int i = 0; i < 3; i++)
                 {
-                    Projectile.ProjectileStructure newStruc = skeleton ?? Projectile.New(self);
+                    ProjectileData newStruc = skeleton ?? Projectile.New(self);
                     newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
                     newStruc.Create();
                 }
             });
         }
 
-        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile.ProjectileStructure? skeleton=null)
+        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, ProjectileData skeleton=null)
         {
             return new AISequence(() =>
             {
@@ -81,8 +52,9 @@ namespace AI
                 }
 
                 float step = 360f / density;
+                ProjectileData clone = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
                 for (float i = from; i <= to; i += step) {
-                    Projectile.ProjectileStructure newStruc = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
+                    ProjectileData newStruc = clone.Clone();
                     newStruc.AngleOffset(newStruc.angleOffset + i).Create();
                 }
             });
@@ -97,18 +69,19 @@ namespace AI
             );
         }
 
-        public static AISequence ShootHexCurve(bool clockwise = true, Projectile.ProjectileStructure? skeleton=null)
+        public static AISequence ShootHexCurve(bool clockwise = true, ProjectileData skeleton=null)
         {
             return new AISequence(() =>
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    Projectile.ProjectileStructure struc = skeleton ?? Projectile.New(self);
+                    ProjectileData struc = skeleton ?? Projectile.New(self);
 
                     float multiplier = clockwise ? 1f : -1f;
                     float curveSpeed = (float)struc.speed * multiplier * 2f;
 
-                    struc.AngleOffset(struc.angleOffset + (i * multiplier * 60))
+                    struc.Clone()
+                         .AngleOffset(struc.angleOffset + (i * multiplier * 60))
                          .MaxTime(3f)
                          .Create()
                          .Curving(curveSpeed, true);
@@ -153,13 +126,16 @@ namespace AI
             });
         }
 
-        public static AISequence ShootAOE(AOE.AOEStructure structure)
+        public static AISequence ShootHomingStrafe(bool clockwise=true, int strafeAmount=5, int speed=100) {
+            return new AISequence(
+                Strafe(clockwise, strafeAmount, speed),
+                Shoot1(Projectile.New(self).Size(Size.MEDIUM).Homing())
+            );
+        }
+
+        public static AISequence ShootAOE(AOEData structure)
         {
-            int index = AISequence.AddPayload();
-            AISequence seq = null;
-            seq = new AISequence(() => { Glare(); AISequence.SetPayload(index, new object[] { structure.Create() }); });
-            seq.payloadID = index;
-            return seq;
+            return new AISequence(() => { Glare(); structure.Create(); });
         }
 
         public static AISequence Teleport(Vector3? target = null, int speed = 25)

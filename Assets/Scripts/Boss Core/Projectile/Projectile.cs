@@ -7,189 +7,14 @@ using UnityEngine.Profiling;
 
 namespace Projectiles
 {
-    /*
-     * Used for handling death events for Projectiles.
-     * In the future, other callbacks might be added.
-     */
-    public delegate void ProjectileCallbackDelegate(Projectile self);
-
+    [RequireComponent(typeof(Rigidbody))]
     public class Projectile : MonoBehaviour
     {
-        public struct ProjectileStructure {
-            public Entity entity;
-
-            // Used internally for the builder notation
-            public Vector3? preStart;
-            public Vector3 start;
-            public Vector3? preTarget;
-            public Vector3 target;
-            public float angleOffset;
-
-            public BossCore.Speed speed;
-            public Size size;
-            public Type type;
-            public object[] _typeParameters;
-
-            public float currentTime;
-            public float maxTime;
-
-            public float damage;
-
-            #region callbacks
-            /*
-             * Called after object is destroyed due to time limit.
-             */
-            public ProjectileCallbackDelegate OnDestroyTimeoutImpl;
-
-            public ProjectileStructure OnDestroyTimeout(ProjectileCallbackDelegate deleg)
-            {
-                this.OnDestroyTimeoutImpl = deleg;
-                return this;
-            }
-
-            /*
-             * Called after object is destroyed due to hitting the arena.
-             */
-            public ProjectileCallbackDelegate OnDestroyOutOfBoundsImpl;
-
-            public ProjectileStructure OnDestroyOutOfBounds(ProjectileCallbackDelegate deleg)
-            {
-                this.OnDestroyOutOfBoundsImpl = deleg;
-                return this;
-            }
-
-            /*
-             * Called when the object hits the player
-             */
-            public ProjectileCallbackDelegate OnDestroyCollisionImpl;
-
-            public ProjectileStructure OnDestroyCollision(ProjectileCallbackDelegate deleg)
-            {
-                this.OnDestroyCollisionImpl = deleg;
-                return this;
-            }
-            #endregion
-
-            public ProjectileStructure(Entity entity) {
-                this.entity = entity;
-
-                this.preStart = null;
-                this.start = Vector3.zero;
-                this.preTarget = null;
-                this.target = Vector3.zero;
-                this.angleOffset = 0f;
-
-                this.speed = BossCore.Speed.MEDIUM;
-                this.size = Projectiles.Size.SMALL;
-                this.type = Type.BASIC;
-                this._typeParameters = null;
-
-                this.currentTime = 0f;
-                this.maxTime = 10f;
-
-                this.damage = ((float)size + 0.5f) * 2f;
-
-                OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
-                OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
-                OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
-            }
-
-            // Builder method
-            public ProjectileStructure Start(Vector3? start)
-            {
-                this.preStart = start;
-                return this;
-            }
-
-            // Builder method
-            public ProjectileStructure Target(Vector3? target)
-            {
-                this.preTarget = target;
-                return this;
-            }
-
-            // Builder method
-            public ProjectileStructure AngleOffset(float offsetDegrees)
-            {
-                this.angleOffset = offsetDegrees;
-                return this;
-            }
-
-            // Builder method
-            public ProjectileStructure MaxTime(float seconds)
-            {
-                this.maxTime = seconds;
-                return this;
-            }
-
-            // Builder method
-            public ProjectileStructure Damage(float damage)
-            {
-                this.damage = damage;
-                return this;
-            }
-
-            // Builder method
-            public ProjectileStructure Speed(BossCore.Speed speed)
-            {
-                this.speed = speed;
-                return this;
-            }
-
-            // Builder method
-            public ProjectileStructure Size(Size size)
-            {
-                this.size = size;
-                this.damage = ((float)size + 0.5f) * 2f;
-                return this;
-            }
-
-            // Generates a new GameObject based on this structure.
-            public Projectile Create()
-            {
-                // Create new GameObject
-                GameObject newObj = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Projectile"));
-                newObj.SetActive(false); // hack- set inactive so we can assign data for use on awake
-
-                // Create a new Projectile component
-                Projectile projectile = newObj.AddComponent<Projectile>();
-                projectile.data = this;
-
-                // Assign and init the RigidBody (or create one if it doesn't exist)
-                Rigidbody body = newObj.GetComponent<Rigidbody>();
-                if (body == null)
-                {
-                    body = newObj.AddComponent<Rigidbody>();
-                }
-                body.useGravity = false;
-
-                // Assign the type with any parameters that were forced in.
-                switch(type) {
-                    case Type.BASIC: break;
-                    case Type.CURVING: projectile.Curving((float)_typeParameters[0], (bool)_typeParameters[1]); break;
-                    case Type.DEATHHEX: projectile.DeathHex(); break;
-                    case Type.HOMING: projectile.Homing(); break;
-                    case Type.INDESTRUCTIBLE: break;
-                }
-
-                newObj.SetActive(true);
-                return projectile;
-            }
-
-        }
-
-        public ProjectileStructure data;
+        public ProjectileData data;
 
         public static Material blueMaterial;
         public static Material orangeMaterial;
         public static Material orangeRedMaterial;
-
-        static Projectile()
-        {
-            blueMaterial = Resources.Load<Material>("Art/Materials/BlueTransparent");
-            orangeMaterial = Resources.Load<Material>("Art/Materials/OrangeTransparent");
-            orangeRedMaterial = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
-        }
 
         /*
          * Creates a default Projectile component for the builder notation.
@@ -197,12 +22,19 @@ namespace Projectiles
          * of 10. It will start at the entity's position and aim at the player
          * (if the entity is the boss), or else aim forward (for the player).
          */
-        public static ProjectileStructure New(Entity entity) {
-            return new ProjectileStructure(entity);
+        public static ProjectileData New(Entity entity) {
+            return new ProjectileData(entity);
         }
 
         public void Awake()
         {
+            if (blueMaterial == null)
+            {
+                blueMaterial = Resources.Load<Material>("Art/Materials/BlueTransparent");
+                orangeMaterial = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                orangeRedMaterial = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
+            }
+
             // Sets start
             data.start = data.preStart ?? data.entity.transform.position;
 
@@ -249,11 +81,7 @@ namespace Projectiles
             }
 
             UpdateOrientationAndVelocity();
-
-            CustomAwake();
         }
-
-        public virtual void CustomAwake() { }
 
 
         /* Updates this Projectile's orientation and velocity. Called when the start,
@@ -355,7 +183,7 @@ namespace Projectiles
 
             // Copy the data over
             //other.data = new ProjectileStructure();
-            other.data = this.data;
+            other.data = data.Clone();
             gameObject.SetActive(true);
 
             // Assign a different, custom material (if applicable)
