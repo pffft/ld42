@@ -10,53 +10,23 @@ using Projectiles;
 using AOEs;
 using BossCore;
 
+using static Moves.Basic;
+
 // TODO: move all boss controller sequences in here
 // make a JSON parser to make this job easier?
 namespace AI
 {
     public partial class AISequence
     {
+        public static AISequence DASH_TEST = new AISequence(
+            8f,
+            new AISequence(() => {
+            return ShootAOE(AOE.New(self).Start(player.transform.position).On(0, 360f).Speed(Speed.FAST).FixedWidth(2f)).Wait(0.75f);
+            })
+
+        );
+
         #region Building Block Sequences
-
-        public static AISequence SHOOT_360 = new AISequence(
-            ShootAOE(AOE.New(self).On(0, 360).FixedWidth(3f))
-        );
-
-        /*
-         * Shoots 2 90 waves as one block, encouraging dodging through them.
-         */
-        public static AISequence SHOOT_2_WAVES = new AISequence(
-            Teleport().Wait(0.5f),
-            ShootArc(100, -45f, 45f, New(self).AngleOffset(-2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
-            ShootArc(100, -45f, 45f, New(self).AngleOffset(2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST))
-            .Wait(1f)
-        );
-
-        /*
-         * Shoots two 60 degree waves with a 45 degree gap in the middle.
-         */
-        public static AISequence SHOOT_WAVE_MIDDLE_GAP = 
-            new AISequence(
-            //Merge(
-            ShootArc(150,  22.5f,  22.5f + 60f),
-            ShootArc(150, -22.5f, -22.5f - 60f)
-        );
-
-        /*
-         * Fires a line at the player, then strafes 60 degrees.
-         */
-        public static AISequence LINE_STRAFE_60 = new AISequence(
-            ShootLine(50, 75f, speed: Speed.SNIPE).Wait(0.2f),
-            Strafe(true, 60f, 50)
-        );
-
-        /*
-         * Shoots a medium-slow 360, then strafes 60 degrees.
-         */
-        public static AISequence SLOW_WAVE_CIRCLE = new AISequence(
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM_SLOW).FixedWidth(5f)),
-            Strafe(true, 60f, 50).Wait(0.5f)
-        );
 
         public static AISequence LINE_CIRCLE_STRAFE_60 = new AISequence(
             ShootAOE(AOE.New(self).Speed(Speed.MEDIUM_SLOW).FixedWidth(5f))
@@ -549,41 +519,13 @@ namespace AI
             Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(140f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(5f)
         );
 
-        public static AISequence AOE_131_MEDIUM = new AISequence(
-            Teleport().Wait(0.5f),
-            PlayerLock(true),
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(10)).Wait(0.38f),
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
-            PlayerLock(false).Wait(1f)
-        );
-
-        public static AISequence AOE_131_FAST = new AISequence(
-            Teleport().Wait(0.5f),
-            PlayerLock(true),
-            ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, 60).FixedWidth(5)).Wait(0.135f),
-            ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(10)).Wait(0.27f),
-            ShootAOE(AOE.New(self).Speed(Speed.FAST).On(-60, 60).FixedWidth(5)).Wait(0.135f),
-            PlayerLock(false).Wait(1f)
-        );
-
-
-        public static AISequence AOE_131_MEDIUM_LONG = new AISequence(
-            Teleport().Wait(0.5f),
-            PlayerLock(true),
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(20)).Wait(0.76f),
-            ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
-            PlayerLock(false).Wait(1f)
-        );
-
         // Testing if we can modify AOE attacks at runtime (the answer is a mind-numbing yes!)
         public static AISequence AOE_TEST = new AISequence(
             4f,
             () =>  {
                 List<AISequence> sequences = new List<AISequence>();
-                AOEData a = AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360f);
-                AOE created = null;
+                AOE a = AOE.New(self).Speed(Speed.MEDIUM).InnerSpeed(Speed.SNAIL).On(0, 360f);
+                AOE.AOEComponent created = null;
                 sequences.Add(new AISequence(() => { created = a.Create(); }));
                 sequences.Add(Pause(2f));
                 sequences.Add(new AISequence(() => { created.data = created.data.InnerSpeed(Speed.FROZEN).Speed(Speed.FROZEN); }));
@@ -592,6 +534,7 @@ namespace AI
             }
         );
 
+        // Lets the player know the cardinal directions will be dangerous soon.
         public static AISequence TELEGRAPH_CARDINAL = new AISequence(
             4f,
             Merge(
@@ -614,7 +557,10 @@ namespace AI
             )
         );
 
-        // This should be the same as above.
+        /*
+         * Shoots 4 waves at cardinal directions; when they hit the edge, they spin around
+         * slowly enough to outrun without dashing. Projectile waves come in that require shield.
+         */
         public static AISequence AOE_TEST_2 = new AISequence(
             6f,
             TELEGRAPH_CARDINAL,
@@ -628,7 +574,7 @@ namespace AI
                      .On(90 - 22.5f, 90 + 22.5f)
                      .On(180 - 22.5f, 180 + 22.5f)
                      .On(270 - 22.5f, 270 + 22.5f)
-                     .OnDestroyTimeout((self) => self.data.Clone().Freeze().RotationSpeed(20f).MaxTime(12.6f).Create())
+                     .OnDestroyTimeout((self) => self.Clone().Freeze().RotationSpeed(20f).MaxTime(12.6f).Create())
                      .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
                     )
             .Wait(3.2f),
@@ -643,7 +589,7 @@ namespace AI
                      .On(90 - 22.5f, 90 + 22.5f)
                      .On(180 - 22.5f, 180 + 22.5f)
                      .On(270 - 22.5f, 270 + 22.5f)
-                     .OnDestroyTimeout((self) => self.data.Clone().Freeze().RotationSpeed(20f).MaxTime(10.4f).Create())
+                     .OnDestroyTimeout((self) => self.Clone().Freeze().RotationSpeed(20f).MaxTime(10.4f).Create())
                     )
             .Wait(1.2f),
 
@@ -654,7 +600,7 @@ namespace AI
                      .InnerSpeed(Speed.FROZEN)
                      .Target(Vector3.forward)
                      .On(0, 360f)
-                     .OnDestroyTimeout((self) => self.data.Clone().Freeze().MaxTime(9.6f).Create())
+                     .OnDestroyTimeout((self) => self.Clone().Freeze().MaxTime(9.6f).Create())
                     )
             .Wait(0.6f),
 
@@ -686,7 +632,7 @@ namespace AI
             8,
             Teleport(NORTH_FAR),
             ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.SLOW).InnerSpeed(Speed.FROZEN).InnerScale(0f).Target(SOUTH_FAR).MaxTime(2f)
-                     .OnDestroyTimeout(self => self.data.Clone().Freeze().MaxTime(10f).Create()))
+                     .OnDestroyTimeout(self => self.Clone().Freeze().MaxTime(10f).Create()))
             .Wait(1f),
             new AISequence(
                 SNIPER_FINAL_PHASE_TOP.Times(2),

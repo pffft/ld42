@@ -133,7 +133,7 @@ namespace AI
             );
         }
 
-        public static AISequence ShootAOE(AOEData structure)
+        public static AISequence ShootAOE(AOE structure)
         {
             return new AISequence(() => { Glare(); structure.Create(); });
         }
