@@ -682,22 +682,22 @@ namespace AI
             ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(1f)
         );
 
-        /*
         public static AISequence SNIPER_FINAL_PHASE = new AISequence(
             8,
             Teleport(NORTH_FAR),
-            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.SLOW).InnerSpeed(Speed.FROZEN).InnerScale(0f).Target(SOUTH_FAR).Material(new Material(Resources.Load<Material>("Art/Materials/PurpleTransparent"))))
-                 .Wait(2f).SetSpeed(Speed.FROZEN).InnerSpeed(Speed.FROZEN).Wait(1f),
+            ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.SLOW).InnerSpeed(Speed.FROZEN).InnerScale(0f).Target(SOUTH_FAR).MaxTime(2f)
+                     .OnDestroyTimeout(self => self.data.Clone().Freeze().MaxTime(10f).Create()))
+            .Wait(1f),
             new AISequence(
                 SNIPER_FINAL_PHASE_TOP.Times(2),
                 SNIPER_FINAL_PHASE_ALL.Times(2),
+                Shoot1(New(self).Speed(Speed.SNAIL).Size(Size.HUGE).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)).Wait(2.5f),
                 Shoot1(New(self).Speed(Speed.SNAIL).Size(Size.HUGE).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)).Wait(2.5f)
             ).Times(3)
         );
-        */
 
         public static AISequence MERGE_TEST = new AISequence(
-            4,
+            8.5f,
             new AISequence(() =>{
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = 0; i < 25; i++)
