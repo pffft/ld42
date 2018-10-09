@@ -42,6 +42,8 @@ namespace GameUI
 			if (instance == null)
 			{
 				instance = this;
+				menuStack = new Stack<Menu> ();
+				currentMenu.OpenImmediate ();
 			}
 			else
 			{
