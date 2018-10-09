@@ -56,9 +56,6 @@ namespace AOEs
         // be set to the live boss/player positions.
         public void Awake()
         {
-            if (AOE_MATERIAL == null) {
-                AOE_MATERIAL = new Material(Resources.Load<Material>("Art/Materials/AOE"));
-            }
 
             data.start = data.preStart ?? data.entity.transform.position;
 

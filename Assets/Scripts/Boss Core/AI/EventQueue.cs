@@ -55,34 +55,6 @@ namespace AI
             for (int i = 0; i < coercedEvents.Length; i++) {
                 Add(coercedEvents[i]);
             }
-
-            /*
-            AISequence[] children = sequence.GetChildren();
-            if (children != null)
-            {
-                for (int i = 0; i < children.Length; i++)
-                {
-                    Add(children[i]);
-                }
-            }
-
-            if (sequence.events == null)
-            {
-                Debug.LogError("Sequence had null events!");
-                return;
-            }
-
-            foreach (AIEvent e in sequence.events)
-            {
-                //Debug.Log("Adding event");
-                if (e == null)
-                {
-                    Debug.LogError("Found null event!");
-                    continue;
-                }
-                Add(e);
-            }
-            */
         }
 
         /*
@@ -121,26 +93,45 @@ namespace AI
 
             // if the player is too aggressive, you can ignore the q here
 
+            // TODO keep popping events while they're concurrent
             if (events.Count == 0) return;
-            AIEvent iEvent = events.Peek();
-            //Debug.Log("Top event is " + (iEvent.ability == null ? "null" : iEvent.ability.name));
 
-            if (internalTime >= iEvent.startTime)
+            int eventsExecuted = 0;
+            while (events.Count > 0 && eventsExecuted < 50)
             {
-                // If the event is new, we fire it
-                if (lastEvent != iEvent)
-                {
-                    if (iEvent.action != null)
-                    {
-                        iEvent.action();
-                    }
-                    lastEvent = iEvent;
-                }
+                AIEvent iEvent = events.Peek();
+                //Debug.Log("Top event is " + (iEvent.ability == null ? "null" : iEvent.ability.name));
 
-                // If the event is stale, remove it from the q
-                if (internalTime >= iEvent.startTime + iEvent.duration)
+                if (internalTime >= iEvent.startTime)
                 {
-                    events.Dequeue();
+                    // If the event is new, we fire it
+                    if (lastEvent != iEvent)
+                    {
+                        if (iEvent.action != null)
+                        {
+                            iEvent.action();
+                        }
+                        lastEvent = iEvent;
+                    }
+
+                    // If the event is stale, remove it from the q
+                    if (internalTime >= iEvent.startTime + iEvent.duration)
+                    {
+                        events.Dequeue();
+                        eventsExecuted++;
+                        if (events.Count == 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
                 }
             }
         }

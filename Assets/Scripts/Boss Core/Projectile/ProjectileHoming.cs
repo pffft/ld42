@@ -47,10 +47,12 @@ namespace Projectiles
                 feathering = (25f - distance) / 15f;
             }
 
-            if (Mathf.Abs(idealRotation) >= 10f && Mathf.Abs(idealRotation) < 120f)
+            float distanceScale = distance < 15f ? 1 + ((15 - distance) / 5f) : 1f;
+            if (Mathf.Abs(idealRotation) >= 10f && Mathf.Abs(idealRotation) < maxDivergence)
             {
-                Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering, Vector3.up);
+                Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering * distanceScale, Vector3.up);
                 body.velocity = rot * body.velocity;
+                body.velocity = (distanceScale * (float)data.speed) * body.velocity.normalized;
                 curDivergence += homingScale;
             }
         }

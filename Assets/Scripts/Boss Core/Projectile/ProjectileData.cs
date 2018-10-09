@@ -143,7 +143,7 @@ namespace Projectiles
         }
 
         // Clone method
-        public ProjectileData CloneWithCallbacks() {
+        public ProjectileData Clone() {
             ProjectileData clone = new ProjectileData(this.entity);
 
             clone.preStart = preStart;
@@ -169,8 +169,8 @@ namespace Projectiles
         }
 
         // Clone method - sets the callbacks to do nothing. This prevents recursive behavior.
-        public ProjectileData Clone() {
-            ProjectileData clone = CloneWithCallbacks();
+        public ProjectileData CloneWithoutCallbacks() {
+            ProjectileData clone = Clone();
             clone.OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
             clone.OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
             clone.OnDestroyCollisionImpl = CallbackDictionary.NOTHING;

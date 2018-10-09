@@ -288,6 +288,10 @@ namespace AOEs
             meshFilter.mesh = new Mesh();
 
             MeshRenderer meshRenderer = obj.AddComponent<MeshRenderer>();
+            if (AOE.AOE_MATERIAL == null)
+            {
+                AOE.AOE_MATERIAL = new Material(Resources.Load<Material>("Art/Materials/AOE"));
+            }
             meshRenderer.material = AOE.AOE_MATERIAL;
 
             CapsuleCollider collider = obj.AddComponent<CapsuleCollider>();

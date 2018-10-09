@@ -5671,21 +5671,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 114941571434193320, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
-        type: 2}
-      propertyPath: shields
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 114941571434193320, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
-        type: 2}
-      propertyPath: shieldsMax
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
-        type: 2}
-      propertyPath: shields
-      value: 100
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
   m_IsPrefabAsset: 0
@@ -7506,70 +7491,6 @@ Prefab:
     - target: {fileID: 4161752672674268, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
       propertyPath: m_RootOrder
       value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
-        type: 2}
-      propertyPath: movespeed.baseValue
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 1258213056334190, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1361199117965970, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1279753824129228, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1076956229501808, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1852215713901966, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065768404458646, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1705574593270298, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1246922315647794, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1617057268946778, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1889529610353062, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1361199117965970, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
-        type: 2}
-      propertyPath: shieldsMax
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
-        type: 2}
-      propertyPath: shieldRegen
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
-        type: 2}
-      propertyPath: shieldDelayMax
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}

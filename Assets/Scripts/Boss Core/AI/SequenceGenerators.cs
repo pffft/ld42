@@ -126,7 +126,7 @@ namespace AI
             });
         }
 
-        public static AISequence ShootHomingStrafe(bool clockwise=true, int strafeAmount=5, int speed=100) {
+        public static AISequence ShootHomingStrafe(bool clockwise=true, int strafeAmount=5, int speed=25) {
             return new AISequence(
                 Strafe(clockwise, strafeAmount, speed),
                 Shoot1(Projectile.New(self).Size(Size.MEDIUM).Homing())

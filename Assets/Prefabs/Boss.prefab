@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33433919324251094}
   - component: {fileID: 23177467591883856}
   - component: {fileID: 65356235592451556}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Mouth Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 33702080754291126}
   - component: {fileID: 23231801768885882}
   - component: {fileID: 65857777742246720}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Mouth Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 33642767213761266}
   - component: {fileID: 23185595615766466}
   - component: {fileID: 135271272060133956}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Eye Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 33093201322729022}
   - component: {fileID: 23541863196129494}
   - component: {fileID: 135132749597282358}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Eye Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4123672693011094}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: todo make me flaming
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 114648287774763342}
   - component: {fileID: 114615383473035938}
   - component: {fileID: 54236418095852368}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Boss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4826510773130234}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Face
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -142,7 +142,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4323752792478050}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: todo add customization for angriness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 33296749791620948}
   - component: {fileID: 23625214872155424}
   - component: {fileID: 65817416481544190}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Angery Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 33589215963775454}
   - component: {fileID: 23042437267188664}
   - component: {fileID: 65948821601129356}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Angery Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -696,37 +696,11 @@ MonoBehaviour:
   health: 0
   healthMax: 75
   shields: 0
-  shieldsMax: 25
-  shieldRegen: 1
-  shieldDelayMax: 2
-  physResist:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
-  elecResist:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
-  biolResist:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
-  cryoResist:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
-  pyroResist:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
-  voidResist:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
+  shieldsMax: 0
+  shieldRegen: 0
+  shieldDelayMax: 0
   movespeed:
-    baseValue: 0
-    lockValue: 0
-    locked: 0
+    baseValue: 100
 --- !u!114 &114648287774763342
 MonoBehaviour:
   m_ObjectHideFlags: 1
