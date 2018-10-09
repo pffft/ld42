@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameUI
@@ -47,36 +48,35 @@ namespace GameUI
 		}
 
 		/// <summary>
-		/// Opens the indicated menu and closes the currently open menu
+		/// Opens the indicated menu, then closes the currently open menu
 		/// </summary>
 		/// <param name="menu"></param>
 		/// <returns></returns>
-		public bool NavigateTo(Menu menu)
+		public void NavigateTo(Menu menu)
 		{
-			currentMenu?.Close ();
 			menuStack.Push (currentMenu);
-			currentMenu = menu;
-			currentMenu.Open ();
-
-			return currentMenu.IsOpen();
+			StartCoroutine (DoMenuTransition (currentMenu, menu));
 		}
 
 		/// <summary>
 		/// Traverses down the previous menu stack one entry, closing the current menu
 		/// </summary>
 		/// <returns></returns>
-		public bool NavigateBack()
+		public void NavigateBack()
 		{
-			if (menuStack.Count > 0)
+			if(menuStack.Count > 0)
+				StartCoroutine (DoMenuTransition (currentMenu, menuStack.Pop ()));
+		}
+
+		private IEnumerator DoMenuTransition(Menu prev, Menu next)
+		{
+			prev?.Close ();
+			while (prev.IsOpen ())
 			{
-				currentMenu?.Close ();
-				currentMenu = menuStack.Pop ();
-				currentMenu.Open();
-
-				return currentMenu.IsOpen ();
+				yield return null;
 			}
-
-			return false;
+			next.Open ();
+			currentMenu = next;
 		}
 		#endregion
 
