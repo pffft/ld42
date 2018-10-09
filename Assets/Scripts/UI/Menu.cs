@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace GameUI
 {
+	/// <summary>
+	/// Represents a single screen in the menu system
+	/// </summary>
 	[RequireComponent (typeof (CanvasGroup))]
 	public abstract class Menu : MonoBehaviour
 	{
@@ -12,6 +15,19 @@ namespace GameUI
 		#endregion
 
 		#region INSTANCE_VARS
+
+		private bool isOpen;
+		public bool IsOpen
+		{
+			get { return isOpen; }
+			protected set
+			{
+				bool changed = isOpen != value;
+				isOpen = value;
+				if(changed)
+					OnFocusChanged (isOpen);
+			}
+		}
 
 		public event FocusChanged changedFocus;
 		#endregion
@@ -39,8 +55,6 @@ namespace GameUI
 		public abstract void Open();
 
 		public abstract void Close();
-
-		public abstract bool IsOpen();
 
 		public void OnFocusChanged(bool inFocus)
 		{

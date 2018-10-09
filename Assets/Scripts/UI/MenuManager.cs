@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace GameUI
 {
-	public class MenuManager : MonoBehaviour
+	/// <summary>
+	/// Manages transitioning between active menus
+	/// </summary>
+	public sealed class MenuManager : MonoBehaviour
 	{
 		#region STATIC_VARS
 
@@ -44,11 +47,26 @@ namespace GameUI
 			{
 				Debug.LogWarning ("Multiple MenuManagers currently active!");
 			}
-
 		}
 
 		/// <summary>
-		/// Opens the indicated menu, then closes the currently open menu
+		/// Attempts to find a menu with the given name; if none exists, returns null
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public Menu GetMenu(string name)
+		{
+			foreach (Menu m in Menu.GetAllMenus ())
+			{
+				if (m.gameObject.name == name)
+					return m;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Closes the currently open menu, then opens the inidcated menu.
 		/// </summary>
 		/// <param name="menu"></param>
 		/// <returns></returns>
@@ -59,19 +77,23 @@ namespace GameUI
 		}
 
 		/// <summary>
-		/// Traverses down the previous menu stack one entry, closing the current menu
+		/// Traverses down the previous menu stack one entry, closing the current menu.
 		/// </summary>
-		/// <returns></returns>
-		public void NavigateBack()
+		/// <returns>True if a back operation is possible, false otherwise</returns>
+		public bool NavigateBack()
 		{
-			if(menuStack.Count > 0)
+			if (menuStack.Count > 0)
+			{
 				StartCoroutine (DoMenuTransition (currentMenu, menuStack.Pop ()));
+				return true;
+			}
+			return false;
 		}
 
 		private IEnumerator DoMenuTransition(Menu prev, Menu next)
 		{
 			prev?.Close ();
-			while (prev.IsOpen ())
+			while (prev.IsOpen)
 			{
 				yield return null;
 			}
