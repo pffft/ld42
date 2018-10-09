@@ -704,7 +704,7 @@ namespace AI
                 {
                     sequences.Add(Shoot1(New(self).AngleOffset(Random.Range(-10f, 10f)).Homing()));
                 }
-                sequences.Add(Pause(1f));
+                sequences.Add(Pause(Random.Range(0.75f, 1.75f)));
                 return sequences.ToArray();
             })
         );
