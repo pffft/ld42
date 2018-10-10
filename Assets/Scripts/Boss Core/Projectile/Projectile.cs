@@ -152,12 +152,21 @@ namespace Projectiles
             Entity otherEntity = otherObject.GetComponentInParent<Entity>();
             if (otherEntity != null)
             {
+                // All projectiles break if they do damage
                 if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
                 {
                     Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, data.entity, data.damage);
                     data.OnDestroyCollisionImpl(this);
                     Destroy(this.gameObject);
+                }
+
+                // Player's projectiles always break on the boss, even if he's invincible
+                if (data.entity.GetFaction() == Entity.Faction.player) {
+                    if (otherEntity.IsInvincible()) {
+                        data.OnDestroyCollisionImpl(this);
+                        Destroy(this.gameObject);
+                    }
                 }
             }
         }

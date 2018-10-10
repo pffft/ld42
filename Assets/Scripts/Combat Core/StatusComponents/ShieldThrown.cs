@@ -63,6 +63,7 @@ namespace CombatCore.StatusComponents
         // Makes the shield "bounce" in a randomized direction
         private static readonly ProjectileCallbackDelegate Bounce = (self) =>
         {
+            if (self.transform.childCount < 1) return;
             Rigidbody body = self.transform.GetChild(0).GetComponent<Rigidbody>();
             body.useGravity = true;
             body.isKinematic = false;
