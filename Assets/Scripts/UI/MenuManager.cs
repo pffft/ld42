@@ -18,8 +18,14 @@ namespace GameUI
 
 		[SerializeField]
 		private Menu currentMenu;
-
 		private Stack<Menu> menuStack;
+
+		private bool transitioning;
+
+		public int HistoryDepth
+		{
+			get { return menuStack.Count; }
+		}
 		#endregion
 
 		#region STATIC_METHODS
@@ -37,13 +43,14 @@ namespace GameUI
 
 		#region INSTANCE_METHODS
 
-		public void Start()
+		public void Awake()
 		{
 			if (instance == null)
 			{
 				instance = this;
 				menuStack = new Stack<Menu> ();
-				currentMenu.OpenImmediate ();
+				currentMenu?.OpenImmediate ();
+				transitioning = false;
 			}
 			else
 			{
@@ -60,7 +67,7 @@ namespace GameUI
 		{
 			foreach (Menu m in Menu.GetAllMenus ())
 			{
-				if (m.gameObject.name == name)
+				if (m.Name == name)
 					return m;
 			}
 
@@ -74,33 +81,48 @@ namespace GameUI
 		/// <returns></returns>
 		public void NavigateTo(Menu menu)
 		{
-			menuStack.Push (currentMenu);
-			StartCoroutine (DoMenuTransition (currentMenu, menu));
+			if (menu == null)
+				return;
+
+			if (!transitioning)
+			{
+				menuStack.Push (currentMenu);
+				StartCoroutine (DoMenuTransition (currentMenu, menu));
+			}
 		}
 
 		/// <summary>
 		/// Traverses down the previous menu stack one entry, closing the current menu.
 		/// </summary>
-		/// <returns>True if a back operation is possible, false otherwise</returns>
-		public bool NavigateBack()
+		/// <returns></returns>
+		public void NavigateBack()
 		{
-			if (menuStack.Count > 0)
+			if (!transitioning && menuStack.Count > 0)
 			{
 				StartCoroutine (DoMenuTransition (currentMenu, menuStack.Pop ()));
-				return true;
 			}
-			return false;
 		}
 
 		private IEnumerator DoMenuTransition(Menu prev, Menu next)
 		{
+			Debug.Log ("Beginning transition from " + prev.Name + " to " + next.Name); //DEBUG
+			transitioning = true;
+
 			prev?.Close ();
 			while (prev.IsOpen)
 			{
 				yield return null;
 			}
+
 			next.Open ();
 			currentMenu = next;
+			while (!next.IsOpen)
+			{
+				yield return null;
+			}
+
+			transitioning = false;
+			Debug.Log ("Finshed transition from " + prev.Name + " to " + next.Name); //DEBUG
 		}
 		#endregion
 

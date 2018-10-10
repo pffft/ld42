@@ -6,31 +6,37 @@ namespace GameUI
 	public class CircularLayout : MonoBehaviour
 	{
 		#region INSTANCE_VARS
-		public bool Expanded { get; set; }
-		public float Radius { get { return distanceToCenter; } }
+		public float Radius { get; set; }
+
+		[SerializeField]
+		private float targetRadius;
+		public float TargetRadius
+		{
+			get { return targetRadius; }
+			set { targetRadius = value; }
+		}
 
 		[SerializeField]
 		private float initialRotation = 90f;
-		private float distanceToCenter;
 		[SerializeField]
-		private float constrictedDistance = 50f;
-		[SerializeField]
-		private float expandedDistance = 100f;
-		[SerializeField]
-		private float expandSpeed = 5f;
+		private float lerpSpeed = 5f;
+		public float LerpSpeed
+		{
+			get { return lerpSpeed; }
+			set { lerpSpeed = value; }
+		}
 		#endregion
 
 		#region INSTANCE_METHODS
 		public void Awake()
 		{
-			Expanded = false;
-			distanceToCenter = constrictedDistance;
+			Radius = TargetRadius = 0f;
 		}
 
 		public void Update()
 		{
 			ApplyLayout ();
-			distanceToCenter = Mathf.Lerp (distanceToCenter, Expanded ? expandedDistance : constrictedDistance, Time.deltaTime * expandSpeed);
+			Radius = Mathf.Lerp (Radius, TargetRadius, Time.deltaTime * lerpSpeed);
 		}
 
 		private void ApplyLayout()
@@ -51,7 +57,7 @@ namespace GameUI
 				Transform petal = transform.GetChild (i);
 
 				//set distance from center
-				Vector2 unrotatedPos =  new Vector2 (distanceToCenter, 0f);
+				Vector2 unrotatedPos =  new Vector2 (Radius, 0f);
 
 				//rotate that bitch
 				petal.localPosition = new Vector2 (

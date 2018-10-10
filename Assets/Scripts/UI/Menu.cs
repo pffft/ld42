@@ -16,6 +16,8 @@ namespace GameUI
 
 		#region INSTANCE_VARS
 
+		public string Name { get { return gameObject.name; } }
+
 		protected CanvasGroup canvGroup;
 
 		private bool isOpen;
@@ -36,6 +38,11 @@ namespace GameUI
 
 		#region STATIC_METHODS
 
+		static Menu()
+		{
+			allMenus = new List<Menu> ();
+		}
+
 		/// <summary>
 		/// Get a list of all menus in the scene (active and inactive)
 		/// </summary>
@@ -48,11 +55,19 @@ namespace GameUI
 
 		#region INSTANCE_METHODS
 
-		public void Start()
+		public void Awake()
 		{
 			allMenus.Add (this);
 
 			canvGroup = GetComponent<CanvasGroup> ();
+
+			RectTransform rect = GetComponent<RectTransform> ();
+			rect.offsetMax = rect.offsetMin = Vector2.zero;
+		}
+
+		public void Start()
+		{
+			transform.localPosition = Vector2.zero;
 		}
 
 		public void OnDestroy()

@@ -94,7 +94,7 @@ namespace GameUI
 
 		#endregion
 
-			#region INSTANCE_METHODS
+		#region INSTANCE_METHODS
 
 		public void AddOption(Option option)
 		{
