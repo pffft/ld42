@@ -79,7 +79,7 @@ namespace Projectiles
                 .Start(self.transform.position)
                 .Target(null)
                 .Size(self.data.size)
-                .Speed(Speed.SNIPE)
+                .Speed(Speed.LIGHTNING)
                 .MaxTime(self.data.maxTime)
                 .Create()
                 .Homing();

@@ -61,6 +61,10 @@ namespace CombatCore
 		#region STATIC_METHODS
 		public static void DamageEntity(Entity victim, Entity attacker, float damage, bool ignoreShields = false, params Status[] s)
 		{
+			//if there's no victim, what's the point?
+			if (victim == null)
+				return;
+
 			//everyone is in combat
 			victim.combatTimer = COMBAT_TIMER_MAX;
 			if (attacker != null)
