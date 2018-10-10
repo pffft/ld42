@@ -23,6 +23,8 @@ namespace AI
          * Should probably disable shield blocking for this phase.
          */
         public static AIPhase PHASE_TUTORIAL_1 = new AIPhase()
+            .SetMaxHealth(20)
+            .SetMaxArenaRadius(0.75f * 50f)
             .AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
             .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
             .AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
@@ -43,13 +45,16 @@ namespace AI
          * of time to throw shield between.
          */
         public static AIPhase PHASE_TUTORIAL_2 = new AIPhase()
-            .AddSequence(10, Teleport().Wait(0.25f).Then(ShootArc(100, -90, 90).Wait(0.1f).Times(10)))
+            .SetMaxHealth(20)
+            .AddSequence(10, FORCE_BLOCK)
             ;
 
         /*
          * Introduces AOEs (and how shield interacts with them).
          */
         public static AIPhase PHASE_TUTORIAL_3 = new AIPhase()
+            .SetMaxHealth(20)
+            .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG)
             ;
 
         public static AIPhase PHASE1 = new AIPhase()
@@ -70,9 +75,7 @@ namespace AI
             .AddSequence(5, SWEEP_WALL_BACK_AND_FORTH)
             .AddSequence(10, WAVE_REVERSE) // maybe add a new color for reversal attacks
             .AddSequence(10, WAVE_REVERSE_TARGET)
-            //.AddSequence(10, WAVE_REVERSE_TARGET_HOMING) // is this too hard? 
             .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Times(2))
-            //.AddSequence(10, CIRCLE_JUMP_ROPE) // Too hard! Esp. with small arena
             .AddSequence(10, FOUR_WAY_SWEEP_WITH_HOMING)
             .AddSequence(10, RANDOM_200_WAVE)
             .AddSequence(10, SHOOT_2_WAVES_45)

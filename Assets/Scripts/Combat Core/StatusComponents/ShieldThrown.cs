@@ -77,6 +77,7 @@ namespace CombatCore.StatusComponents
             // Then make the shield go that way
             Quaternion rotation = Quaternion.AngleAxis(degrees, Vector3.up);
             body.AddForce(250f * (rotation * self.GetComponent<Rigidbody>().velocity.normalized), ForceMode.Impulse);
+            self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
         };
 

@@ -88,9 +88,9 @@ namespace AI
             PlayerLock(false)
         );
 
-        public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(6.5f,
+        public static AISequence HOMING_STRAFE_WAVE_SHOOT = new AISequence(5.5f,
             Teleport().Wait(0.2f),
-            ShootHomingStrafe(strafeAmount: 15).Times(15),//.Wait(0.3f) // This is hard; adding wait is reasonable
+            ShootHomingStrafe(strafeAmount: 15).Wait(0.01f).Times(15).Wait(0.3f), // This is hard; adding wait is reasonable
             SHOOT_2_WAVES.Times(2)
         );
 
@@ -597,6 +597,13 @@ namespace AI
                 sequences.Add(Pause(Random.Range(0.75f, 1.75f)));
                 return sequences.ToArray();
             })
+        );
+
+        public static AISequence FORCE_BLOCK = new AISequence(
+            5f,
+            Teleport().Wait(0.25f),
+            ShootArc(100, -90, 90, Projectile.New(self).Size(Size.TINY)).Wait(0.1f).Times(10),
+            Pause(2f)
         );
 
         #endregion

@@ -325,8 +325,7 @@ namespace AOEs
         public static AOE New(Entity self)
         {
             // Create a new structure, and initialize it with default values.
-            AOE structure = new AOE(self);
-            return structure;
+            return new AOE(self);
         }
 
         public AOE(Entity self)

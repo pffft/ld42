@@ -80,6 +80,7 @@ public class BossHealthBar : MonoBehaviour
 		activeBar = transform.GetChild (activeBarIndex).GetComponent<ResourceBar> ();
 		prevBar.Front.fillAmount = 0f;
 
+        BossController.NextPhase();
 		Entity.HealEntity (target, float.PositiveInfinity);
 
 		for (float dur = phaseTransitionDuration, initDur = dur; dur > 0f; dur -= Time.deltaTime)

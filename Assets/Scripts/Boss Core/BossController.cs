@@ -48,7 +48,10 @@ public class BossController : MonoBehaviour
     public static BossController instance;
     #endregion
 
-    private static AIPhase phase;
+    //private static AIPhase phase;
+    private static List<AIPhase> phases;
+    private static AIPhase currentPhase;
+    private static int phaseIndex;
 
     private void Awake()
     {
@@ -74,9 +77,19 @@ public class BossController : MonoBehaviour
     void Start()
     {
         Profiler.BeginSample("Initialize event queue");
+        phases = new List<AIPhase>();
+        phases.Add(AIPhase.PHASE_TUTORIAL_1);
+        phases.Add(AIPhase.PHASE_TUTORIAL_2);
+        phases.Add(AIPhase.PHASE_TUTORIAL_3);
+        phases.Add(AIPhase.PHASE1);
+
+        currentPhase = phases[phaseIndex];
+        self.healthMax = currentPhase.maxHealth;
+        World.Arena.RadiusInWorldUnits = currentPhase.maxArenaRadius;
+        CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
 
         //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
-        phase = AIPhase.PHASE_TUTORIAL_1;
+        //phase = AIPhase.PHASE_TUTORIAL_1;
         //phase = AIPhase.PHASE1;
 
         //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
@@ -104,12 +117,23 @@ public class BossController : MonoBehaviour
     void Update()
     {
         eventQueue.Update();
-        #if true
         if (eventQueue.Empty())
         {
-            eventQueue.Add(phase.GetNext());
+            eventQueue.Add(currentPhase.GetNext());
         }
-        #endif
+    }
+
+    public static void NextPhase() {
+        phaseIndex++;
+        if (phaseIndex > phases.Count) {
+            Debug.LogError("You win!");
+        }
+        currentPhase = phases[phaseIndex];
+        self.healthMax = currentPhase.maxHealth;
+        World.Arena.RadiusInWorldUnits = currentPhase.maxArenaRadius;
+
+        eventQueue.Add(Teleport(World.Arena.CENTER));
+        eventQueue.Add(AISequence.Pause(3f));
     }
 
     public static void Glare()

@@ -135,7 +135,7 @@ namespace AI
 
         public static AISequence ShootAOE(AOE structure)
         {
-            return new AISequence(() => { Glare(); structure.Create(); });
+            return new AISequence(() => { Glare(); structure.Clone().Create(); });
         }
 
         public static AISequence Teleport(Vector3? target = null, int speed = 25)

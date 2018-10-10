@@ -5738,12 +5738,12 @@ Prefab:
     - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: healthMax
-      value: 10000
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: health
-      value: 10000
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
@@ -7628,6 +7628,11 @@ Prefab:
     - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
         type: 2}
       propertyPath: shieldDelayMax
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: healthMax
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

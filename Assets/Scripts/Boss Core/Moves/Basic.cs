@@ -192,7 +192,7 @@ namespace Moves
         public static AISequence SPLIT_6 = new AISequence(
             4,
             Teleport().Wait(0.5f),
-            Shoot1(Projectile.New(self).MaxTime(0.25f).Speed(Speed.VERY_FAST).OnDestroyTimeout(CallbackDictionary.SPAWN_6).Curving(0f, true)).Wait(0.5f)
+            Shoot1(Projectile.New(self).MaxTime(0.25f).Speed(Speed.VERY_FAST).OnDestroyTimeout(CallbackDictionary.SPAWN_6).Curving(0f, false)).Wait(0.5f)
         );
 
         /*

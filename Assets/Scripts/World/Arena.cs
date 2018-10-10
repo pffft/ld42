@@ -41,9 +41,9 @@ namespace World
 
 		private float maxArea;
 
-        private const float ARENA_SCALE = 50f;
+        private static float ARENA_SCALE = 50f;
 
-        private static GameObject instance = null;
+        private static Arena instance = null;
 
 		private float CurrentArea
 		{
@@ -52,18 +52,27 @@ namespace World
 
         public static float RadiusInWorldUnits 
         {
-            get { return instance.transform.localScale.x * ARENA_SCALE; }
+            get { GetInstance(); return instance.transform.localScale.x * ARENA_SCALE; }
+            set {
+                Debug.Log("Setting arena scale to " + value);
+                GetInstance();
+                ARENA_SCALE = value;
+                instance.transform.localScale = GameObject.Find("Player").GetComponent<Entity>().HealthPerc * (ARENA_SCALE / 50f) * Vector3.one;
+                /*Entity.DamageEntity(GameObject.Find("Player").GetComponent<Entity>(), BossController.self, 0f);*/ }
+        }
+
+        public static Arena GetInstance() {
+            if (instance == null) {
+                instance = GameObject.Find("Arena").GetComponent<Arena>();
+            }
+            return instance;
         }
 
 		public void Start()
 		{
-            if (instance == null) {
-                instance = this.gameObject;
-            } else {
-                Debug.LogError("More than one Arena created.");
-            }
+            GetInstance();
 
-			float maxRadius = Mathf.Max (transform.localScale.x, transform.localScale.y) * (3f / 4f);
+            float maxRadius = Mathf.Max (transform.localScale.x, transform.localScale.y);
 			transform.localScale = Vector3.one * maxRadius;
 			maxArea = Mathf.PI * maxRadius * maxRadius;
 
@@ -83,7 +92,7 @@ namespace World
 				return;
 
 			//drop the player if they're outside the arena
-			if (Vector3.Distance (transform.position, player.transform.position) > ARENA_SCALE * transform.localScale.x)
+			if (Vector3.Distance (transform.position, player.transform.position) > 50f * transform.localScale.x)
 			{
 				Rigidbody playerRB = player.GetComponent<Rigidbody> ();
 
@@ -121,7 +130,7 @@ namespace World
 		{
 			while (Mathf.Abs(CurrentArea - targetArea) > threshold)
 			{
-				float newRadius = Mathf.Lerp (transform.localScale.x, Mathf.Sqrt (targetArea / Mathf.PI), Time.deltaTime * adjustSpeed);
+                float newRadius = Mathf.Lerp (transform.localScale.x, (ARENA_SCALE / 50f) * Mathf.Sqrt (targetArea / Mathf.PI), Time.deltaTime * adjustSpeed);
 				transform.localScale = Vector3.one * newRadius;
 
 				yield return null;
