@@ -47,24 +47,24 @@ namespace AI
         public static AISequence SHOOT3_WAVE3 = new AISequence(
             3, 
             Teleport().Wait(0.5f),
-            SHOOT_360,
+            AOE_360,
             Shoot3().Wait(0.1f).Times(20),
-            SHOOT_360,
+            AOE_360,
             Shoot3().Wait(0.1f).Times(20),
-            SHOOT_360.Wait(0.5f)
+            AOE_360.Wait(0.5f)
         );
 
         public static AISequence HEX_CURVE_INTRO = new AISequence(
             4, 
             ShootHexCurve(true),
-            SHOOT_360.Wait(2.5f),
+            AOE_360.Wait(2.5f),
             ShootHexCurve(false),
-            SHOOT_360.Wait(2.5f),
+            AOE_360.Wait(2.5f),
             ShootHexCurve(true),
-            SHOOT_360,
+            AOE_360,
             ShootHexCurve(false).Wait(1f),
-            SHOOT_360.Wait(1f),
-            SHOOT_360.Wait(1.5f),
+            AOE_360.Wait(1f),
+            AOE_360.Wait(1.5f),
             Teleport().Wait(0.5f)
         );
 
@@ -81,10 +81,10 @@ namespace AI
             Teleport(CENTER).Wait(1.5f),
             PlayerLock(true),
             ShootHexCurve(true),
-            SHOOT_360.Wait(0.5f),
+            AOE_360.Wait(0.5f),
             ShootHexCurve(true, New(self).AngleOffset(30f)).Wait(0.5f),
-            SHOOT_360.Wait(1f),
-            SHOOT_360.Wait(1f),
+            AOE_360.Wait(1f),
+            AOE_360.Wait(1f),
             PlayerLock(false)
         );
 
@@ -109,26 +109,6 @@ namespace AI
             ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(1f),
             ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(1f),
             ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(0.75f)
-        );
-
-        public static AISequence SPLIT_6 = new AISequence(
-            4,
-            Teleport().Wait(0.5f),
-            new AISequence(() => {
-                Projectile proj = Projectile.New(self)
-                                            .MaxTime(0.25f)
-                                            .Speed(Speed.VERY_FAST)
-                                            .OnDestroyTimeout(CallbackDictionary.SPAWN_6)
-                                            .Curving(0f, false)
-                                            .Create();
-
-            }).Wait(0.25f)
-        );
-
-        public static AISequence SPLIT_6_CURVE = new AISequence(
-            5f, 
-            Teleport().Wait(0.5f),
-            Shoot1(New(self).MaxTime(0.25f).Speed(Speed.VERY_FAST).DeathHex()).Wait(0.5f)
         );
 
         /*
@@ -173,12 +153,12 @@ namespace AI
             ShootHexCurve(false, New(self).AngleOffset(30f)),
             // This homing might be too hard; especially with this amount of 360s.
             Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(10),
-            SHOOT_360,
+            AOE_360,
             Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
-            SHOOT_360,
+            AOE_360,
             Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
-            SHOOT_360.Wait(0.5f),
-            SHOOT_360.Wait(0.5f)
+            AOE_360.Wait(0.5f),
+            AOE_360.Wait(0.5f)
         );
 
         public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5f, 
@@ -201,7 +181,7 @@ namespace AI
                 {
                     sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * 6f).Size(Size.MEDIUM)).Wait(0.1f));
                 }
-                sequences.Add(SHOOT_360);
+                sequences.Add(AOE_360);
             }
             for (int i = 0; i < 4; i++)
             {
@@ -219,46 +199,10 @@ namespace AI
                 {
                     sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f).Size(Size.MEDIUM)).Wait(0.1f));
                 }
-                sequences.Add(SHOOT_360);
+                sequences.Add(AOE_360);
             }
             return sequences.ToArray();
         });
-
-        /*
-         * Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.
-         * This doesn't lock onto the player's old position, so it will follow the player.
-         */
-        public static AISequence SWEEP = new AISequence(
-            2,
-            Teleport(),
-            new AISequence(() =>
-            {
-                List<AISequence> sequences = new List<AISequence>();
-                for (int i = -30; i < 90; i += 5)
-                {
-                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
-                }
-                return sequences.ToArray();
-            }).Wait(0.25f)
-        );
-
-        public static AISequence SWEEP_BACK_AND_FORTH = new AISequence(
-            3,
-            Teleport(), 
-            new AISequence(() => {
-                List<AISequence> sequences = new List<AISequence>();
-                for (int i = -30; i < 90; i += 5)
-                {
-                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
-                }
-                sequences.Add(Pause(0.75f));
-                for (int i = 30; i > -90; i -= 5)
-                {
-                    sequences.Add(Shoot1(New(self).AngleOffset(i)).Wait(0.01f));
-                }
-                return sequences.ToArray();
-            }).Wait(0.5f)
-        );
 
         public static AISequence SWEEP_BACK_AND_FORTH_MEDIUM = new AISequence(
             5.5f,

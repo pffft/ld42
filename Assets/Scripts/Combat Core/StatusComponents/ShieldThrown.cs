@@ -41,6 +41,7 @@ namespace CombatCore.StatusComponents
                 shieldThrown.name = "Thrown Shield";
                 shieldThrown.transform.position = subject.transform.position;
                 shieldThrown.transform.parent = homingProj.transform;
+                shieldThrown.GetComponent<KeepOnArena>().shouldReset = false;
             }
         }
 
@@ -54,13 +55,8 @@ namespace CombatCore.StatusComponents
             body.isKinematic = false;
             body.velocity = Vector3.zero;
 
+            self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
-
-            if (((child.position.x * child.position.x) + (child.position.z * child.position.z)) >= GameObject.Find("Arena").transform.localScale.x) {
-                float randomDegrees = Random.Range(0f, 359f);
-                float randomWidth = Random.Range(5f, GameObject.Find("Arena").transform.localScale.x * 50f);
-                child.position = (Quaternion.AngleAxis(randomDegrees, Vector3.up) * (randomWidth * Vector3.forward)) + Vector3.up * 10f;
-            }
 
         };
 

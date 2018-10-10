@@ -47,7 +47,7 @@ namespace Projectiles
                 feathering = (25f - distance) / 15f;
             }
 
-            float distanceScale = distance < 15f ? 1 + ((15 - distance) / 5f) : 1f;
+            float distanceScale = 1f; //distance < 15f ? 1 + ((15 - distance) / 5f) : 1f;
             if (Mathf.Abs(idealRotation) >= 10f && Mathf.Abs(idealRotation) < 120f)
             {
                 Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering * distanceScale, Vector3.up);

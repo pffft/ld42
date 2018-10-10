@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using static AI.AISequence;
+using static AI.SequenceGenerators;
 
 namespace AI
 {
@@ -14,12 +15,42 @@ namespace AI
             ;
 
         /*
-         * Teaches the player basic movement and throwing (to advance).
+         * Teaches the player basic movement and throwing.
+         * 
+         * Should consist of moves that are easy to dodge by running or dashing,
+         * and have plenty of time in between to throw a shield.
+         * 
+         * Should probably disable shield blocking for this phase.
          */
         public static AIPhase PHASE_TUTORIAL_1 = new AIPhase()
-            .AddSequence(10, Moves.Basic.SHOOT_1)
+            .AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
+            .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
+            .AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
+            .AddSequence(10, Teleport().Wait(0.25f).Then(Shoot1().Wait(0.1f).Times(7)).Wait(1.5f))
+            .AddSequence(10, Teleport().Wait(0.25f).Then(Shoot3().Wait(0.1f).Times(15)).Wait(1.5f))
+            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(50, -35, 35).Wait(1.5f)))
+            .AddSequence(4, Teleport().Wait(0.25f).Then(ShootArc(50, -60, 60).Wait(1.5f)))
+            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(50, -75, 75).Wait(1.5f)))
+            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(100, -35, 35).Wait(1.5f)))
+            .AddSequence(4, Teleport().Wait(0.25f).Then(ShootArc(100, -60, 60).Wait(1.5f)))
+            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(100, -75, 75).Wait(1.5f)))
             ;
 
+        /*
+         * Teaches the player that the shield exists.
+         * 
+         * Should consist of both dashing and blocking attacks, with plenty
+         * of time to throw shield between.
+         */
+        public static AIPhase PHASE_TUTORIAL_2 = new AIPhase()
+            .AddSequence(10, Teleport().Wait(0.25f).Then(ShootArc(100, -90, 90).Wait(0.1f).Times(10)))
+            ;
+
+        /*
+         * Introduces AOEs (and how shield interacts with them).
+         */
+        public static AIPhase PHASE_TUTORIAL_3 = new AIPhase()
+            ;
 
         public static AIPhase PHASE1 = new AIPhase()
             .AddSequence(10, SHOOT3_WAVE3)
@@ -27,12 +58,12 @@ namespace AI
             .AddSequence(10, HEX_CURVE_INTRO)
             .AddSequence(10, DOUBLE_HEX_CURVE)
             .AddSequence(10, HOMING_STRAFE_WAVE_SHOOT.Times(2))
-            .AddSequence(10, SWEEP)
-            .AddSequence(10, SWEEP_BACK_AND_FORTH)
+            .AddSequence(10, Moves.Basic.SWEEP)
+            .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH)
             .AddSequence(10, SWEEP_BACK_AND_FORTH_MEDIUM)
             .AddSequence(10, SWEEP_BACK_AND_FORTH_ADVANCED)
-            .AddSequence(10, SPLIT_6)
-            .AddSequence(10, SPLIT_6_CURVE)
+            .AddSequence(10, Moves.Basic.SPLIT_6)
+            .AddSequence(10, Moves.Basic.SPLIT_6_CURVE)
             .AddSequence(10, CIRCLE_IN_OUT)
             .AddSequence(10, SWEEP_WALL_CLOCKWISE)
             .AddSequence(10, SWEEP_WALL_COUNTERCLOCKWISE)

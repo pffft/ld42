@@ -41,14 +41,29 @@ namespace World
 
 		private float maxArea;
 
+        private const float ARENA_SCALE = 50f;
+
+        private static GameObject instance = null;
+
 		private float CurrentArea
 		{
 			get { return Mathf.PI * transform.localScale.x * transform.localScale.x; }
 		}
 
+        public static float RadiusInWorldUnits 
+        {
+            get { return instance.transform.localScale.x * ARENA_SCALE; }
+        }
+
 		public void Start()
 		{
-			float maxRadius = Mathf.Max (transform.localScale.x, transform.localScale.y);
+            if (instance == null) {
+                instance = this.gameObject;
+            } else {
+                Debug.LogError("More than one Arena created.");
+            }
+
+			float maxRadius = Mathf.Max (transform.localScale.x, transform.localScale.y) * (3f / 4f);
 			transform.localScale = Vector3.one * maxRadius;
 			maxArea = Mathf.PI * maxRadius * maxRadius;
 
@@ -68,7 +83,7 @@ namespace World
 				return;
 
 			//drop the player if they're outside the arena
-			if (Vector3.Distance (transform.position, player.transform.position) > 50 * transform.localScale.x)
+			if (Vector3.Distance (transform.position, player.transform.position) > ARENA_SCALE * transform.localScale.x)
 			{
 				Rigidbody playerRB = player.GetComponent<Rigidbody> ();
 
