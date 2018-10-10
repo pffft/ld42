@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileCurving : Projectile
+    public class ProjectileCurving : Projectile.ProjectileComponent
     {
         public Rigidbody body;
         public float curveAmount;
@@ -30,19 +30,19 @@ namespace Projectiles
                 if (data.currentTime > count / numSpawners)
                 {
                     count++;
-                    New(data.entity)
-                        .Start(transform.position)
-                        .MaxTime(data.maxTime - data.currentTime)
-                        .Size(Size.SMALL)
-                        .Speed(BossCore.Speed.FROZEN)
-                        .Create();
+                    Projectile.New(data.entity)
+                            .Start(transform.position)
+                            .MaxTime(data.maxTime - data.currentTime)
+                            .Size(Size.SMALL)
+                            .Speed(BossCore.Speed.FROZEN)
+                            .Create();
                 }
             }
         }
 	}
 
     public static class ProjectileCurvingHelper {
-        public static ProjectileCurving Curving(this Projectile projectile, float curveAmount, bool leavesTrail)
+        public static ProjectileCurving Curving(this Projectile.ProjectileComponent projectile, float curveAmount, bool leavesTrail)
         {
             ProjectileCurving curving = projectile.CastTo<ProjectileCurving>();
 
@@ -53,7 +53,7 @@ namespace Projectiles
             return curving;
         }
 
-        public static ProjectileData Curving(this ProjectileData structure, float curveAmount, bool leavesTrail) 
+        public static Projectile Curving(this Projectile structure, float curveAmount, bool leavesTrail) 
         {
             structure.type = Type.CURVING;
             structure._typeParameters = new object[] { curveAmount, leavesTrail };

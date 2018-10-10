@@ -11,7 +11,7 @@ namespace AI
     {
 
         public static AIPhase PHASE_TEST = new AIPhase()
-            .AddSequence(10, DASH_TEST)
+            .AddSequence(10, HOMING_STRAFE_WAVE_SHOOT)
             ;
 
         /*

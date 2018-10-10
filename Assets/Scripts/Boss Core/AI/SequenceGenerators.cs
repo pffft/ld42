@@ -12,17 +12,17 @@ namespace AI
 {
     public static class SequenceGenerators
     {
-        public static AISequence Shoot1(ProjectileData skeleton=null)
+        public static AISequence Shoot1(Projectile skeleton=null)
         {
             return new AISequence(() =>
             {
                 Glare();
-                ProjectileData struc = skeleton ?? Projectile.New(self);
+                Projectile struc = skeleton ?? Projectile.New(self);
                 struc.Create();
             });
         }
 
-        public static AISequence Shoot3(ProjectileData skeleton=null)
+        public static AISequence Shoot3(Projectile skeleton=null)
         {
             return new AISequence(() =>
             {
@@ -30,14 +30,14 @@ namespace AI
 
                 for (int i = 0; i < 3; i++)
                 {
-                    ProjectileData newStruc = skeleton ?? Projectile.New(self);
+                    Projectile newStruc = skeleton ?? Projectile.New(self);
                     newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
                     newStruc.Create();
                 }
             });
         }
 
-        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, ProjectileData skeleton=null)
+        public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile skeleton=null)
         {
             return new AISequence(() =>
             {
@@ -52,9 +52,9 @@ namespace AI
                 }
 
                 float step = 360f / density;
-                ProjectileData clone = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
+                Projectile clone = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
                 for (float i = from; i <= to; i += step) {
-                    ProjectileData newStruc = clone.Clone();
+                    Projectile newStruc = clone.Clone();
                     newStruc.AngleOffset(newStruc.angleOffset + i).Create();
                 }
             });
@@ -69,13 +69,13 @@ namespace AI
             );
         }
 
-        public static AISequence ShootHexCurve(bool clockwise = true, ProjectileData skeleton=null)
+        public static AISequence ShootHexCurve(bool clockwise = true, Projectile skeleton=null)
         {
             return new AISequence(() =>
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    ProjectileData struc = skeleton ?? Projectile.New(self);
+                    Projectile struc = skeleton ?? Projectile.New(self);
 
                     float multiplier = clockwise ? 1f : -1f;
                     float curveSpeed = (float)struc.speed * multiplier * 2f;
@@ -197,21 +197,21 @@ namespace AI
             eventQueue.Pause();
 
             physbody.velocity = Vector3.zero;
-
             Vector3 dashDir = (targetPosition - instance.transform.position).normalized;
-            float dist;
-            while ((dist = Vector3.Distance(targetPosition, instance.transform.position)) > 0f)
-            {
 
-                float dashDistance = (insaneMode ? 1.2f : 1f) * self.movespeed.Value * 4 * Time.deltaTime;
+            float accDist = 0f, maxDist = Vector3.Distance(targetPosition, instance.transform.position);
+            while(accDist < maxDist) {
+                float dashDistance = Mathf.Min((insaneMode ? 1.2f : 1f) * self.movespeed.Value * 4 * Time.deltaTime, maxDist - accDist);
 
-                if (dist < dashDistance)
+                RaycastHit hit;
+                if (Physics.Raycast(instance.transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
                 {
-                    instance.transform.position = targetPosition;
+                    instance.transform.position = hit.point;
                     break;
                 }
 
-                instance.transform.position += dashDir * (dashDistance);
+                instance.transform.position += dashDir * dashDistance;
+                accDist += dashDistance;
                 yield return null;
             }
 

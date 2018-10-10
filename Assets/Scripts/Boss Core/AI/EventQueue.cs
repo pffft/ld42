@@ -93,24 +93,20 @@ namespace AI
 
             // if the player is too aggressive, you can ignore the q here
 
-            // TODO keep popping events while they're concurrent
             if (events.Count == 0) return;
 
+            // TODO clean up this block
             int eventsExecuted = 0;
             while (events.Count > 0 && eventsExecuted < 50)
             {
                 AIEvent iEvent = events.Peek();
-                //Debug.Log("Top event is " + (iEvent.ability == null ? "null" : iEvent.ability.name));
 
                 if (internalTime >= iEvent.startTime)
                 {
                     // If the event is new, we fire it
                     if (lastEvent != iEvent)
                     {
-                        if (iEvent.action != null)
-                        {
-                            iEvent.action();
-                        }
+                        iEvent.action?.Invoke();
                         lastEvent = iEvent;
                     }
 
