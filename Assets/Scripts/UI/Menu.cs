@@ -51,6 +51,22 @@ namespace GameUI
 		{
 			return allMenus;
 		}
+
+		/// <summary>
+		/// Attempts to find a menu with the given name; if none exists, returns null
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public static Menu GetMenu(string name)
+		{
+			foreach (Menu m in GetAllMenus ())
+			{
+				if (m.Name == name)
+					return m;
+			}
+
+			return null;
+		}
 		#endregion
 
 		#region INSTANCE_METHODS

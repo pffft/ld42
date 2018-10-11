@@ -160,8 +160,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbbda532aca7f724198e35773e61d6e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRadius: 100
-  initialRotation: 90
+  targetRadius: 0
+  offsetRotation: 90
   lerpSpeed: 5
 --- !u!1 &323407351 stripped
 GameObject:
@@ -243,6 +243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layout: {fileID: 160468346}
   holdingRadius: 100
+  rotationSpeed: 1
 --- !u!225 &906226807
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -304,12 +305,12 @@ Prefab:
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: -86.60128
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -49.99927
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
@@ -434,8 +435,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbbda532aca7f724198e35773e61d6e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRadius: 100
-  initialRotation: 90
+  targetRadius: 0
+  offsetRotation: 90
   lerpSpeed: 5
 --- !u!114 &983093202
 MonoBehaviour:
@@ -450,6 +451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layout: {fileID: 983093201}
   holdingRadius: 100
+  rotationSpeed: 1
 --- !u!225 &983093203
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -544,12 +546,12 @@ Prefab:
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 86.60128
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -49.999294
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
@@ -674,12 +676,12 @@ Prefab:
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0000043711375
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 99.99997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
@@ -913,12 +915,12 @@ Prefab:
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 0.0000011924877
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -99.99997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
@@ -1278,12 +1280,12 @@ Prefab:
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0000043710756
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 99.99855
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224966466455266322, guid: 84ea71974a7572746bb388be2d6a4e06,
         type: 2}

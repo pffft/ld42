@@ -12,6 +12,9 @@ namespace GameUI
 
 		[SerializeField]
 		private float holdingRadius;
+
+		[SerializeField]
+		private float rotationSpeed;
 		#endregion
 
 		#region INSTANCE_METHODS
@@ -19,6 +22,11 @@ namespace GameUI
 		{
 			base.Awake ();
 			CloseImmediate ();
+		}
+
+		public void Update()
+		{
+			layout.OffsetRotation += rotationSpeed * Time.unscaledDeltaTime;
 		}
 
 		public override void Close()
@@ -31,6 +39,7 @@ namespace GameUI
 		{
 			layout.TargetRadius = layout.Radius = 0f;
 			canvGroup.interactable = false;
+			canvGroup.blocksRaycasts = false;
 			canvGroup.alpha = 0f;
 			IsOpen = false;
 		}
@@ -45,6 +54,7 @@ namespace GameUI
 		{
 			layout.TargetRadius = layout.Radius = holdingRadius;
 			canvGroup.interactable = true;
+			canvGroup.blocksRaycasts = true;
 			canvGroup.alpha = 1f;
 			IsOpen = true;
 		}
@@ -55,7 +65,7 @@ namespace GameUI
 			float currDist;
 
 			if(!opening)
-				canvGroup.interactable = opening;
+				canvGroup.interactable = canvGroup.blocksRaycasts = opening;
 
 			//wait for the layout to do its thing
 			layout.TargetRadius = targetRadius;
@@ -66,7 +76,7 @@ namespace GameUI
 			}
 
 			if (opening)
-				canvGroup.interactable = opening;
+				canvGroup.interactable = canvGroup.blocksRaycasts = opening;
 
 			IsOpen = opening;
 		}

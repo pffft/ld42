@@ -53,12 +53,14 @@ namespace World
         public static float RadiusInWorldUnits 
         {
             get { GetInstance(); return instance.transform.localScale.x * ARENA_SCALE; }
-            set {
+            set
+			{
                 Debug.Log("Setting arena scale to " + value);
                 GetInstance();
                 ARENA_SCALE = value;
                 instance.transform.localScale = GameObject.Find("Player").GetComponent<Entity>().HealthPerc * (ARENA_SCALE / 50f) * Vector3.one;
-                /*Entity.DamageEntity(GameObject.Find("Player").GetComponent<Entity>(), BossController.self, 0f);*/ }
+				/*Entity.DamageEntity(GameObject.Find("Player").GetComponent<Entity>(), BossController.self, 0f);*/
+			}
         }
 
         public static Arena GetInstance() {
@@ -117,6 +119,8 @@ namespace World
 				enabled = false;
 
 				Time.timeScale = 0.3f;  Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+				player.OnDeath ();
 			}
 		}
 

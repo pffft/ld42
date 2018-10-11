@@ -17,7 +17,12 @@ namespace GameUI
 		}
 
 		[SerializeField]
-		private float initialRotation = 90f;
+		private float offsetRotation = 90f;
+		public float OffsetRotation
+		{
+			get { return offsetRotation; }
+			set { offsetRotation = Mathf.Repeat(value, 360f); }
+		}
 		[SerializeField]
 		private float lerpSpeed = 5f;
 		public float LerpSpeed
@@ -36,7 +41,7 @@ namespace GameUI
 		public void Update()
 		{
 			ApplyLayout ();
-			Radius = Mathf.Lerp (Radius, TargetRadius, Time.deltaTime * lerpSpeed);
+			Radius = Mathf.Lerp (Radius, TargetRadius, Time.unscaledDeltaTime * lerpSpeed);
 		}
 
 		private void ApplyLayout()
@@ -52,7 +57,7 @@ namespace GameUI
 			for (int i = 0; i < transform.childCount; i++)
 			{
 				//determine rotation
-				float theta = (i * (360f / transform.childCount)) + initialRotation;
+				float theta = (i * (360f / transform.childCount)) + offsetRotation;
 				theta *= Mathf.Deg2Rad;
 				Transform petal = transform.GetChild (i);
 

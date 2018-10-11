@@ -30,7 +30,7 @@ namespace GameUI
 
 		#region STATIC_METHODS
 
-		public MenuManager GetInstance()
+		public static MenuManager GetInstance()
 		{
 			if (instance == null)
 			{
@@ -59,34 +59,16 @@ namespace GameUI
 		}
 
 		/// <summary>
-		/// Attempts to find a menu with the given name; if none exists, returns null
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		public Menu GetMenu(string name)
-		{
-			foreach (Menu m in Menu.GetAllMenus ())
-			{
-				if (m.Name == name)
-					return m;
-			}
-
-			return null;
-		}
-
-		/// <summary>
 		/// Closes the currently open menu, then opens the inidcated menu.
 		/// </summary>
 		/// <param name="menu"></param>
 		/// <returns></returns>
 		public void NavigateTo(Menu menu)
 		{
-			if (menu == null)
-				return;
-
 			if (!transitioning)
 			{
-				menuStack.Push (currentMenu);
+				if(currentMenu != null)
+					menuStack.Push (currentMenu);
 				StartCoroutine (DoMenuTransition (currentMenu, menu));
 			}
 		}
@@ -105,24 +87,24 @@ namespace GameUI
 
 		private IEnumerator DoMenuTransition(Menu prev, Menu next)
 		{
-			Debug.Log ("Beginning transition from " + prev.Name + " to " + next.Name); //DEBUG
+			Debug.Log ("Beginning transition from " + prev?.Name + " to " + next?.Name); //DEBUG
 			transitioning = true;
 
 			prev?.Close ();
-			while (prev.IsOpen)
+			while (prev != null && prev.IsOpen)
 			{
 				yield return null;
 			}
 
-			next.Open ();
+			next?.Open ();
 			currentMenu = next;
-			while (!next.IsOpen)
+			while (next != null && !next.IsOpen)
 			{
 				yield return null;
 			}
 
 			transitioning = false;
-			Debug.Log ("Finshed transition from " + prev.Name + " to " + next.Name); //DEBUG
+			Debug.Log ("Finshed transition from " + prev?.Name + " to " + next?.Name); //DEBUG
 		}
 		#endregion
 

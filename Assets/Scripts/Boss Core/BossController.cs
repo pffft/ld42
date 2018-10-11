@@ -110,7 +110,7 @@ public class BossController : MonoBehaviour
         phaseIndex++;
         if (phaseIndex > phases.Count) {
             Debug.LogError("You win!");
-        }
+		}
 
         currentPhase = phases[phaseIndex];
         self.healthMax = currentPhase.maxHealth;
