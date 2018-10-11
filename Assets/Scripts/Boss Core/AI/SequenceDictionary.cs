@@ -603,7 +603,7 @@ namespace AI
             5f,
             Teleport().Wait(0.25f),
             ShootArc(100, -90, 90, Projectile.New(self).Size(Size.TINY)).Wait(0.1f).Times(10),
-            Pause(2f)
+            Pause(4f)
         );
 
         #endregion
