@@ -7,9 +7,24 @@ public class BossHealthBar : MonoBehaviour
 	[SerializeField]
 	private Entity target;
 
-	[Range(0f, 50f)]
 	[SerializeField]
 	private int numberOfPhases = 5;
+	public int NumberOfPhases
+	{
+		get { return numberOfPhases; }
+		set
+		{
+			if (value != numberOfPhases)
+			{
+				numberOfPhases = value;
+				for (int i = 0; i < transform.childCount; i++)
+				{
+					Destroy (transform.GetChild (i));
+				}
+				BuildBar ();
+			}
+		}
+	}
 	
 	[SerializeField]
 	private GameObject resourceBarPrefab;
@@ -38,6 +53,19 @@ public class BossHealthBar : MonoBehaviour
 
 	public void Start()
 	{
+		BuildBar ();
+
+		activeBarIndex = 0;
+		activeBar = transform.GetChild (activeBarIndex).GetComponent<ResourceBar> ();
+		activeBar.Width = activeBarWidth;
+
+		target.died += PhaseCompleted;
+
+		transitioning = false;
+	}
+
+	private void BuildBar()
+	{
 		if (resourceBarPrefab != null)
 		{
 			for (int i = 0; i < numberOfPhases; i++)
@@ -50,21 +78,19 @@ public class BossHealthBar : MonoBehaviour
 				bar.Width = inactiveBarWidth;
 			}
 		}
-
-		activeBarIndex = 0;
-		activeBar = transform.GetChild (activeBarIndex).GetComponent<ResourceBar> ();
-		activeBar.Width = activeBarWidth;
-
-		target.died += PhaseCompleted;
-
-		transitioning = false;
 	}
 
 	public void Update()
 	{
-		activeBar.Front.fillAmount = target.HealthPerc;
+		if (!transitioning)
+			activeBar.Front.fillAmount = target.HealthPerc;
+		else
+			activeBar.Front.fillAmount = 1f;
 	}
 
+	/// <summary>
+	/// Called on target death
+	/// </summary>
 	private void PhaseCompleted()
 	{
 		if (!transitioning)
@@ -81,7 +107,6 @@ public class BossHealthBar : MonoBehaviour
 		prevBar.Front.fillAmount = 0f;
 
         BossController.NextPhase();
-		Entity.HealEntity (target, float.PositiveInfinity);
 
 		for (float dur = phaseTransitionDuration, initDur = dur; dur > 0f; dur -= Time.deltaTime)
 		{
