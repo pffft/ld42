@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileCurving : Projectile.ProjectileComponent
+    public class ProjectileCurving : ProjectileComponent
     {
         public Rigidbody body;
         public float curveAmount;
@@ -42,7 +42,7 @@ namespace Projectiles
 	}
 
     public static class ProjectileCurvingHelper {
-        public static ProjectileCurving Curving(this Projectile.ProjectileComponent projectile, float curveAmount, bool leavesTrail)
+        public static ProjectileCurving Curving(this ProjectileComponent projectile, float curveAmount, bool leavesTrail)
         {
             ProjectileCurving curving = projectile.CastTo<ProjectileCurving>();
 

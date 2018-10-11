@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileDeathHex : Projectile.ProjectileComponent
+    public class ProjectileDeathHex : ProjectileComponent
     {
 
         public override Material GetCustomMaterial() {
@@ -14,7 +14,7 @@ namespace Projectiles
 
     public static class ProjectileDeathHexHelper
     {
-        public static ProjectileDeathHex DeathHex(this Projectile.ProjectileComponent projectile)
+        public static ProjectileDeathHex DeathHex(this ProjectileComponent projectile)
         {
             return (ProjectileDeathHex)projectile
                 .CastTo<ProjectileDeathHex>();

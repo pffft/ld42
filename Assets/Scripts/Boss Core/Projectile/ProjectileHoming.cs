@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileHoming : Projectile.ProjectileComponent
+    public class ProjectileHoming : ProjectileComponent
     {
 
         public GameObject targetObject;
@@ -59,7 +59,7 @@ namespace Projectiles
     }
 
     public static class ProjectileHomingHelper {
-        public static ProjectileHoming Homing(this Projectile.ProjectileComponent projectile)
+        public static ProjectileHoming Homing(this ProjectileComponent projectile)
         {
             ProjectileHoming homing = projectile.CastTo<ProjectileHoming>();
 
