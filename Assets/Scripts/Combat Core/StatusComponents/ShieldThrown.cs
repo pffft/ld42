@@ -20,7 +20,7 @@ namespace CombatCore.StatusComponents
             Controller.playerShield.SetActive(false);
 
             // Spawns a homing projectile
-            Projectile homingProj = Projectile.New(subject)
+            Projectile.ProjectileComponent homingProj = Projectile.New(subject)
                                               .Target(target)
                                               .MaxTime(2f)
                                               .Speed(BossCore.Speed.VERY_FAST)
@@ -41,6 +41,7 @@ namespace CombatCore.StatusComponents
                 shieldThrown.name = "Thrown Shield";
                 shieldThrown.transform.position = subject.transform.position;
                 shieldThrown.transform.parent = homingProj.transform;
+                shieldThrown.GetComponent<KeepOnArena>().shouldReset = false;
             }
         }
 
@@ -54,19 +55,15 @@ namespace CombatCore.StatusComponents
             body.isKinematic = false;
             body.velocity = Vector3.zero;
 
+            self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
-
-            if (((child.position.x * child.position.x) + (child.position.z * child.position.z)) >= GameObject.Find("Arena").transform.localScale.x) {
-                float randomDegrees = Random.Range(0f, 359f);
-                float randomWidth = Random.Range(5f, GameObject.Find("Arena").transform.localScale.x * 50f);
-                child.position = (Quaternion.AngleAxis(randomDegrees, Vector3.up) * (randomWidth * Vector3.forward)) + Vector3.up * 10f;
-            }
 
         };
 
         // Makes the shield "bounce" in a randomized direction
         private static readonly ProjectileCallbackDelegate Bounce = (self) =>
         {
+            if (self.transform.childCount < 1) return;
             Rigidbody body = self.transform.GetChild(0).GetComponent<Rigidbody>();
             body.useGravity = true;
             body.isKinematic = false;
@@ -81,6 +78,7 @@ namespace CombatCore.StatusComponents
             // Then make the shield go that way
             Quaternion rotation = Quaternion.AngleAxis(degrees, Vector3.up);
             body.AddForce(250f * (rotation * self.GetComponent<Rigidbody>().velocity.normalized), ForceMode.Impulse);
+            self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
         };
 

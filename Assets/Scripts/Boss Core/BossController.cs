@@ -48,7 +48,10 @@ public class BossController : MonoBehaviour
     public static BossController instance;
     #endregion
 
-    private static AIPhase phase;
+    //private static AIPhase phase;
+    private static List<AIPhase> phases;
+    private static AIPhase currentPhase;
+    private static int phaseIndex = -1;
 
     private void Awake()
     {
@@ -73,42 +76,53 @@ public class BossController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Profiler.BeginSample("Initialize event queue");
+        Profiler.BeginSample("Initialize phases");
 
-        //eventQueue.AddSequence(AISequence.SWEEP_BACK_AND_FORTH);
-        //phase = AIPhase.PHASE1;
-        phase = AIPhase.PHASE_TEST;
-        //eventQueue.Add(AISequence.CIRCLE_JUMP_ROPE.Wait(10f).Times(2));
-
-        /*
-        eventQueue.Add(new AISequence(() =>
-        {
-            AOE.Create(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(6);
-        }).Wait(0.75f).Times(2));
-        eventQueue.Add(new AISequence(() =>
-        {
-            AOE.Create(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(12);
-        }));
-        */
-        //eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(6)).Wait(10f));
-        //eventQueue.Add(ShootAOE(AOE.Create(self).SetSpeed(Speed.FAST).On(-120, 120).SetFixedWidth(6)).Wait(10f));
-        //eventQueue.Add(ShootAOE(AOE.New(self).SetSpeed(Speed.FAST).On(-60, 60).SetFixedWidth(6)).Wait(0.5f).Times(20));
-
-        //eventQueue.Add(AISequence.AOE_131_MEDIUM_LONG.Wait(0.5f).Times(10));
+        phases = new List<AIPhase>();
+        //phases.Add(AIPhase.PHASE_TUTORIAL_1);
+        //phases.Add(AIPhase.PHASE_TUTORIAL_2);
+        //phases.Add(AIPhase.PHASE_TUTORIAL_3);
+        phases.Add(AIPhase.PHASE1);
+        //phases.Add(AIPhase.PHASE_TEST);
 
         Profiler.EndSample();
+
+        NextPhase();
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Every frame, prompt the queue for then next event.
         eventQueue.Update();
-        #if true
+
+        // If the queue ran out of events, pull the next AISequence in the phase
         if (eventQueue.Empty())
         {
-            eventQueue.Add(phase.GetNext());
+            eventQueue.Add(currentPhase.GetNext());
         }
-        #endif
+    }
+
+    /*
+     * Transitions to the next phase by loading in the next set of moves.
+     */
+    public static void NextPhase() {
+        phaseIndex++;
+        if (phaseIndex > phases.Count) {
+            Debug.LogError("You win!");
+        }
+
+        currentPhase = phases[phaseIndex];
+        self.healthMax = currentPhase.maxHealth;
+        World.Arena.RadiusInWorldUnits = currentPhase.maxArenaRadius;
+
+        // Heal up to the new max health.
+        CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
+
+        self.SetInvincible(true);
+        eventQueue.Add(Teleport(World.Arena.CENTER));
+        eventQueue.Add(AISequence.Pause(3f));
+        eventQueue.Add(new AISequence(() => { self.SetInvincible(false); }));
     }
 
     public static void Glare()

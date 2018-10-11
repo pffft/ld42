@@ -4008,6 +4008,11 @@ Prefab:
       propertyPath: target
       value: 
       objectReference: {fileID: 1299480889}
+    - target: {fileID: 114979808143589782, guid: 96f64c8325da2694bbbd1b4a7d9699eb,
+        type: 2}
+      propertyPath: numberOfPhases
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96f64c8325da2694bbbd1b4a7d9699eb, type: 2}
   m_IsPrefabAsset: 0
@@ -5733,17 +5738,17 @@ Prefab:
     - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: shields
-      value: 100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: healthMax
-      value: 10000
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: health
-      value: 10000
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
@@ -7628,6 +7633,11 @@ Prefab:
     - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
         type: 2}
       propertyPath: shieldDelayMax
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: healthMax
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileHoming : Projectile
+    public class ProjectileHoming : Projectile.ProjectileComponent
     {
 
         public GameObject targetObject;
@@ -47,17 +47,19 @@ namespace Projectiles
                 feathering = (25f - distance) / 15f;
             }
 
+            float distanceScale = 1f; //distance < 15f ? 1 + ((15 - distance) / 5f) : 1f;
             if (Mathf.Abs(idealRotation) >= 10f && Mathf.Abs(idealRotation) < 120f)
             {
-                Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering, Vector3.up);
+                Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering * distanceScale, Vector3.up);
                 body.velocity = rot * body.velocity;
+                body.velocity = (distanceScale * (float)data.speed) * body.velocity.normalized;
                 curDivergence += homingScale;
             }
         }
     }
 
     public static class ProjectileHomingHelper {
-        public static ProjectileHoming Homing(this Projectile projectile)
+        public static ProjectileHoming Homing(this Projectile.ProjectileComponent projectile)
         {
             ProjectileHoming homing = projectile.CastTo<ProjectileHoming>();
 
@@ -70,7 +72,7 @@ namespace Projectiles
             return homing;
         }
 
-        public static Projectile.ProjectileStructure Homing(this Projectile.ProjectileStructure structure) {
+        public static Projectile Homing(this Projectile structure) {
             structure.type = Type.HOMING;
             return structure;
         }

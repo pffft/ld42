@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileDeathHex : Projectile
+    public class ProjectileDeathHex : Projectile.ProjectileComponent
     {
 
         public override Material GetCustomMaterial() {
@@ -14,13 +14,13 @@ namespace Projectiles
 
     public static class ProjectileDeathHexHelper
     {
-        public static ProjectileDeathHex DeathHex(this Projectile projectile)
+        public static ProjectileDeathHex DeathHex(this Projectile.ProjectileComponent projectile)
         {
             return (ProjectileDeathHex)projectile
                 .CastTo<ProjectileDeathHex>();
         }
 
-        public static Projectile.ProjectileStructure DeathHex(this Projectile.ProjectileStructure structure) {
+        public static Projectile DeathHex(this Projectile structure) {
             structure.type = Type.DEATHHEX;
             structure.OnDestroyTimeout(CallbackDictionary.SPAWN_6_CURVING);
             return structure;
