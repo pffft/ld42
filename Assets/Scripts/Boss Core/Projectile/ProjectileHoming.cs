@@ -63,7 +63,7 @@ namespace Projectiles
         {
             ProjectileHoming homing = projectile.CastTo<ProjectileHoming>();
 
-            homing.targetObject = projectile.data.entity.GetFaction() == Entity.Faction.enemy? GameObject.Find("Player") : GameObject.Find("Boss");
+            homing.targetObject = projectile.data.entity.GetFaction() == Entity.Faction.enemy? GameManager.Player : GameManager.Boss.gameObject;
             homing.body = projectile.GetComponent<Rigidbody>();
             homing.wasClose = false;
             homing.curDivergence = 0f;

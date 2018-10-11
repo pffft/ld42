@@ -50,7 +50,7 @@ namespace AOEs
                         // TODO cache me
                         targetPosition = BossController.isPlayerLocked ?
                            BossController.playerLockPosition :
-                           GameObject.Find("Player").transform.position;
+                           GameManager.Player.transform.position;
                     }
                     else
                     {
@@ -90,7 +90,7 @@ namespace AOEs
 
                 // Hit the arena walls
                 // should be "innerscale"- what about AOE attacks without hole in center?
-                if (data.scale > (GameObject.Find("Arena").transform.localScale.x * 50f) + (data.start.magnitude))
+                if (data.scale > GameManager.Arena.RadiusInWorldUnits + data.start.magnitude)
                 {
                     Debug.Log("Ring hit arena. Returning.");
                     data.OnDestroyOutOfBoundsImpl(data);

@@ -36,78 +36,62 @@ namespace World
 		[SerializeField]
 		private float threshold = 0.01f;
 
-		[SerializeField]
-		private Entity player;
-
 		private float maxArea;
 
         private static float ARENA_SCALE = 50f;
-
-        private static Arena instance = null;
 
 		private float CurrentArea
 		{
 			get { return Mathf.PI * transform.localScale.x * transform.localScale.x; }
 		}
 
-        public static float RadiusInWorldUnits 
+        public float RadiusInWorldUnits 
         {
-            get { GetInstance(); return instance.transform.localScale.x * ARENA_SCALE; }
+            get { return transform.localScale.x * ARENA_SCALE; }
             set
 			{
-                Debug.Log("Setting arena scale to " + value);
-                GetInstance();
                 ARENA_SCALE = value;
-                instance.transform.localScale = GameObject.Find("Player").GetComponent<Entity>().HealthPerc * (ARENA_SCALE / 50f) * Vector3.one;
-				/*Entity.DamageEntity(GameObject.Find("Player").GetComponent<Entity>(), BossController.self, 0f);*/
+                maxArea = ARENA_SCALE * ARENA_SCALE / 50f / 50f * Mathf.PI;
+                StartCoroutine(ChangeArenaSize(GameManager.Player.GetComponent<Entity>().HealthPerc * maxArea));
 			}
-        }
-
-        public static Arena GetInstance() {
-            if (instance == null) {
-                instance = GameObject.Find("Arena").GetComponent<Arena>();
-            }
-            return instance;
         }
 
 		public void Start()
 		{
-            GetInstance();
-
             float maxRadius = Mathf.Max (transform.localScale.x, transform.localScale.y);
 			transform.localScale = Vector3.one * maxRadius;
 			maxArea = Mathf.PI * maxRadius * maxRadius;
 
-			if(player != null)
-				player.tookDamage += OnPlayerDamageTaken;
+            if(GameManager.Player != null)
+                GameManager.Player.GetComponent<Entity>().tookDamage += OnPlayerDamageTaken;
 		}
 
 		public void OnDestroy()
 		{
-			if (player != null)
-				player.tookDamage -= OnPlayerDamageTaken;
+			if (GameManager.Player != null)
+                GameManager.Player.GetComponent<Entity>().tookDamage -= OnPlayerDamageTaken;
 		}
 
 		public void Update()
 		{
-			if (player == null)
+			if (GameManager.Player == null)
 				return;
 
 			//drop the player if they're outside the arena
-			if (Vector3.Distance (transform.position, player.transform.position) > 50f * transform.localScale.x)
+			if (Vector3.Distance (transform.position, GameManager.Player.transform.position) > 50f * transform.localScale.x)
 			{
-				Rigidbody playerRB = player.GetComponent<Rigidbody> ();
+				Rigidbody playerRB = GameManager.Player.GetComponent<Rigidbody> ();
 
 				playerRB.constraints = playerRB.constraints & ~RigidbodyConstraints.FreezeAll;
 				playerRB.useGravity = true;
 				playerRB.AddForce (Vector3.down * 20f, ForceMode.Impulse);
 				playerRB.AddRelativeTorque (Vector3.right * 2f, ForceMode.Impulse);
 
-				player.GetComponent<Controller> ().enabled = false;
-				player.GetComponent<Animator> ().enabled = false;
+                GameManager.Player.GetComponent<Controller> ().enabled = false;
+                GameManager.Player.GetComponent<Animator> ().enabled = false;
 
-				Rigidbody[] parts = player.GetComponentsInChildren<Rigidbody> ();
-				Vector3 center = Vector3.up + player.transform.position;
+                Rigidbody[] parts = GameManager.Player.GetComponentsInChildren<Rigidbody> ();
+				Vector3 center = Vector3.up + GameManager.Player.transform.position;
 				foreach (Rigidbody p in parts)
 				{
 					p.transform.parent = null;
@@ -120,7 +104,7 @@ namespace World
 
 				Time.timeScale = 0.3f;  Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
-				player.OnDeath ();
+                GameManager.Player.GetComponent<Entity>().OnDeath ();
 			}
 		}
 

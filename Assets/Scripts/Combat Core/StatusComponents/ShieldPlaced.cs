@@ -24,7 +24,7 @@ namespace CombatCore.StatusComponents
 
         public override void OnApply(Entity subject)
         {
-            Controller.playerShield.SetActive(false);
+            GameManager.HeldShield.SetActive(false);
             subject.movespeed.LockTo(10);
             this.isAttached = true;
 
@@ -35,7 +35,7 @@ namespace CombatCore.StatusComponents
 
             if (shield == null)
             {
-                shield = GameObject.Find("Shield Down");
+                shield = GameManager.PlacedShield;
                 shieldEntity = shield.GetComponent<Entity>();
 
                 shieldEntity.tookDamage += (Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields) => {
@@ -52,7 +52,7 @@ namespace CombatCore.StatusComponents
                     shield.GetComponent<Entity>().shieldRegen = 25f;
                 };
             }
-            shield.transform.parent = GameObject.Find("Player").transform;
+            shield.transform.parent = GameManager.Player.transform;
             shield.transform.position = subject.transform.position;
             shield.transform.rotation = Quaternion.AngleAxis(degrees, Vector3.up);
 
@@ -112,7 +112,7 @@ namespace CombatCore.StatusComponents
         {
             _shield.SetActive(false);
             subject.movespeed.Unlock();
-            Controller.playerShield.SetActive(true);
+            GameManager.HeldShield.SetActive(true);
             //subject.AddStatus(Status.Get("Exhausted"));
         }
     }

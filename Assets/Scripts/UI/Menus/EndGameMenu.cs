@@ -13,8 +13,7 @@ public class EndGameMenu : MonoBehaviour
 
 	public void Start()
 	{
-		//TODO better way to find player
-		player = GameObject.Find ("Player").GetComponent<Entity> ();
+        player = GameManager.Player.GetComponent<Entity> ();
 		player.died += GameEnd;
 
 		Menu.GetMenu ("End Game Menu").CloseImmediate ();

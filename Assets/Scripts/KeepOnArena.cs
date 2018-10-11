@@ -20,7 +20,7 @@ public class KeepOnArena : MonoBehaviour {
             if (transform.position.y < -1f)
             {
                 float randomDegrees = Random.Range(0f, 359f);
-                float randomWidth = Random.Range(5f, World.Arena.RadiusInWorldUnits);
+                float randomWidth = Random.Range(5f, GameManager.Arena.RadiusInWorldUnits);
                 transform.position = (Quaternion.AngleAxis(randomDegrees, Vector3.up) * (randomWidth * Vector3.forward)) + Vector3.up * 10f;
             }
         }

@@ -9,7 +9,6 @@ namespace CombatCore.StatusComponents
     {
 
         private Vector3 target;
-        private GameObject shieldThrown = null;
 
         public void SetTarget(Vector3 target) {
             this.target = target;
@@ -17,7 +16,7 @@ namespace CombatCore.StatusComponents
 
         public override void OnApply(Entity subject)
         {
-            Controller.playerShield.SetActive(false);
+            GameManager.HeldShield.SetActive(false);
 
             // Spawns a homing projectile
             ProjectileComponent homingProj = Projectile.New(subject)
@@ -35,13 +34,13 @@ namespace CombatCore.StatusComponents
             GameObject.Destroy(homingProj.GetComponent<MeshRenderer>());
 
             // Try to spawn a shield. If one exists (it shouldn't), fail.
-            if (shieldThrown == null)
+            if (GameManager.ThrownShield == null)
             {
-                shieldThrown = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Shield"));
-                shieldThrown.name = "Thrown Shield";
-                shieldThrown.transform.position = subject.transform.position;
-                shieldThrown.transform.parent = homingProj.transform;
-                shieldThrown.GetComponent<KeepOnArena>().shouldReset = false;
+                GameManager.ThrownShield = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Shield"));
+                GameManager.ThrownShield.name = "Thrown Shield";
+                GameManager.ThrownShield.transform.position = subject.transform.position;
+                GameManager.ThrownShield.transform.parent = homingProj.transform;
+                GameManager.ThrownShield.GetComponent<KeepOnArena>().shouldReset = false;
             }
         }
 
@@ -84,11 +83,11 @@ namespace CombatCore.StatusComponents
 
         public override void OnRevert(Entity subject)
         {
-            GameObject.Destroy(shieldThrown);
-            shieldThrown = null;
+            GameObject.Destroy(GameManager.ThrownShield);
+            GameManager.ThrownShield = null;
 
-            Controller.playerShield.SetActive(true);
-            GameObject.Find("HUD").GetComponent<HUD>().shieldAvailable = true;
+            GameManager.HeldShield.SetActive(true);
+            GameManager.HUD.shieldAvailable = true;
         }
     }
 }

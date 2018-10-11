@@ -28,14 +28,14 @@ namespace AI
             .AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
             .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
             .AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
-            .AddSequence(10, Teleport().Wait(0.25f).Then(Shoot1().Wait(0.1f).Times(7)).Wait(1.5f))
-            .AddSequence(10, Teleport().Wait(0.25f).Then(Shoot3().Wait(0.1f).Times(15)).Wait(1.5f))
-            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(50, -35, 35).Wait(1.5f)))
-            .AddSequence(4, Teleport().Wait(0.25f).Then(ShootArc(50, -60, 60).Wait(1.5f)))
-            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(50, -75, 75).Wait(1.5f)))
-            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(100, -35, 35).Wait(1.5f)))
-            .AddSequence(4, Teleport().Wait(0.25f).Then(ShootArc(100, -60, 60).Wait(1.5f)))
-            .AddSequence(3, Teleport().Wait(0.25f).Then(ShootArc(100, -75, 75).Wait(1.5f)))
+            .AddSequence(10, Moves.Tutorial1.SHOOT_1_SEVERAL)
+            .AddSequence(10, Moves.Tutorial1.SHOOT_3_SEVERAL)
+            .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70)
+            .AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120)
+            .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150)
+            .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70_DENSE)
+            .AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120_DENSE)
+            .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150_DENSE)
             ;
 
         /*
@@ -46,7 +46,7 @@ namespace AI
          */
         public static AIPhase PHASE_TUTORIAL_2 = new AIPhase()
             .SetMaxHealth(20)
-            .AddSequence(10, FORCE_BLOCK)
+            .AddSequence(10, Moves.Tutorial2.FORCE_BLOCK)
             ;
 
         /*
@@ -54,7 +54,11 @@ namespace AI
          */
         public static AIPhase PHASE_TUTORIAL_3 = new AIPhase()
             .SetMaxHealth(20)
-            .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG)
+            .AddSequence(10, SHOOT3_WAVE3.Wait(1f))
+            .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Wait(0.5f))
+            .AddSequence(10, Moves.Tutorial3.AOE_90)
+            .AddSequence(10, Moves.Tutorial3.AOE_120)
+            .AddSequence(10, Moves.Tutorial3.AOE_360)
             ;
 
         public static AIPhase PHASE1 = new AIPhase()
@@ -77,7 +81,7 @@ namespace AI
             .AddSequence(10, WAVE_REVERSE_TARGET)
             .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Times(2))
             .AddSequence(10, FOUR_WAY_SWEEP_WITH_HOMING)
-            .AddSequence(10, RANDOM_200_WAVE)
+            //.AddSequence(10, RANDOM_200_WAVE)
             .AddSequence(10, SHOOT_2_WAVES_45)
             .AddSequence(10, SHOOT_4_WAVES_BEHIND)
 

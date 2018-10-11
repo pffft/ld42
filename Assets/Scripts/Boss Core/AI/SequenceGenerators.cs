@@ -94,12 +94,12 @@ namespace AI
             return new AISequence(() =>
             {
 
-                Vector3 targetPos = target.HasValue ? target.Value - instance.transform.position : player.transform.position - instance.transform.position;
+                Vector3 targetPos = target.HasValue ? target.Value - GameManager.Boss.transform.position : GameManager.Player.transform.position - GameManager.Boss.transform.position;
                 Vector3 leftDirection = (Quaternion.AngleAxis(90, Vector3.up) * targetPos).normalized;
 
                 for (int i = 0; i < amount; i++)
                 {
-                    Vector3 spawn = instance.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
+                    Vector3 spawn = GameManager.Boss.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
                     Projectile.New(self)
                               .Start(spawn)
                               .Target(spawn + targetPos)
@@ -117,7 +117,7 @@ namespace AI
                 for (int i = 0; i < 6; i++)
                 {
                     Projectile.New(self)
-                              .Target(player.transform.position)
+                              .Target(GameManager.Player.transform.position)
                               .AngleOffset(i * 60f)
                               .MaxTime(maxTime)
                               .Create()
@@ -145,7 +145,7 @@ namespace AI
                 self.movespeed.LockTo(speed);
                 if (target.HasValue)
                 {
-                    instance.StartCoroutine(Dashing(target.Value));
+                    GameManager.Boss.StartCoroutine(Dashing(target.Value));
                     Glare();
                     return;
                 }
@@ -154,7 +154,7 @@ namespace AI
                 float minAngle = 50f;
                 float maxAngle = 100f;
 
-                Vector3 oldPosVector = instance.transform.position - player.transform.position;
+                Vector3 oldPosVector = GameManager.Boss.transform.position - GameManager.Player.transform.position;
 
                 int count = 0;
                 Vector3 rawPosition;
@@ -162,7 +162,7 @@ namespace AI
                 {
                     count++;
                     float degreeRotation = Random.Range(minAngle, maxAngle) * (Random.Range(0, 2) == 0 ? -1 : 1);
-                    float distance = Random.Range(minDistance * arena.transform.localScale.x, 50f * arena.transform.localScale.x);
+                    float distance = Random.Range(minDistance * GameManager.Arena.transform.localScale.x, 50f * GameManager.Arena.transform.localScale.x);
 
                     if (count == 15)
                     {
@@ -178,14 +178,14 @@ namespace AI
                     }
                     else
                     {
-                        rawPosition = (rot * (oldPosVector * (distance / oldPosVector.magnitude))) + player.transform.position;
+                        rawPosition = (rot * (oldPosVector * (distance / oldPosVector.magnitude))) + GameManager.Player.transform.position;
                     }
                     rawPosition.y = 0f;
 
                 } while (rawPosition.magnitude > 50f);
 
                 rawPosition.y = 1.31f;
-                instance.StartCoroutine(Dashing(rawPosition));
+                GameManager.Boss.StartCoroutine(Dashing(rawPosition));
 
                 Glare();
             });
@@ -196,21 +196,20 @@ namespace AI
 
             eventQueue.Pause();
 
-            physbody.velocity = Vector3.zero;
-            Vector3 dashDir = (targetPosition - instance.transform.position).normalized;
+            Vector3 dashDir = (targetPosition - GameManager.Boss.transform.position).normalized;
 
-            float accDist = 0f, maxDist = Vector3.Distance(targetPosition, instance.transform.position);
+            float accDist = 0f, maxDist = Vector3.Distance(targetPosition, GameManager.Boss.transform.position);
             while(accDist < maxDist) {
                 float dashDistance = Mathf.Min((insaneMode ? 1.2f : 1f) * self.movespeed.Value * 4 * Time.deltaTime, maxDist - accDist);
 
                 RaycastHit hit;
-                if (Physics.Raycast(instance.transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
+                if (Physics.Raycast(GameManager.Boss.transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
                 {
-                    instance.transform.position = hit.point;
+                    GameManager.Boss.transform.position = hit.point;
                     break;
                 }
 
-                instance.transform.position += dashDir * dashDistance;
+                GameManager.Boss.transform.position += dashDir * dashDistance;
                 accDist += dashDistance;
                 yield return null;
             }
@@ -225,10 +224,10 @@ namespace AI
             {
                 self.movespeed.LockTo(speed);
 
-                Vector3 oldPosVector = instance.transform.position - center;
+                Vector3 oldPosVector = GameManager.Boss.transform.position - center;
                 Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);
 
-                instance.StartCoroutine(Dashing(rot * oldPosVector));
+                GameManager.Boss.StartCoroutine(Dashing(rot * oldPosVector));
             });
         }
 
@@ -251,7 +250,7 @@ namespace AI
             {
                 if (enableLock)
                 {
-                    playerLockPosition = player.transform.position;
+                    playerLockPosition = GameManager.Player.transform.position;
                 }
                 isPlayerLocked = enableLock;
             });

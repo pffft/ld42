@@ -323,7 +323,7 @@ GameObject:
   - component: {fileID: 4159705499467118}
   - component: {fileID: 114941571434193320}
   m_Layer: 12
-  m_Name: Shield Down
+  m_Name: Placed Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -374,7 +374,7 @@ GameObject:
   - component: {fileID: 95859600606769214}
   - component: {fileID: 54449697449066432}
   m_Layer: 12
-  m_Name: Shield Up
+  m_Name: Held Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -797,7 +797,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1183583254606020}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4759061015698456}
@@ -1692,7 +1692,7 @@ MonoBehaviour:
   faction: 1
   health: 100
   healthMax: 100
-  shields: 100
+  shields: 0
   shieldsMax: 0
   shieldRegen: 0
   shieldDelayMax: 0

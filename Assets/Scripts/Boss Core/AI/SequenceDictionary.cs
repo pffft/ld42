@@ -21,7 +21,7 @@ namespace AI
         public static AISequence DASH_TEST = new AISequence(
             8f,
             new AISequence(() => {
-            return ShootAOE(AOE.New(self).Start(player.transform.position).On(0, 360f).Speed(Speed.FAST).FixedWidth(2f)).Wait(0.75f);
+            return ShootAOE(AOE.New(self).Start(GameManager.Player.transform.position).On(0, 360f).Speed(Speed.FAST).FixedWidth(2f)).Wait(0.75f);
             })
 
         );
@@ -597,13 +597,6 @@ namespace AI
                 sequences.Add(Pause(Random.Range(0.75f, 1.75f)));
                 return sequences.ToArray();
             })
-        );
-
-        public static AISequence FORCE_BLOCK = new AISequence(
-            5f,
-            Teleport().Wait(0.25f),
-            ShootArc(100, -90, 90, Projectile.New(self).Size(Size.TINY)).Wait(0.1f).Times(10),
-            Pause(4f)
         );
 
         #endregion

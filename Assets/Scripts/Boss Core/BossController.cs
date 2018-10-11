@@ -22,15 +22,6 @@ public class BossController : MonoBehaviour
     // The event queue that we use for planning attacks.
     public static EventQueue eventQueue;
 
-    // A reference to the player object (for position tracking)
-    public static GameObject player;
-
-    // A reference to the game arena.
-    public static GameObject arena;
-
-    // A reference to our physics body (for self movement and dashing)
-    public static Rigidbody physbody;
-
     // Toggles insane mode. This just makes everything a living hell.
     // Specifically, every waiting period is reduced and movement speed is buffed.
     public static bool insaneMode;
@@ -44,10 +35,6 @@ public class BossController : MonoBehaviour
     public static Vector3 playerLockPosition;
     public static bool isPlayerLocked;
 
-    #region Singleton stuff
-    public static BossController instance;
-    #endregion
-
     //private static AIPhase phase;
     private static List<AIPhase> phases;
     private static AIPhase currentPhase;
@@ -55,20 +42,8 @@ public class BossController : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Debug.LogError("Looks like you have two BossControllers here. Stop that.");
-        }
-
         eventQueue = new EventQueue();
-        player = GameObject.Find("Player");
-        arena = GameObject.Find("Arena");
 
-        physbody = GetComponent<Rigidbody>();
         self = GetComponent<CombatCore.Entity>();
         self.name = BOSS_NAME;
     }
@@ -114,7 +89,7 @@ public class BossController : MonoBehaviour
 
         currentPhase = phases[phaseIndex];
         self.healthMax = currentPhase.maxHealth;
-        World.Arena.RadiusInWorldUnits = currentPhase.maxArenaRadius;
+        GameManager.Arena.RadiusInWorldUnits = currentPhase.maxArenaRadius;
 
         // Heal up to the new max health.
         CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
@@ -127,8 +102,8 @@ public class BossController : MonoBehaviour
 
     public static void Glare()
     {
-        Quaternion lookRotation = Quaternion.LookRotation(player.transform.position - instance.transform.position);
-        instance.transform.rotation = lookRotation;
+        Quaternion lookRotation = Quaternion.LookRotation(GameManager.Player.transform.position - GameManager.Boss.transform.position);
+        GameManager.Boss.transform.rotation = lookRotation;
     }
 
 }

@@ -14,14 +14,11 @@ public class Controller : MonoBehaviour
 	private Vector3 facePos;
 	private bool dashing;
 
-    public static GameObject playerShield;
-
 	public void Awake()
 	{
 		physbody = GetComponent<Rigidbody> ();
 		self = GetComponent<CombatCore.Entity> ();
 		dashing = false;
-        playerShield = GameObject.Find("Shield Up");
     }
 
 	public void Start()
@@ -163,7 +160,7 @@ public class Controller : MonoBehaviour
 		UnityEditor.Handles.color = Color.red;
 		UnityEditor.Handles.DrawWireArc (new Vector3(transform.position.x, 0f, transform.position.z), Vector3.up, Vector3.forward, 360f, dashRange);
 
-        GameObject shield = GameObject.Find("Shield Down");
+        GameObject shield = GameManager.PlacedShield;
         if (shield != null)
         {
             UnityEditor.Handles.color = Color.blue;

@@ -36,10 +36,9 @@ namespace Projectiles {
             {
                 if (data.entity.name.Equals(BossController.BOSS_NAME))
                 {
-                    // TODO cache me
                     targetPosition = BossController.isPlayerLocked ?
                        BossController.playerLockPosition :
-                       GameObject.Find("Player").transform.position;
+                       GameManager.Player.transform.position;
                 }
                 else
                 {

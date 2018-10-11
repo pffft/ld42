@@ -90,7 +90,7 @@ namespace CombatCore
             shieldThrown.GetComponent<StatusComponents.ShieldThrown>().SetTarget(targetPosition);
             subject.AddStatus(shieldThrown);
 
-            GameObject.Find("HUD").GetComponent<HUD>().shieldAvailable = false;
+            GameManager.HUD.shieldAvailable = false;
 
             return true;
 
@@ -131,7 +131,7 @@ namespace CombatCore
                     return true;
                 }
                 // If we're not tied, but close to the shield, also reclaim it.
-                else if ((GameObject.Find("Shield Down").transform.position - subject.transform.position).magnitude < 5f)
+                else if ((GameManager.PlacedShield.transform.position - subject.transform.position).magnitude < 5f)
                 {
                     Debug.Log("Close to shield, reclaiming it");
                     subject.RemoveStatus("Shield Placed");
@@ -148,7 +148,7 @@ namespace CombatCore
             // The shield is thrown (throw active)
             if (subject.HasStatus("Shield Thrown"))
             {
-                if ((GameObject.Find("Thrown Shield").transform.position - subject.transform.position).magnitude < 5f)
+                if ((GameManager.ThrownShield.transform.position - subject.transform.position).magnitude < 5f)
                 {
                     Debug.Log("Close to thrown shield, reclaiming it");
                     subject.RemoveStatus("Shield Thrown");
