@@ -13,27 +13,71 @@ namespace AI
 
     public partial class AISequence
     {
+        public static bool ShouldTryExpandFunctions = false;
+
         // A list of events to execute.
         public AIEvent[] events;
         private AISequence[] children;
 
-        /*
-         * A relative difficulty parameter. 
-         * 
-         * This is from a scale of 0 - 10, where a "10" is the point where any person
-         * would call the move "actual bullshit". That means that the move may guarantee
-         * damage, might not have safespots, might be too fast, or all of the above.
-         * 
-         * Most moves that make it to the game should be at most an 8.
-         * 
-         * This can go above 10, but that's for testing purposes (or masochism).
-         */
-        public float difficulty;
-
-        private AISequence reference;
-
         public delegate AISequence[] AISequenceGenerator();
         public AISequenceGenerator GetChildren;
+
+        // A description string. 
+        public string description;
+
+        public AISequence Description(string desc) {
+            this.description = desc;
+            return this;
+        }
+
+        public override string ToString() {
+            if (description != null) {
+                return description;
+            }
+
+            if (this is Move) {
+                Move move = this as Move;
+                if (move.description != null) {
+                    return move.description;
+                } else {
+                    return move.sequence.ToString();
+                }
+            }
+
+            string fullDesc = null;
+            AISequence[] sequences = GetChildren();
+            if (sequences != null)
+            {
+
+                if (description == null)
+                {
+                    fullDesc += sequences[0];
+                }
+                else
+                {
+                    fullDesc += " Then, " + sequences[0];
+                }
+
+                if (sequences.Length > 1)
+                {
+                    for (int i = 1; i < sequences.Length; i++)
+                    {
+                        fullDesc += " Then, " + sequences[i];
+                    }
+                }
+
+                // TODO: find a way to detect repeated function calls (with different parameters), and
+                // combine them. E.g., Shoot1(... AngleOffset: -30) ... Shoot1(... AngleOffset: 90) should
+                // collapse into something easier to read. For now, ShouldTryExpandFunctions is false so
+                // we don't have a million sequences printing out.
+            }
+            else if (events != null)
+            {
+                fullDesc += "Some events executed, and that's all we know.";
+            }
+
+            return fullDesc;
+        }
 
         #region Constructors
 
@@ -41,7 +85,6 @@ namespace AI
         private AISequence(AIEvent[] events) { 
             this.events = events; 
             this.children = null;
-            this.difficulty = -1;
 
             this.GetChildren = () => { return children; };
         }
@@ -50,11 +93,8 @@ namespace AI
          * Creates a new singleton AISequence from the given Action.
          * This has no delay after its event.
          */
-        public AISequence(AIEvent.Action a) : this(-1, a) { }
-
-        public AISequence(float difficulty, AIEvent.Action a)
+        public AISequence(AIEvent.Action a)
         {
-            this.difficulty = difficulty;
             this.events = new AIEvent[] { new AIEvent(0f, a) };
             this.children = null;
 
@@ -64,11 +104,8 @@ namespace AI
         /*
          * Takes an arbitrary length list of AISequences and combines them into an AISequence.
          */
-        public AISequence(params AISequence[] sequences) : this(-1, sequences) { }
-
-        public AISequence(float difficulty, params AISequence[] sequences)
+        public AISequence(params AISequence[] sequences)
         {
-            this.difficulty = difficulty;
             this.events = null;
             this.children = sequences;
 
@@ -76,32 +113,28 @@ namespace AI
         }
 
         /*
-         * "Explodes" the generation function and adds all the elements to a single AISequence.
-         * TODO: this is in a delicate state- the "events" should be accessed using the new GetEvents
-         * delegate. Anything not using that will crash!
+         * Keeps track of a function that can "explode" into a list of AISequences.
+         * When this is added to the event queue, this function is called.
          */
-        public AISequence(GenerateSequences genFunction) : this(-1, genFunction) { }
-
-        public AISequence(float difficulty, GenerateSequences genFunction) {
-            this.difficulty = difficulty;
+        public AISequence(GenerateSequences genFunction) {
             this.events = null;
             this.children = null;
 
             this.GetChildren = () => genFunction();
+            this.description = ShouldTryExpandFunctions ? null : "Some sequences were generated from a function.";
         }
 
         /*
-         * Executes the generation function and instantiates this AISequence as the result.
+         * Keeps track of a function that can "explode" into a single AISequence.
+         * When this is added to the event queue, this function is called.
          */
-        public AISequence(GenerateSequence genFunction) : this(-1, genFunction) { }
-
-        public AISequence(float difficulty, GenerateSequence genFunction)
+        public AISequence(GenerateSequence genFunction)
         {
-            this.difficulty = difficulty;
             this.events = null;
             this.children = null;
 
             this.GetChildren = () => new AISequence[] { genFunction() };
+            this.description = ShouldTryExpandFunctions ? null : "A sequence was generated from a function.";
         }
 
         #endregion
@@ -249,7 +282,14 @@ namespace AI
                 }
             }
 
-            return new AISequence(finalEventsList.ToArray());
+            string mergedDesc = "Merged( ";
+            for (int i = 0; i < sequences.Length - 1; i++) {
+                mergedDesc += sequences[i] + " And ";
+            }
+            mergedDesc += sequences[sequences.Length - 1];
+            mergedDesc += ").";
+
+            return new AISequence(finalEventsList.ToArray()).Description(mergedDesc);
         }
 
         public static AISequence Merge(List<AISequence> sequences)
@@ -275,7 +315,7 @@ namespace AI
             for (int i = 0; i < times; i++) {
                 newSequences[i] = this;
             }
-            return new AISequence(newSequences);
+            return new AISequence(newSequences).Description(times + " times: ");
         }
 
         /*
@@ -293,7 +333,7 @@ namespace AI
          */
         public static AISequence Pause(float duration)
         {
-            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) });
+            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) }).Description("Wait for " + duration + " seconds.");
         }
 
         /*

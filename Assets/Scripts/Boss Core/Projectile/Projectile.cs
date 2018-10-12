@@ -218,5 +218,14 @@ namespace Projectiles
 
             return projectile;
         }
+
+        public override string ToString()
+        {
+            // TODO can make this more descriptive; i.e. if entity is boss and preTarget is null, then add "aimed at the player".
+            return "Projectile"
+                + " with speed " + speed
+                + ", size " + size
+                + ((type != Type.BASIC) ? ", and type " + type.ToString() : "");
+        }
     }
 }

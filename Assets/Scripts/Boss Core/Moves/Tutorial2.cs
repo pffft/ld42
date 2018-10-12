@@ -10,13 +10,24 @@ using static BossController;
 
 namespace Moves
 {
-    public static class Tutorial2 {
+    public class Tutorial2 : IMoveDictionary {
 
-        public static AISequence FORCE_BLOCK = new AISequence(
-            5f,
-            Teleport().Wait(0.25f),
-            ShootArc(100, -90, 90, Projectile.New(self).Size(Size.TINY)).Wait(0.1f).Times(10),
-            Pause(4f)
-        );
+        /// <summary>
+        /// Fires 10 sets of tiny projectiles in a 180 degree arc, too dense to dash through.
+        /// </summary>
+        public static Move FORCE_BLOCK;
+
+        public void Load() {
+            FORCE_BLOCK = new Move(
+                5f,
+                "FORCE_BLOCK",
+                "Fires 10 sets of tiny projectiles in a 180 degree arc, too dense to dash through.",
+                new AISequence(
+                    Teleport().Wait(0.25f),
+                    ShootArc(100, -90, 90, Projectile.New(self).Size(Size.TINY)).Wait(0.1f).Times(10),
+                    Pause(4f)
+                )
+            );
+        }
     }
 }

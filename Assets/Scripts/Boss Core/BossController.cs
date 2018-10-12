@@ -52,15 +52,19 @@ public class BossController : MonoBehaviour
     void Start()
     {
         Profiler.BeginSample("Initialize phases");
+        AIPhase.Load();
+        Profiler.EndSample();
+
 
         phases = new List<AIPhase>();
+
         phases.Add(AIPhase.PHASE_TUTORIAL_1);
         phases.Add(AIPhase.PHASE_TUTORIAL_2);
         phases.Add(AIPhase.PHASE_TUTORIAL_3);
         phases.Add(AIPhase.PHASE1);
         //phases.Add(AIPhase.PHASE_TEST);
 
-        Profiler.EndSample();
+        eventQueue.Add(Moves.Basic.SWEEP);
 
         NextPhase();
     }
@@ -95,8 +99,7 @@ public class BossController : MonoBehaviour
         CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
 
         self.SetInvincible(true);
-        eventQueue.Add(Teleport(World.Arena.CENTER));
-        eventQueue.Add(AISequence.Pause(3f));
+        eventQueue.Add(Teleport(World.Arena.CENTER).Wait(3f));
         eventQueue.Add(new AISequence(() => { self.SetInvincible(false); }));
     }
 
