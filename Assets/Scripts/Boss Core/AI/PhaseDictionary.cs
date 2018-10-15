@@ -74,6 +74,7 @@ namespace AI
         public static void Load() {
             AISequence.ShouldAllowInstantiation = true;
 
+            /*
             Profiler.BeginSample("Loading in moves via reflection");
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             foreach (System.Type type in assembly.GetTypes()) {
@@ -88,57 +89,62 @@ namespace AI
                 }
             }
             Profiler.EndSample();
+            */
+
+            new Moves.Basic.Definitions().Load();
 
             PHASE_TUTORIAL_1 = new AIPhase()
                 .SetMaxHealth(20)
                 .SetMaxArenaRadius(0.75f * 50f)
+                .AddMove(10, Moves.Basic.Definitions.Shoot1)
+                .AddMove(10, Moves.Basic.Definitions.Shoot_2_Waves)
                 //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
-                .AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
-                .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
-                .AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
-                .AddSequence(10, Moves.Tutorial1.SHOOT_1_SEVERAL)
-                .AddSequence(10, Moves.Tutorial1.SHOOT_3_SEVERAL)
-                .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70)
-                .AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120)
-                .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150)
-                .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70_DENSE)
-                .AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120_DENSE)
-                .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150_DENSE)
+                //.AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
+                //.AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
+                //.AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
+                //.AddSequence(10, Moves.Tutorial1.SHOOT_1_SEVERAL)
+                //.AddSequence(10, Moves.Tutorial1.SHOOT_3_SEVERAL)
+                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70)
+                //.AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120)
+                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150)
+                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70_DENSE)
+                //.AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120_DENSE)
+                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150_DENSE)
                 ;
 
             PHASE_TUTORIAL_2 = new AIPhase()
                 .SetMaxHealth(20)
-                .AddSequence(10, Moves.Tutorial2.FORCE_BLOCK)
+                //.AddSequence(10, Moves.Tutorial2.FORCE_BLOCK)
                 ;
 
             PHASE_TUTORIAL_3 = new AIPhase()
                 .SetMaxHealth(20)
                 //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
-                .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Wait(0.5f))
-                .AddSequence(10, Moves.Tutorial3.AOE_90)
-                .AddSequence(10, Moves.Tutorial3.AOE_120)
-                .AddSequence(10, Moves.Tutorial3.AOE_360)
+                //.AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Wait(0.5f))
+                //.AddSequence(10, Moves.Tutorial3.AOE_90)
+                //.AddSequence(10, Moves.Tutorial3.AOE_120)
+                //.AddSequence(10, Moves.Tutorial3.AOE_360)
                 ;
 
             PHASE1 = new AIPhase()
                 //.AddSequence(10, SHOOT3_WAVE3)
-                .AddSequence(10, Moves.Basic.SHOOT_2_WAVES.Times(5))
+                //.AddSequence(10, Moves.Basic.SHOOT_2_WAVES.Times(5))
                 //.AddSequence(10, HEX_CURVE_INTRO)
                 //.AddSequence(10, DOUBLE_HEX_CURVE)
                 //.AddSequence(10, HOMING_STRAFE_WAVE_SHOOT.Times(2))
-                .AddSequence(10, Moves.Basic.SWEEP)
-                .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH)
+                //.AddSequence(10, Moves.Basic.SWEEP)
+                //.AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH)
                 //.AddSequence(10, SWEEP_BACK_AND_FORTH_MEDIUM)
                 //.AddSequence(10, SWEEP_BACK_AND_FORTH_ADVANCED)
-                .AddSequence(10, Moves.Basic.SPLIT_6)
-                .AddSequence(10, Moves.Basic.SPLIT_6_CURVE)
+                //.AddSequence(10, Moves.Basic.SPLIT_6)
+                //.AddSequence(10, Moves.Basic.SPLIT_6_CURVE)
                 //.AddSequence(10, CIRCLE_IN_OUT)
                 //.AddSequence(10, SWEEP_WALL_CLOCKWISE)
                 //.AddSequence(10, SWEEP_WALL_COUNTERCLOCKWISE)
                 //.AddSequence(5, SWEEP_WALL_BACK_AND_FORTH)
                 //.AddSequence(10, WAVE_REVERSE) // maybe add a new color for reversal attacks
                 //.AddSequence(10, WAVE_REVERSE_TARGET)
-                .AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Times(2))
+                //.AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Times(2))
                 //.AddSequence(10, FOUR_WAY_SWEEP_WITH_HOMING)
                 //.AddSequence(10, RANDOM_200_WAVE) // Kind of hard. Move to a later phase.
                 //.AddSequence(10, SHOOT_2_WAVES_45)

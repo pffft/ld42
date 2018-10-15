@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Moves;
+
 // TODO: make a list of weight/AISequence pairs that can be constructed
 // make a list of scripted events that happen once in X times
 // randomly choose the next sequence to do, or check if player interrupts
@@ -39,19 +41,19 @@ namespace AI
             return this;
         }
 
-        public AIPhase AddSequence(int weight, AISequence sequence) {
-            phaseSequences.Add(new AIPhaseComponent(weight, sequence));
+        public AIPhase AddMove(int weight, Move move) {
+            phaseSequences.Add(new AIPhaseComponent(weight, move));
             totalWeight += weight;
             return this;
         }
 
-        public AIPhase AddScriptedSequence(int when, AISequence sequence) {
-            scriptedSequences.Add(new AIPhaseScriptedComponent(when, sequence));
+        public AIPhase AddScriptedMove(int when, Move move) {
+            scriptedSequences.Add(new AIPhaseScriptedComponent(when, move));
             return this;
         }
 
-        public AIPhase AddRepeatingScriptedSequence(int everyX, AISequence sequence) {
-            repeatingScriptedSequences.Add(new AIPhaseScriptedComponent(everyX, sequence));
+        public AIPhase AddRepeatingScriptedMove(int everyX, Move move) {
+            repeatingScriptedSequences.Add(new AIPhaseScriptedComponent(everyX, move));
             return this;
         }
 
@@ -59,7 +61,7 @@ namespace AI
          * TODO: make this use the difficulty to consider weights, rather than custom weights.
          * Then make the difficulty an AnimationCurve.
          */
-        public AISequence GetNext()
+        public Move GetNext()
         {
             count++;
 
@@ -69,7 +71,7 @@ namespace AI
             foreach (AIPhaseScriptedComponent component in scriptedSequences) {
                 // Only run if the event is scheduled to run.
                 if (count == component.everyX) {
-                    return component.sequence;
+                    return component.move;
                 }
             }
 
@@ -78,12 +80,12 @@ namespace AI
             {
                 if (count == 0 && component.everyX == 0)
                 {
-                    return component.sequence;
+                    return component.move;
                 }
 
                 if (count % component.everyX == 0)
                 {
-                    return component.sequence;
+                    return component.move;
                 }
             }
 
@@ -92,7 +94,7 @@ namespace AI
             int currentWeight = 0;
             foreach (AIPhaseComponent component in phaseSequences) {
                 if (targetWeight < currentWeight + component.weight) {
-                    return component.sequence;
+                    return component.move;
                 }
                 currentWeight += component.weight;
             }
@@ -110,21 +112,21 @@ namespace AI
 
         private class AIPhaseComponent {
             public int weight;
-            public AISequence sequence;
+            public Move move;
 
-            public AIPhaseComponent(int weight, AISequence sequence) {
+            public AIPhaseComponent(int weight, Move move) {
                 this.weight = weight;
-                this.sequence = sequence;
+                this.move = move;
             }
         }
 
         private class AIPhaseScriptedComponent {
             public int everyX;
-            public AISequence sequence;
+            public Move move;
 
-            public AIPhaseScriptedComponent(int everyX, AISequence sequence) {
+            public AIPhaseScriptedComponent(int everyX, Move move) {
                 this.everyX = everyX;
-                this.sequence = sequence;
+                this.move = move;
             }
         }
     }

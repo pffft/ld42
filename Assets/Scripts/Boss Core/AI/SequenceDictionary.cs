@@ -10,7 +10,7 @@ using Projectiles;
 using AOEs;
 using BossCore;
 
-using static Moves.Basic;
+using Moves.Basic;
 
 // TODO: move all boss controller sequences in here
 // make a JSON parser to make this job easier?
