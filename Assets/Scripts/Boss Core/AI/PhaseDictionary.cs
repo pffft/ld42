@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using UnityEngine.Profiling;
+
 using static AI.AISequence;
 using static AI.SequenceGenerators;
 
@@ -61,15 +63,36 @@ namespace AI
         //.AddSequence(10, CIRCLE_JUMP_ROPE)
         //;
 
+        /*
+         * TODO: Make this automatically check the "Moves" namespace and instantiate/load
+         * all the classes within it (except Move and IMoveDictionary). Make it throw warnings
+         * if a Move is declared in a class but never initialized (null), and if a Move is
+         * initialized before it's loaded through Load().
+         * 
+         * TODO: Add some form of progress indicator to this.
+         */
         public static void Load() {
-            new Moves.Basic().Load();
-            new Moves.Tutorial1().Load();
+            AISequence.ShouldAllowInstantiation = true;
+
+            Profiler.BeginSample("Loading in moves via reflection");
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            foreach (System.Type type in assembly.GetTypes()) {
+                if (type.Namespace != null && type.Namespace.Equals("Moves"))
+                {
+                    if (type.Name.Equals("Move") || type.Name.Equals("IMoveDictionary"))
+                    {
+                        continue;
+                    }
+
+                    (System.Activator.CreateInstance(type) as IMoveDictionary).Load();
+                }
+            }
+            Profiler.EndSample();
 
             PHASE_TUTORIAL_1 = new AIPhase()
                 .SetMaxHealth(20)
                 .SetMaxArenaRadius(0.75f * 50f)
                 //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
-                /*
                 .AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
                 .AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
                 .AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
@@ -81,7 +104,6 @@ namespace AI
                 .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70_DENSE)
                 .AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120_DENSE)
                 .AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150_DENSE)
-                */
                 ;
 
             PHASE_TUTORIAL_2 = new AIPhase()

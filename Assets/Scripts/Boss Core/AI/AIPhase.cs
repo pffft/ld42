@@ -97,6 +97,12 @@ namespace AI
                 currentWeight += component.weight;
             }
 
+            if (phaseSequences.Count == 0)
+            {
+                Debug.LogError("Failed to get next sequence for phase. Dictionary is empty. Add some sequences!");
+                return null;
+            }
+
             // This shouldn't ever trigger.
             Debug.LogError("Failed to get next sequence for phase.");
             return null;

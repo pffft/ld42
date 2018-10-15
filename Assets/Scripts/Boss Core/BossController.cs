@@ -64,8 +64,6 @@ public class BossController : MonoBehaviour
         phases.Add(AIPhase.PHASE1);
         //phases.Add(AIPhase.PHASE_TEST);
 
-        eventQueue.Add(Moves.Basic.SWEEP);
-
         NextPhase();
     }
 

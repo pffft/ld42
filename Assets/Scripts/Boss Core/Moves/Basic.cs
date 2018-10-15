@@ -199,8 +199,8 @@ namespace Moves
 
             SWEEP = new Move(
                 2f,
-                //"SWEEP",
-                //"Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.",
+                "SWEEP",
+                "Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.",
                 new AISequence(
                     Teleport().Wait(0.25f),
                     PlayerLock(true),

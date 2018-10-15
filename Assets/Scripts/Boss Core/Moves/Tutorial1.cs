@@ -13,20 +13,44 @@ namespace Moves
 {
     public class Tutorial1 : IMoveDictionary
     {
+        /// <summary>
+        /// Shoots between 5 and 10 default projectiles at the player.
+        /// </summary>
         public static Move SHOOT_1_SEVERAL;
 
+        /// <summary>
+        /// Shoots between 7 and 12 3-way projectiles at the player.
+        /// </summary>
         public static Move SHOOT_3_SEVERAL;
 
+        /// <summary>
+        /// Shoots a 70 degree arc at the player.
+        /// </summary>
         public static Move SHOOT_ARC_70;
 
+        /// <summary>
+        /// Shoots a 120 degree arc at the player.
+        /// </summary>
         public static Move SHOOT_ARC_120;
 
+        /// <summary>
+        /// Shoots a 150 degree arc at the player.
+        /// </summary>
         public static Move SHOOT_ARC_150;
 
+        /// <summary>
+        /// Shoots a dense 70 degree arc at the player.
+        /// </summary>
         public static Move SHOOT_ARC_70_DENSE;
 
+        /// <summary>
+        /// Shoots a dense 120 degree arc at the player.
+        /// </summary>
         public static Move SHOOT_ARC_120_DENSE;
 
+        /// <summary>
+        /// Shoots a dense 150 degree arc at the player.
+        /// </summary>
         public static Move SHOOT_ARC_150_DENSE;
 
         public void Load() {

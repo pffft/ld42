@@ -13,7 +13,27 @@ namespace AI
 
     public partial class AISequence
     {
+        /// <summary>
+        /// When calling ToString on AISequences, should we try to expand sequence generator
+        /// functions into their base AISequences, or simply say there was a function there?
+        /// </summary>
         public static bool ShouldTryExpandFunctions = false;
+
+        /// <summary>
+        /// Should we allow new AISequences to be generated? This is false by default; when
+        /// we are ready to load in the sequence dictionaries, we set this to true. This will
+        /// catch floating AISequence declarations at runtime.
+        /// </summary>
+        public static bool ShouldAllowInstantiation = false;
+
+        [System.Diagnostics.DebuggerHidden]
+        private static void CheckAllowInstantiation()
+        {
+            if (!ShouldAllowInstantiation)
+            {
+                throw new System.Exception("Free-floating AISequence generated outside of Load().");
+            }
+        }
 
         // A list of events to execute.
         public AIEvent[] events;
@@ -82,7 +102,8 @@ namespace AI
         #region Constructors
 
         // Used internally as a shortcut.
-        private AISequence(AIEvent[] events) { 
+        private AISequence(AIEvent[] events) {
+            CheckAllowInstantiation();
             this.events = events; 
             this.children = null;
 
@@ -95,6 +116,7 @@ namespace AI
          */
         public AISequence(AIEvent.Action a)
         {
+            CheckAllowInstantiation();
             this.events = new AIEvent[] { new AIEvent(0f, a) };
             this.children = null;
 
@@ -106,6 +128,7 @@ namespace AI
          */
         public AISequence(params AISequence[] sequences)
         {
+            CheckAllowInstantiation();
             this.events = null;
             this.children = sequences;
 
@@ -116,7 +139,9 @@ namespace AI
          * Keeps track of a function that can "explode" into a list of AISequences.
          * When this is added to the event queue, this function is called.
          */
-        public AISequence(GenerateSequences genFunction) {
+        public AISequence(GenerateSequences genFunction)
+        {
+            CheckAllowInstantiation();
             this.events = null;
             this.children = null;
 
@@ -130,6 +155,7 @@ namespace AI
          */
         public AISequence(GenerateSequence genFunction)
         {
+            CheckAllowInstantiation();
             this.events = null;
             this.children = null;
 
