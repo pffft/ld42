@@ -6,7 +6,7 @@ using AI;
 
 namespace Moves
 {
-    internal class Move : AISequence
+    public class Move : AISequence
     {
 
         /*

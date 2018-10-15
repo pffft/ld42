@@ -55,8 +55,8 @@ namespace AI
                 return description;
             }
 
-            if (this is Move) {
-                Move move = this as Move;
+            if (this is Moves.Move) {
+                Moves.Move move = this as Moves.Move;
                 if (move.description != null) {
                     return move.description;
                 } else {

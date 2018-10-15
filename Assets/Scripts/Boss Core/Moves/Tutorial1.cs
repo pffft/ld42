@@ -76,7 +76,7 @@ namespace Moves
                     Teleport().Wait(0.25f),
                     new AISequence(() =>
                     {
-                        return Shoot1().Wait(0.1f).Times(Random.Range(7, 12));
+                        return Shoot3().Wait(0.1f).Times(Random.Range(7, 12));
                     }).Wait(1.5f)
                 )
             );

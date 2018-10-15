@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IMoveDictionary {
+namespace Moves
+{
+    public interface IMoveDictionary
+    {
 
-    /*
-     * Loads this Move file's moves and initializes their sequences.
-     */
-    void Load();
+        /*
+         * Loads this Move file's moves and initializes their sequences.
+         */
+        void Load();
+    }
 }

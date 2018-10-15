@@ -84,7 +84,7 @@ namespace AI
                         continue;
                     }
 
-                    (System.Activator.CreateInstance(type) as IMoveDictionary).Load();
+                    (System.Activator.CreateInstance(type) as Moves.IMoveDictionary).Load();
                 }
             }
             Profiler.EndSample();
