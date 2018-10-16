@@ -8,7 +8,7 @@ using AOEs;
 
 namespace Moves
 {
-    public abstract class Move
+    public abstract class Move : AISequence
     {
         /*
          * A relative difficulty parameter. 
@@ -108,6 +108,11 @@ namespace Moves
                     .Pause(GetBeforeDelay())
                     .Then(GetSequence())
                     .Wait(GetAfterDelay());
+        }
+
+        public void Initialize() {
+            this.description = GetDescription();
+            this.GetChildren = () => GetFinalSequence().GetChildren();
         }
     }
 }

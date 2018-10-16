@@ -6,57 +6,53 @@ using System.Reflection;
 
 public class MoveLoader {
 
-    public void Load() {
+    public virtual void Load() {
 
+        Profiler.BeginSample("Loading " + GetType().Namespace);
         Assembly thisAssembly = Assembly.GetExecutingAssembly();
 
-        Debug.Log("Loading in namespace: " + GetType().Namespace);
+        // Grab all the fields within this namespace
         FieldInfo[] fields = GetType().GetFields(BindingFlags.Public | BindingFlags.Static);
 
         for (int i = 0; i < fields.Length; i++)
         {
-            string fullName = GetType().Namespace + "." + fields[i].Name;
-
-            System.Type type = thisAssembly.GetType(fullName);
-            if (type == null)
-            {
-                Debug.LogError("Failed to locate class with type \"" + fullName + "\".");
+            // If the field is already instantiated, then we can skip it without reporting errors.
+            if (fields[i].GetValue(null) != null) {
                 continue;
             }
 
+            // Try seeing what the type of the field is first- if it's custom, try to load that in.
+            System.Type type = fields[i].FieldType;
+            if (type == null || type.Name.Equals("Move"))
+            {
+                // Failing that, try to look up the class name by the field's name.
+                string fullName = GetType().Namespace + "." + fields[i].Name;
+                type = thisAssembly.GetType(fullName);
+                if (type == null)
+                {
+                    Debug.LogError("Failed to locate class with type \"" + fullName + "\".");
+                    continue;
+                }
+            }
+
+            // Try to instantiate the type via a parameterless constructor.
             try 
             {
-                fields[i].SetValue(null, System.Activator.CreateInstance(type));
+                Moves.Move move = System.Activator.CreateInstance(type) as Moves.Move;
+
+                Debug.Log("Is move null?: " + (move == null));
+                move.Initialize();
+                fields[i].SetValue(null, move);
             } 
-            catch (System.MissingMethodException m) 
+            catch (System.MissingMethodException) 
             {
                 // We can optionally try harder to find other constructors here.
                 // Maybe check for optional types; feed in defaults for value types, etc..
 
-                Debug.LogError("Failed to find parameterless constructor for type \"" + fullName + "\".");
+                Debug.LogError("Failed to find parameterless constructor for type \"" + type.FullName + "\".");
                 continue;
-            }
-
-            Debug.Log("Successfully loaded Move " + fields[i].Name);
-        }
-
-        /*
-        Profiler.BeginSample("Loading in moves via reflection");
-        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        foreach (System.Type type in assembly.GetTypes())
-        {
-            if (type.Namespace != null && type.Namespace.Equals(GetType().Namespace))
-            {
-                if (type.Name.Equals("Definitions"))
-                {
-                    continue;
-                }
-
-                //(System.Activator.CreateInstance(type) as Moves.IMoveDictionary).Load();
-
             }
         }
         Profiler.EndSample();
-        */
     }
 }

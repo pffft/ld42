@@ -59,22 +59,9 @@ namespace AI
             AISequence[] sequences = GetChildren();
             if (sequences != null)
             {
-
-                if (description == null)
+                for (int i = 0; i < sequences.Length; i++)
                 {
-                    fullDesc += sequences[0];
-                }
-                else
-                {
-                    fullDesc += " Then, " + sequences[0];
-                }
-
-                if (sequences.Length > 1)
-                {
-                    for (int i = 1; i < sequences.Length; i++)
-                    {
-                        fullDesc += " Then, " + sequences[i];
-                    }
+                    fullDesc += " Then, " + sequences[i];
                 }
 
                 // TODO: find a way to detect repeated function calls (with different parameters), and

@@ -7,6 +7,9 @@ using UnityEngine.Profiling;
 using static AI.AISequence;
 using static AI.SequenceGenerators;
 
+using System.Reflection;
+using System.Linq;
+
 namespace AI
 {
     public partial class AIPhase
@@ -74,32 +77,57 @@ namespace AI
         public static void Load() {
             AISequence.ShouldAllowInstantiation = true;
 
-            /*
-            Profiler.BeginSample("Loading in moves via reflection");
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            foreach (System.Type type in assembly.GetTypes()) {
-                if (type.Namespace != null && type.Namespace.Equals("Moves"))
-                {
-                    if (type.Name.Equals("Move") || type.Name.Equals("IMoveDictionary"))
-                    {
+            Profiler.BeginSample("Loading Moves");
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // Grab all the distinct namespaces in this project
+            List<string> namespaces = assembly
+                .GetTypes()
+                .Select(t => t.Namespace)
+                .Distinct()
+                .ToList();
+
+            foreach (string ns in namespaces) {
+                // Select the ones that aren't default, and start with "Moves"
+                if (ns != null && ns.StartsWith("Moves", System.StringComparison.Ordinal)) {
+
+                    // Exclude the base "Moves" namespace itself
+                    if (ns.Equals("Moves")) {
                         continue;
                     }
 
-                    (System.Activator.CreateInstance(type) as Moves.IMoveDictionary).Load();
+                    // Ensure that namespace has a Definitions file
+                    // TODO: note that we technically don't need a definitions file; that just gives us the
+                    // compile-time reassurance of existence. We can still look into the directory and load in
+                    // and moves as needed, though accessing those moves without a move dictionary might be hard.
+                    System.Type type = assembly.GetType(ns + ".Definitions");
+                    if (type == null) {
+                        Debug.LogError("Found Move namespace with missing \"Definitions\" file: " + ns);
+                        continue;
+                    }
+
+                    // Ensure the Definitions file is a valid MoveLoader
+                    MoveLoader loader = System.Activator.CreateInstance(type) as MoveLoader;
+                    if (loader == null) {
+                        Debug.LogError("Found \"Definitions\" file that is not a MoveLoader type: " + ns);
+                        continue;
+                    }
+
+                    // Load it up!
+                    loader.Load();
                 }
             }
-            Profiler.EndSample();
-            */
 
-            new Moves.Basic.Definitions().Load();
+            Profiler.EndSample();
+
+            //new Moves.Basic.Definitions().Load();
 
             PHASE_TUTORIAL_1 = new AIPhase()
                 .SetMaxHealth(20)
                 .SetMaxArenaRadius(0.75f * 50f)
-                .AddMove(10, Moves.Basic.Definitions.Shoot1)
-                .AddMove(10, Moves.Basic.Definitions.Shoot_2_Waves)
+                //.AddSequence(10, Moves.Basic.Definitions.SHOOT_1)
                 //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
-                //.AddSequence(10, Moves.Basic.SWEEP.Wait(1f))
+                .AddSequence(10, Moves.Basic.Definitions.SWEEP.Wait(1f))
                 //.AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
                 //.AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
                 //.AddSequence(10, Moves.Tutorial1.SHOOT_1_SEVERAL)
@@ -128,11 +156,15 @@ namespace AI
 
             PHASE1 = new AIPhase()
                 //.AddSequence(10, SHOOT3_WAVE3)
-                //.AddSequence(10, Moves.Basic.SHOOT_2_WAVES.Times(5))
+                .AddSequence(10, Moves.Basic.Definitions.SHOOT_2_WAVES)
+                .AddSequence(10, Moves.Basic.Definitions.AOE_90)
+                .AddSequence(10, Moves.Basic.Definitions.AOE_120)
+                .AddSequence(10, Moves.Basic.Definitions.AOE_360)
+
                 //.AddSequence(10, HEX_CURVE_INTRO)
                 //.AddSequence(10, DOUBLE_HEX_CURVE)
                 //.AddSequence(10, HOMING_STRAFE_WAVE_SHOOT.Times(2))
-                //.AddSequence(10, Moves.Basic.SWEEP)
+                //.AddMove(10, Moves.Basic.Definitions.SWEEP)
                 //.AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH)
                 //.AddSequence(10, SWEEP_BACK_AND_FORTH_MEDIUM)
                 //.AddSequence(10, SWEEP_BACK_AND_FORTH_ADVANCED)

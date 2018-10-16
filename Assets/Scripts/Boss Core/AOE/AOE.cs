@@ -558,5 +558,10 @@ namespace AOEs
             obj.SetActive(true);
             return aoe;
         }
+
+        public override string ToString()
+        {
+            return "AOE";
+        }
     }
 }

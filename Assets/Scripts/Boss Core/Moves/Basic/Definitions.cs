@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using AOEs;
+using static BossController;
+
 namespace Moves.Basic
 {
     public class Definitions : MoveLoader
@@ -9,17 +12,17 @@ namespace Moves.Basic
         /// <summary>
         /// Shoots a single small, medium speed projectile at the player.
         /// </summary>
-        public static Move Shoot1;
+        public static Shoot1 SHOOT_1;
 
         /// <summary>
         /// Shoots three small, medium speed projectiles at the player.
         /// </summary>
-        public static Move SHOOT_3;
+        public static Shoot3 SHOOT_3;
 
         /// <summary>
         /// Shoots 2 90 waves as one block, encouraging dodging through them.
         /// </summary>
-        public static Move Shoot_2_Waves;
+        public static Shoot_2_Waves SHOOT_2_WAVES;
 
         /// <summary>
         /// Shoots two 60 degree waves with a 45 degree gap in the middle.
@@ -29,7 +32,7 @@ namespace Moves.Basic
         /// <summary>
         /// Shoots a 360 degree AOE attack with a width of 3.
         /// </summary>
-        public static Move Aoe_360;
+        public static Move AOE_360;
 
         /// <summary>
         /// Shoots a 120 degree AOE attack with a width of 3.
@@ -60,7 +63,7 @@ namespace Moves.Basic
         /// <summary>
         /// Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.
         /// </summary>
-        public static Move SWEEP;
+        public static Sweep SWEEP;
 
         /// <summary>
         /// Shoots a sweep from +30 degrees to -90 degrees offset from the player's current position.
@@ -87,5 +90,14 @@ namespace Moves.Basic
         /// Shoots a projectile that splits into 6 curving projectiles.
         /// </summary>
         public static Move SPLIT_6_CURVE;
+
+        public override void Load() {
+
+            AOE_90 = new ShootAOE(AOE.New(self).On(-45f, 45f).FixedWidth(3f));
+            AOE_120 = new ShootAOE(AOE.New(self).On(-60f, 60f).FixedWidth(3f));
+            AOE_360 = new ShootAOE(AOE.New(self).On(0, 360).FixedWidth(3f));
+
+            base.Load();
+        }
     }
 }

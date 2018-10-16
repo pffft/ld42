@@ -12,30 +12,30 @@ namespace AI
 {
     public static class SequenceGenerators
     {
-        public static AISequence Shoot1(Projectile skeleton=null)
-        {
-            return new AISequence(() =>
-            {
-                Glare();
-                Projectile struc = skeleton ?? Projectile.New(self);
-                struc.Create();
-            }).Description("Shot a single " + (skeleton == null ? "default projectile at the player." : skeleton + "."));
-        }
+        //public static AISequence Shoot1(Projectile skeleton=null)
+        //{
+        //    return new AISequence(() =>
+        //    {
+        //        Glare();
+        //        Projectile struc = skeleton ?? Projectile.New(self);
+        //        struc.Create();
+        //    }).Description("Shot a single " + (skeleton == null ? "default projectile at the player." : skeleton + "."));
+        //}
 
-        public static AISequence Shoot3(Projectile skeleton=null)
-        {
-            return new AISequence(() =>
-            {
-                Glare();
+        //public static AISequence Shoot3(Projectile skeleton=null)
+        //{
+        //    return new AISequence(() =>
+        //    {
+        //        Glare();
 
-                for (int i = 0; i < 3; i++)
-                {
-                    Projectile newStruc = skeleton ?? Projectile.New(self);
-                    newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
-                    newStruc.Create();
-                }
-            }).Description("Shot three " + (skeleton == null ? "default projectiles at the player." : skeleton + ".")); ;
-        }
+        //        for (int i = 0; i < 3; i++)
+        //        {
+        //            Projectile newStruc = skeleton ?? Projectile.New(self);
+        //            newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
+        //            newStruc.Create();
+        //        }
+        //    }).Description("Shot three " + (skeleton == null ? "default projectiles at the player." : skeleton + ".")); ;
+        //}
 
         public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile skeleton=null)
         {
@@ -132,7 +132,7 @@ namespace AI
         public static AISequence ShootHomingStrafe(bool clockwise=true, int strafeAmount=5, int speed=25) {
             return new AISequence(
                 Strafe(clockwise, strafeAmount, speed),
-                Shoot1(Projectile.New(self).Size(Size.MEDIUM).Homing())
+                new Moves.Basic.Shoot1(Projectile.New(self).Size(Size.MEDIUM).Homing()).GetSequence()
             ).Description("Strafed " + strafeAmount + " degrees " + (clockwise ? "clockwise" : "counterclockwise") + " and shot a homing projectile.");
         }
 
