@@ -156,12 +156,12 @@ namespace Moves
         //        ShootAOE(AOE.New(self).On(-60, 60f).FixedWidth(3f))
         //    );
 
-        //    AOE_90 = new Move(
-        //        1.5f,
-        //        "AOE_360",
-        //        "Shoots a 90 degree AOE attack with a width of 3.",
-        //        ShootAOE(AOE.New(self).On(-45f, 45f).FixedWidth(3f))
-        //    );
+            //AOE_90 = new Move(
+            //    1.5f,
+            //    "AOE_360",
+            //    "Shoots a 90 degree AOE attack with a width of 3.",
+            //    ShootAOE(AOE.New(self).On(-45f, 45f).FixedWidth(3f))
+            //);
 
         //    LINE_STRAFE_60 = new Move(
         //        2f,
@@ -197,26 +197,26 @@ namespace Moves
         //        )
         //    );
 
-        //    SWEEP = new Move(
-        //        2f,
-        //        "SWEEP",
-        //        "Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.",
-        //        new AISequence(
-        //            Teleport().Wait(0.25f),
-        //            PlayerLock(true),
-        //            new AISequence(() =>
-        //            {
-        //                List<AISequence> sequences = new List<AISequence>();
-        //                for (int i = -30; i < 90; i += 5)
-        //                {
-        //                    sequences.Add(Shoot1(Projectile.New(self).AngleOffset(i)).Wait(0.05f));
-        //                }
-        //                return sequences.ToArray();
-        //            }),
-        //            PlayerLock(false),
-        //            Pause(0.25f)
-        //        )
-        //    );
+            //SWEEP = new Move(
+            //    2f,
+            //    "SWEEP",
+            //    "Shoots a sweep from -30 degrees to +90 degrees offset from the player's current position.",
+            //    new AISequence(
+            //        Teleport().Wait(0.25f),
+            //        PlayerLock(true),
+            //        new AISequence(() =>
+            //        {
+            //            List<AISequence> sequences = new List<AISequence>();
+            //            for (int i = -30; i < 90; i += 5)
+            //            {
+            //                sequences.Add(Shoot1(Projectile.New(self).AngleOffset(i)).Wait(0.05f));
+            //            }
+            //            return sequences.ToArray();
+            //        }),
+            //        PlayerLock(false),
+            //        Pause(0.25f)
+            //    )
+            //);
 
         //    SWEEP_REVERSE = new Move(
         //        2f,

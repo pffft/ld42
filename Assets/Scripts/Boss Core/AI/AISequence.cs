@@ -50,12 +50,6 @@ namespace AI
             return this;
         }
 
-        // Glue code. Allows an AISequence to be "promoted" to a Move with
-        // a lot of defaults set. Not meant to be used externally.
-        public static implicit operator Moves.Move(AISequence sequence) {
-            return new Moves.GenericMove(sequence);
-        }
-
         public override string ToString() {
             if (description != null) {
                 return description;
