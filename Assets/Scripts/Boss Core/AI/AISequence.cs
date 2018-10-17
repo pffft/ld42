@@ -55,6 +55,7 @@ namespace AI
                 return description;
             }
 
+            /*
             if (this is Move) {
                 Move move = this as Move;
                 if (move.description != null) {
@@ -63,6 +64,7 @@ namespace AI
                     return move.sequence.ToString();
                 }
             }
+            */
 
             string fullDesc = null;
             AISequence[] sequences = GetChildren();
