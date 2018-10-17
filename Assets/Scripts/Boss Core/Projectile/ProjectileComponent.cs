@@ -118,8 +118,8 @@ namespace Projectiles {
 
             if (transform.position.magnitude > 100f)
             {
-                data.OnDestroyOutOfBoundsImpl(this);
-                Destroy(this.gameObject);
+                //data.OnDestroyOutOfBoundsImpl(this);
+                //Destroy(this.gameObject);
             }
 
             Profiler.BeginSample("Projectile custom update");

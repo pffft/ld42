@@ -3,7 +3,7 @@ using AOEs;
 using BossCore;
 using Projectiles;
 using System.Collections.Generic;
-
+using UnityEngine;
 using static AI.AISequence;
 using static AI.SequenceGenerators;
 using static BossController;
@@ -99,6 +99,14 @@ namespace Moves
         /// Shoots a projectile that splits into 6 curving projectiles.
         /// </summary>
         public static Move SPLIT_6_CURVE;
+
+        public static Move LIGHTNING_ARENA;
+
+        public static Move LIGHTNING_WITH_AOE;
+
+        public static Move LIGHTNING_AOE_WAVE;
+
+        public static Move PINCER;
 
         #endregion
 
@@ -306,6 +314,154 @@ namespace Moves
                     Teleport().Wait(0.5f),
                     Shoot1(Projectile.New(self).MaxTime(0.25f).Speed(Speed.VERY_FAST).DeathHex()).Wait(0.5f)
                 )
+            );
+
+            LIGHTNING_ARENA = new Move(
+                5f,
+                "LIGHTNING_ARENA",
+                "Spawns lightning on the whole arena",
+                new AISequence(
+                    Teleport(World.Arena.CENTER).Wait(0.25f),
+                    new AISequence(() => {
+                        List<AISequence> sequences = new List<AISequence>();
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            sequences.Add(Shoot1(
+                                Projectile
+                                    .New(self)
+                                    .AngleOffset(i * 90f)
+                                    .Lightning(0)
+                                    .Speed(Speed.LIGHTNING)
+                                    .MaxTime(0.05f)
+                                    .OnDestroyTimeout(CallbackDictionary.LIGHTNING_RECUR)
+                                ).Wait(0.1f));
+                        }
+                        return sequences.ToArray();
+                    }).Wait(1f)
+                )
+            );
+
+            LIGHTNING_WITH_AOE = new Move(
+                6f,
+                "LIGHTNING_WITH_AOE",
+                "Test",
+                new AISequence(
+                    ShootAOE(AOE
+                             .New(self)
+                             .On(-22.5f, 22.5f)
+                             .On(90 - 22.5f, 90 + 22.5f)
+                             .On(180 - 22.5f, 180 + 22.5f)
+                             .On(270 - 22.5f, 270 + 22.5f)
+                             .AngleOffset(-25)
+                             .RotationSpeed(15f)
+                             .FixedWidth(10f)
+                             .Speed(Speed.MEDIUM_SLOW)
+                    ).Wait(1.5f),
+                    LIGHTNING_ARENA.Wait(0.5f),
+                    ShootAOE(AOE
+                             .New(self)
+                             .On(-22.5f, 22.5f)
+                             .On(90 - 22.5f, 90 + 22.5f)
+                             .On(180 - 22.5f, 180 + 22.5f)
+                             .On(270 - 22.5f, 270 + 22.5f)
+                             .AngleOffset(25)
+                             .RotationSpeed(-15f)
+                             .FixedWidth(10f)
+                             .Speed(Speed.MEDIUM_SLOW)
+                    ).Wait(1.5f),
+                    LIGHTNING_ARENA.Wait(2.5f)
+                )
+            );
+
+            LIGHTNING_AOE_WAVE = new Move(
+                6f,
+                "LIGHTNING_AOE_WAVE",
+                "Test",
+                new AISequence(
+                    Teleport().Wait(0.5f),
+                    new AISequence(() => {
+                    List<AISequence> sequences = new List<AISequence>();
+
+                    for (int i = 0; i < 7; i++) {
+                        int nextAttack = Random.Range(0, 5);
+                        switch(nextAttack) {
+                            case 0: sequences.Add(
+                                ShootArc(100, -60, 60, Projectile.New(self).Size(Size.HUGE).Speed(Speed.VERY_FAST)).Wait(0.05f).Times(3)); break;
+                            case 1: sequences.Add(
+                                ShootAOE(AOE.New(self).On(-60, 60).FixedWidth(3f).Speed(Speed.VERY_FAST))); break;
+                            case 2: sequences.Add(
+                                Shoot1(Projectile.New(self).Lightning(0).Speed(Speed.LIGHTNING).MaxTime(0.05f).OnDestroyTimeout(CallbackDictionary.LIGHTNING_RECUR))); break;
+                            case 3: sequences.Add(
+                                Merge(
+                                    ShootArc(150, 22.5f, 22.5f + 60f, Projectile.New(self).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
+                                    ShootArc(150, -22.5f, -22.5f - 60f, Projectile.New(self).Size(Size.MEDIUM).Speed(Speed.VERY_FAST))
+                                )); break;
+                            case 4: sequences.Add(
+                                ShootArc(100, -60, 60, Projectile.New(self).Speed(Speed.VERY_FAST).Size(Size.TINY)).Wait(0.1f).Times(7)
+                                ); break;
+                        }
+                        sequences.Add(Pause(0.5f));
+                    }
+
+                    return sequences.ToArray();
+                    })
+                )
+            );
+
+            PINCER = new Move(
+                4f,
+                "PINCER",
+                "Test",
+                new AISequence(() =>
+                {
+                    List<AISequence> sequences = new List<AISequence>();
+
+                    Speed speed = Speed.SNIPE;
+
+                    //for (int i = 30; i < 120; i += 5)
+                    float curve = 135f;
+                    for (int i = 0; i < 10; i++) 
+                    {
+                        float curveAmount =
+                            -4f * // base
+                            (float)speed * // turning radius is tighter when we go faster
+                            (20f / (GameManager.Boss.transform.position - GameManager.Player.transform.position).magnitude) * // contribution due to distance from player
+                            Mathf.Sqrt(2) * Mathf.Sin(Mathf.Deg2Rad * curve); // contribution due to initial firing offset
+                        Debug.Log(curveAmount);
+
+                        //sequences.Add(Shoot1(Projectile.New(self).Speed(Speed.SNIPE).AngleOffset(i).Curving(curveAmount, false).MaxTime(2.2f)));
+                        //sequences.Add(Shoot1(Projectile.New(self).Speed(Speed.SNIPE).AngleOffset(-i).Curving(-curveAmount, false).MaxTime(2.2f)));
+                        sequences.Add(Shoot1(Projectile.New(self).Speed(Speed.SNIPE).AngleOffset(curve).Curving(curveAmount, false).MaxTime(3.35f)));
+                        //sequences.Add(Shoot1(Projectile.New(self).Speed(Speed.SNIPE).AngleOffset(-curve).Curving(-curveAmount, false).MaxTime(1f)));
+                        sequences.Add(Pause(0.05f));
+
+                    /*
+                     * Note that the best function found for the max time at 50 units away (y),
+                     * as a function of the curvature (x), was:
+                     * 
+                     * on the lower end:
+                     * 1 + (x/128)^3
+                     * 
+                     * on the higher end:
+                     * 1 + tan(x/2) [in degrees]
+                     * 
+                     * Using a linear interpolation of these two (with bounds of [0, 180]) gives:
+                     * ( ((180 - x) / 180) * (1 + (x/128)^3) ) + ( (x / 180) * (1 + tan(x/2) )
+                     * 
+                     * This isn't ideal. Find a better formula.
+                     */
+
+                    /*
+                     * Better formula for actual max time:
+                     * 360 / (2 * curve) * speed * PI * (50 / sin(curveAmount))
+                     */
+                    }
+
+                    
+                    //sequences.Add(Shoot1(Projectile.New(self).Speed(Speed.SNIPE).AngleOffset(-45).Curving(-curveAmount, false)));
+                    return sequences.ToArray();
+                }).Wait(0.5f)
             );
         }
 

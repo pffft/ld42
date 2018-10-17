@@ -118,5 +118,33 @@ namespace Projectiles
                 .OnDestroyTimeout(REVERSE_FASTER)
                 .Create();
         };
+
+        public static ProjectileCallbackDelegate LIGHTNING_RECUR = (self) =>
+        {
+            ProjectileLightning lightningSelf = self as ProjectileLightning;
+            int times;
+            if (lightningSelf.level < 3)
+            {
+                times = Random.Range(2, 3);
+            }
+            else
+            {
+                times = Random.Range(1, 2);
+            }
+
+            for (int i = 0; i < times; i++)
+            {
+                Projectile
+                    .New(self.data.entity)
+                    .Start(self.transform.position)
+                    .Target(lightningSelf.initialTarget)
+                    .AngleOffset(self.data.angleOffset - 45f + Random.Range(0, 90f))
+                    .Speed(Speed.LIGHTNING)
+                    .MaxTime(Random.Range(0.05f, 0.15f))
+                    .OnDestroyTimeout(LIGHTNING_RECUR)
+                    .Lightning(lightningSelf.level + 1)
+                    .Create();
+            }
+        };
     }
 }

@@ -13,6 +13,6 @@ namespace BossCore {
         FAST = 35,
         VERY_FAST = 45,
         SNIPE = 50, // This is realistically the fastest speed you should use.
-        LIGHTNING = 60
+        LIGHTNING = 75
     };
 }

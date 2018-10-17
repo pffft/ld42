@@ -10,6 +10,7 @@ namespace Projectiles
         INDESTRUCTIBLE,
         HOMING,
         CURVING,
-        DEATHHEX
+        DEATHHEX,
+        LIGHTNING
     }
 }

@@ -12,9 +12,10 @@ namespace AI
     public partial class AIPhase
     {
 
-        public static AIPhase PHASE_TEST = new AIPhase()
-            //.AddSequence(10, HOMING_STRAFE_WAVE_SHOOT)
-            ;
+        //public static AIPhase PHASE_TEST = new AIPhase()
+        //.AddSequence(10, HOMING_STRAFE_WAVE_SHOOT)
+        //   ;
+        public static AIPhase PHASE_TEST;
 
         /*
          * Teaches the player basic movement and throwing.
@@ -88,6 +89,10 @@ namespace AI
                 }
             }
             Profiler.EndSample();
+
+            PHASE_TEST = new AIPhase()
+                .AddSequence(10, Moves.Basic.PINCER)
+                ;
 
             PHASE_TUTORIAL_1 = new AIPhase()
                 .SetMaxHealth(20)
