@@ -213,6 +213,7 @@ namespace Projectiles
                 case Type.CURVING: projectile.Curving((float)_typeParameters[0], (bool)_typeParameters[1]); break;
                 case Type.DEATHHEX: projectile.DeathHex(); break;
                 case Type.HOMING: projectile.Homing(); break;
+                case Type.LIGHTNING: projectile.Lightning((int)_typeParameters[0]); break;
                 case Type.INDESTRUCTIBLE: break;
             }
 
