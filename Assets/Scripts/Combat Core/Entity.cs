@@ -15,7 +15,7 @@ namespace CombatCore
 
 		// The faction this Entity belongs to. Entities of the same faction cannot hurt eachother
 		[SerializeField]
-        private Faction faction;
+		private Faction faction = Faction.neutral;
 
 		// A resource pool that is deducted from when taking damage. Death occurs when it reaches 0.
 		[SerializeField]

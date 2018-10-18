@@ -4,7 +4,10 @@ using UnityEngine.UI;
 public class ResourceBar : MonoBehaviour
 {
 	[SerializeField]
-	private Image front, back;
+	private Image front = null;
+
+	[SerializeField]
+	private Image back = null;
 
 	public float Width
 	{

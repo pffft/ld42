@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using CombatCore;
+using System.Collections;
 using UnityEngine;
 
 public class Controller : MonoBehaviour
@@ -6,7 +7,7 @@ public class Controller : MonoBehaviour
 	private const string ABILITY_1 = "Dash", ABILITY_2 = "Throw", ABILITY_3 = "Block";
 
 	[SerializeField]
-	private float dashRange;
+	private float dashRange = 15f;
 
 	private Rigidbody physbody;
 	private CombatCore.Entity self;
@@ -17,25 +18,25 @@ public class Controller : MonoBehaviour
 	public void Awake()
 	{
 		physbody = GetComponent<Rigidbody> ();
-		self = GetComponent<CombatCore.Entity> ();
+		self = GetComponent<Entity> ();
 		dashing = false;
     }
 
 	public void Start()
 	{
-		self.AddAbility (CombatCore.Ability.Get (ABILITY_1));
-		self.AddAbility (CombatCore.Ability.Get (ABILITY_2));
-		self.AddAbility (CombatCore.Ability.Get (ABILITY_3));
+		self.AddAbility (Ability.Get (ABILITY_1));
+		self.AddAbility (Ability.Get (ABILITY_2));
+		self.AddAbility (Ability.Get (ABILITY_3));
 
 		self.tookDamage += Self_tookDamage;
 	}
 
-	private void Self_tookDamage(CombatCore.Entity victim, CombatCore.Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
+	private void Self_tookDamage(Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)
 	{
 		if (damageApplied)
 		{
 			CameraController.GetInstance ().Shake (1f, new Vector3 (rawDamage * 10f, rawDamage * 10f, rawDamage * 10f), 0.75f);
-			self.AddStatus (new CombatCore.Status ("Invincible", "", null, CombatCore.Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
+			self.AddStatus (new Status ("Invincible", "", null, Status.DecayType.communal, 1, 0.25f, new CombatCore.StatusComponents.Invincible ()));
 		}
 	}
 
@@ -46,23 +47,23 @@ public class Controller : MonoBehaviour
 
 		if (Input.GetKey (KeyCode.Space))
 		{
-			if (self.GetAbility (ABILITY_1).Use (self, facePos, dashRange))
+			if (!self.GetAbility (ABILITY_1).Use (self, facePos, dashRange))
 			{
-				
+				//TODO play failed to use ability sound
 			}
 		}
         if (Input.GetButtonDown("Fire1"))
 		{
-			if (self.GetAbility (ABILITY_2).Use (self, facePos))
+			if (!self.GetAbility (ABILITY_2).Use (self, facePos))
 			{
-                
+				//TODO play failed to use ability sound
 			}
 		}
 		if (Input.GetButtonDown("Fire2"))
 		{
-			if (self.GetAbility (ABILITY_3).Use (self, facePos))
+			if (!self.GetAbility (ABILITY_3).Use (self, facePos))
 			{
-
+				//TODO play failed to use ability sound
 			}
 		}
 	}

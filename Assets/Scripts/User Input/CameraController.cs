@@ -1,21 +1,21 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+//TODO fix follow logic, use followRadius
 public class CameraController : MonoBehaviour
 {
 	private static CameraController instance;
 
+//	[SerializeField]
+//	private float followRadius = 0f;
 	[SerializeField]
-	private float followRadius;
+	private float followSpeed = 10f;
 
 	[SerializeField]
-	private float followSpeed;
+	private bool isFollowing = false;
 
 	[SerializeField]
-	private bool isFollowing;
-
-	[SerializeField]
-	private Transform[] followTargets;
+	private Transform[] followTargets = new Transform[2];
 
 	[SerializeField]
 	private float minZoom = 10f;
@@ -160,7 +160,6 @@ public class CameraController : MonoBehaviour
 
 	private Vector3 GetOutermostTarget(Vector3 avgPos)
 	{
-		Vector3 cameraDir = cam.transform.rotation * Vector3.forward;
 		Vector3 outermost = Vector3.zero;
 		float distance = 0f;
 

@@ -8,13 +8,13 @@ namespace GameUI
 		#region INSTANCE_VARS
 
 		[SerializeField]
-		private CircularLayout layout;
+		private CircularLayout layout = null;
 
 		[SerializeField]
-		private float holdingRadius;
+		private float holdingRadius = 100f;
 
 		[SerializeField]
-		private float rotationSpeed;
+		private float rotationSpeed = 0f;
 		#endregion
 
 		#region INSTANCE_METHODS
