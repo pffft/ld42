@@ -5,7 +5,6 @@ using Projectiles;
 using System.Collections.Generic;
 
 using static AI.AISequence;
-using static AI.SequenceGenerators;
 using static BossController;
 
 namespace Moves

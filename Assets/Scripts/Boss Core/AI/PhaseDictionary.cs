@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Profiling;
 
 using static AI.AISequence;
-using static AI.SequenceGenerators;
 
 using System.Reflection;
 using System.Linq;
@@ -78,88 +77,48 @@ namespace AI
         public static void Load() {
             AISequence.ShouldAllowInstantiation = true;
 
-            /*
-            Profiler.BeginSample("Loading Moves");
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            // Grab all the distinct namespaces in this project
-            List<string> namespaces = assembly
-                .GetTypes()
-                .Select(t => t.Namespace)
-                .Distinct()
-                .ToList();
-
-            foreach (string ns in namespaces) {
-                // Select the ones that aren't default, and start with "Moves"
-                if (ns != null && ns.StartsWith("Moves", System.StringComparison.Ordinal)) {
-
-                    // Exclude the base "Moves" namespace itself
-                    if (ns.Equals("Moves")) {
-                        continue;
-                    }
-
-                    // Ensure that namespace has a Definitions file
-                    // TODO: note that we technically don't need a definitions file; that just gives us the
-                    // compile-time reassurance of existence. We can still look into the directory and load in
-                    // and moves as needed, though accessing those moves without a move dictionary might be hard.
-                    System.Type type = assembly.GetType(ns + ".Definitions");
-                    if (type == null) {
-                        Debug.LogError("Found Move namespace with missing \"Definitions\" file: " + ns);
-                        continue;
-                    }
-
-                    // Ensure the Definitions file is a valid MoveLoader
-                    MoveLoader loader = System.Activator.CreateInstance(type) as MoveLoader;
-                    if (loader == null) {
-                        Debug.LogError("Found \"Definitions\" file that is not a MoveLoader type: " + ns);
-                        continue;
-                    }
-
-                    // Load it up!
-                    loader.Load();
-                }
-            }
-
-            Profiler.EndSample();
-            */
-
             PHASE_TEST = new AIPhase()
                 //.AddSequence(10, Moves.Basic.PINCER)
                 //.AddSequence(10, Moves.Test.Definitions.LIGHTNING_ARENA)
-                .AddSequence(10, new Moves.Test.Lightning_Arena());
+                //.AddSequence(10, new Moves.Test.Lightning_Arena().Times(2))
                 //.AddSequence(10, new Moves.Test.Lightning_With_AOE())
+                //.AddSequence(10, new Moves.Basic.Shoot1());
+                //.AddSequence(10, new Moves.Test.Laser())
+                //.AddSequence(10, new Moves.Test.Quick_Waves())
+                //.AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
+                //.AddSequence(10, new Moves.Test.Double_Laser_Sweep())
+                .AddSequence(10, new Moves.Test.Pincer_Sweep())
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()
                 .SetMaxHealth(20)
                 .SetMaxArenaRadius(0.75f * 50f)
-                //.AddSequence(10, Moves.Basic.Definitions.SHOOT_1)
-                //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
                 .AddSequence(10, new Moves.Basic.Sweep().Wait(1f))
-                //.AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
-                //.AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
-                //.AddSequence(10, Moves.Tutorial1.SHOOT_1_SEVERAL)
-                //.AddSequence(10, Moves.Tutorial1.SHOOT_3_SEVERAL)
-                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70)
-                //.AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120)
-                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150)
-                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_70_DENSE)
-                //.AddSequence(4, Moves.Tutorial1.SHOOT_ARC_120_DENSE)
-                //.AddSequence(3, Moves.Tutorial1.SHOOT_ARC_150_DENSE)
+                .AddSequence(10, new Moves.Basic.Sweep(reverse: true).Wait(1f))
+                .AddSequence(10, new Moves.Basic.Sweep_Back_And_Forth().Wait(1f))
+                .AddSequence(10, new Moves.Basic.Sweep_Both().Wait(1f))
+                .AddSequence(10, new Moves.Tutorial1.Shoot_1_Several())
+                .AddSequence(10, new Moves.Tutorial1.Shoot_3_Several())
+                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(70))
+                .AddSequence(4, new Moves.Tutorial1.Shoot_Arc(120))
+                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(150))
+                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(70, true))
+                .AddSequence(4, new Moves.Tutorial1.Shoot_Arc(120, true))
+                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(150, true))
                 ;
 
             PHASE_TUTORIAL_2 = new AIPhase()
                 .SetMaxHealth(20)
-                //.AddSequence(10, Moves.Tutorial2.FORCE_BLOCK)
+                .AddSequence(10, new Moves.Tutorial2.Force_Block())
                 ;
 
             PHASE_TUTORIAL_3 = new AIPhase()
                 .SetMaxHealth(20)
                 //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
                 //.AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Wait(0.5f))
-                //.AddSequence(10, Moves.Tutorial3.AOE_90)
-                //.AddSequence(10, Moves.Tutorial3.AOE_120)
-                //.AddSequence(10, Moves.Tutorial3.AOE_360)
+                .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(90))
+                .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(120))
+                .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(360))
                 ;
 
             PHASE1 = new AIPhase()

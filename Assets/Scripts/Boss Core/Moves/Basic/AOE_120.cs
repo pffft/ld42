@@ -10,9 +10,13 @@ namespace Moves.Basic
 {
     public class AOE_120 : AISequence
     {
-
-        public override float Difficulty => 1f;
-
-        public AOE_120() : base(new ShootAOE(AOE.New(self).On(-60, 60).FixedWidth(3f))) { }
+        public AOE_120() : base
+        (
+            new ShootAOE(AOE.New(self).On(-60, 60).FixedWidth(3f))
+        ) 
+        {
+            Description = "Shoots a 120 degree wide AOE at the player.";
+            Difficulty = 1f;
+        }
     }
 }

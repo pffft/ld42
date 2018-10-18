@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using AI;
 using UnityEngine;
 
-using static AI.SequenceGenerators;
 using Projectiles;
 using static BossController;
 using BossCore;
@@ -13,12 +12,9 @@ namespace Moves.Test
 {
     public class Lightning_Arena : AISequence
     {
-        public override string Description => "Spawns lightning on the whole arena";
-        public override float Difficulty => 5f;
-
         public Lightning_Arena() : base
         (
-            Teleport(World.Arena.CENTER).Wait(0.25f),
+            new Teleport(World.Arena.CENTER).Wait(0.25f),
             new AISequence(() =>
             {
                 List<AISequence> sequences = new List<AISequence>();
@@ -39,6 +35,9 @@ namespace Moves.Test
             }),
             Pause(1f)
         )
-        { }
+        { 
+            Description = "Spawns lightning on the whole arena";
+            Difficulty = 5f;
+        }
     }
 }

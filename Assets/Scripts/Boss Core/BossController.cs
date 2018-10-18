@@ -5,7 +5,6 @@ using Projectiles;
 using AI;
 
 using UnityEngine.Profiling;
-using static AI.SequenceGenerators;
 
 /*
  * TODO: refactor the shootXXX methods to have similar parameters.
@@ -97,10 +96,50 @@ public class BossController : MonoBehaviour
         CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
 
         self.SetInvincible(true);
-        eventQueue.Add(Teleport(World.Arena.CENTER).Wait(3f));
+        eventQueue.Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
         eventQueue.Add(new AISequence(() => { self.SetInvincible(false); }));
     }
 
+    /*
+     * Dashes to the provided position. 
+     * 
+     * This happens separately from the event queue, and will pause any future
+     * events until after this dash is completed.
+     */
+    public static IEnumerator Dash(Vector3 targetPosition)
+    {
+
+        eventQueue.Pause();
+
+        Vector3 dashDir = (targetPosition - GameManager.Boss.transform.position).normalized;
+
+        float accDist = 0f, maxDist = Vector3.Distance(targetPosition, GameManager.Boss.transform.position);
+        while (accDist < maxDist)
+        {
+            float dashDistance = Mathf.Min((insaneMode ? 1.2f : 1f) * self.movespeed.Value * 4 * Time.deltaTime, maxDist - accDist);
+
+            RaycastHit hit;
+            if (Physics.Raycast(GameManager.Boss.transform.position, dashDir, out hit, dashDistance, 1 << LayerMask.NameToLayer("Default")))
+            {
+                GameManager.Boss.transform.position = hit.point;
+                break;
+            }
+
+            GameManager.Boss.transform.position += dashDir * dashDistance;
+            accDist += dashDistance;
+            yield return null;
+        }
+
+        self.movespeed.LockTo(25);
+        eventQueue.Unpause();
+    }
+
+    /*
+     * Rotates the boss model to look in the direction of the player.
+     * 
+     * Should be used when launching an attack at the player to let them know
+     * about the boundless depths of white-hot furi that the boss has for them.
+     */
     public static void Glare()
     {
         Quaternion lookRotation = Quaternion.LookRotation(GameManager.Player.transform.position - GameManager.Boss.transform.position);

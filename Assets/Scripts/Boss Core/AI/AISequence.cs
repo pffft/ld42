@@ -52,9 +52,9 @@ namespace AI
          * 
          * This can go above 10, but that's for testing purposes (or masochism).
          */
-        public virtual float Difficulty
+        public float Difficulty
         {
-            get; private set;
+            get; protected set;
         }
 
         /*
@@ -62,14 +62,14 @@ namespace AI
          * 
          * The default value is the name of the class.
          */
-        public virtual string Name
+        public string Name
         {
             get
             {
                 return GetType().Name.Replace('_', ' ');
             }
 
-            private set
+            protected set
             {
                 Name = value;
             }
@@ -81,9 +81,9 @@ namespace AI
          * You should override this method with a more descriptive bit of text;
          * a warning is generated if this value isn't set.
          */
-        public virtual string Description
+        public string Description
         {
-            get; set;
+            get; protected set;
         }
 
         public override string ToString() {
@@ -95,7 +95,11 @@ namespace AI
             AISequence[] sequences = GetChildren();
             if (sequences != null)
             {
-                for (int i = 0; i < sequences.Length; i++)
+                if (sequences.Length > 0) {
+                    fullDesc += sequences[0];
+                }
+
+                for (int i = 1; i < sequences.Length; i++)
                 {
                     fullDesc += " Then, " + sequences[i];
                 }
@@ -116,7 +120,7 @@ namespace AI
         #region Constructors
 
         // Used internally as a shortcut.
-        private AISequence(AIEvent[] events) {
+        protected AISequence(AIEvent[] events) {
             CheckAllowInstantiation();
             this.events = events; 
             this.children = null;
@@ -228,8 +232,7 @@ namespace AI
         /*
          * Returns this AISequence, but flattened from a tree structure to a simple
          * array of AIEvents. This will execute any generation functions every time 
-         * it is called, and so the exact AIEvents generated may vary every time
-         * this method is called.
+         * it is called, and so the exact list returned may vary between method calls.
          */
         public AIEvent[] Flatten() {
             return FlattenRecur(this);
@@ -244,6 +247,10 @@ namespace AI
                     childrenEvents.AddRange(FlattenRecur(seqChildren[i]));
                 }
                 return childrenEvents.ToArray();
+            }
+
+            if (sequence.events == null) {
+                Debug.LogError("Failed to flatten AISequence: \"" + sequence + "\". Children and Events are both null.");
             }
             return sequence.events; // If null, will crash AddRange above
         }

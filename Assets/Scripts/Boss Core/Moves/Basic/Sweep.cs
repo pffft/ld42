@@ -5,26 +5,16 @@ using UnityEngine;
 
 using Projectiles;
 using static BossController;
-using static AI.SequenceGenerators;
 using static AI.AISequence;
 
 namespace Moves.Basic
 {
     public class Sweep : AISequence
     {
-
-        public override float Difficulty => 2f;
-
-        public override string Description => 
-            "Shoots a sweep from " + (reverse ? -30 : 90) + 
-            " degrees to " + (reverse ? 90 : -30) + " degrees offset from the player's current position.";
-
-        private readonly bool reverse;
-
         public Sweep(bool reverse = false) : base
         (
-            Teleport().Wait(0.25f),
-            PlayerLock(true),
+            new Teleport().Wait(0.25f),
+            new PlayerLock(true),
             new AISequence(() =>
             {
                 int start = reverse ? 90 : -30;
@@ -38,11 +28,13 @@ namespace Moves.Basic
                 }
                 return sequences.ToArray();
             }),
-            PlayerLock(false),
+            new PlayerLock(false),
             Pause(0.25f)
         )
         {
-            this.reverse = reverse;
+            Description = "Shoots a sweep from " + (reverse ? -30 : 90) +
+                " degrees to " + (reverse ? 90 : -30) + " degrees offset from the player's current position.";
+            Difficulty = 2f;
         }
     }
 }

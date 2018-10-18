@@ -376,6 +376,7 @@ namespace AOEs
             for (int i = 0; i < AOE.NUM_SECTIONS; i++)
             {
                 float angle = (i + 0.5f) * AOE.THETA_STEP;
+                //Debug.Log("Checking if " + angle + " is between " + from + " and " + to);
                 if (angle >= from && angle <= to)
                 {
                     regions[i] = true;
@@ -451,6 +452,11 @@ namespace AOEs
             //this.innerScale = 0f;
             this.innerExpansionSpeed = BossCore.Speed.FROZEN;
             this.fixedWidth = width;
+            return this;
+        }
+
+        public AOE Scale(float scale) {
+            this.scale = scale;
             return this;
         }
 

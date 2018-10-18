@@ -6,11 +6,6 @@ namespace Moves.Basic
 {
     public class Shoot3 : AISequence
     {
-        public override string Description => "Shot three " + (skeleton == null ? "default projectiles at the player." : skeleton + ".");
-
-        public override float Difficulty => 1.5f;
-
-        private readonly Projectile skeleton;
 
         public Shoot3(Projectile skeleton = null) : base
         (
@@ -27,7 +22,7 @@ namespace Moves.Basic
             }
         )
         {
-            this.skeleton = skeleton != null ? skeleton.Clone() : Projectile.New(self);
+            Description = "Shot three " + (skeleton == null ? "default projectiles at the player." : skeleton + ".");
         }
     }
 }

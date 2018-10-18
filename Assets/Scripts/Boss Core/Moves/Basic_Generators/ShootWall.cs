@@ -8,12 +8,6 @@ namespace Moves.Basic
 {
     public class ShootWall : AISequence
     {
-        public override string Description => "Shot a wall with offset " + angleOffset + " at the player."
-
-        public override float Difficulty => 1.5f;
-
-        private readonly float angleOffset;
-
         public ShootWall(float angleOffset) : base
         (
             AISequence.Merge(
@@ -22,7 +16,7 @@ namespace Moves.Basic
             )
         )
         {
-            this.angleOffset = angleOffset;
+            Description = "Shot a wall with offset " + angleOffset + " at the player.";
         }
     }
 }

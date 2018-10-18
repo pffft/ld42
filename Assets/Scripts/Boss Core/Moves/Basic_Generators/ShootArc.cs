@@ -6,15 +6,6 @@ namespace Moves.Basic
 {
     public class ShootArc : AISequence
     {
-        public override string Description => "Shot an arc (density=" + density + ", from=" + from + ", to=" + to + ") of " +
-            (skeleton == null ? "default projectiles at the player." : skeleton + ".");
-
-        public override float Difficulty => 1.5f;
-
-        private readonly int density;
-        private readonly float from;
-        private readonly float to;
-        private readonly Projectile skeleton;
 
         public ShootArc(int density = 50, float from = 0, float to = 360, Projectile skeleton = null) : base
         (
@@ -40,10 +31,8 @@ namespace Moves.Basic
             }
         )
         {
-            this.density = density;
-            this.from = from;
-            this.to = to;
-            this.skeleton = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
+            Description = "Shot an arc (density=" + density + ", from=" + from + ", to=" + to + ") of " +
+              (skeleton == null ? "default projectiles at the player." : skeleton + ".");
         }
     }
 }

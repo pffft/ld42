@@ -7,12 +7,16 @@ public class CameraController : MonoBehaviour
 
 	[SerializeField]
 	private float followRadius;
+
 	[SerializeField]
 	private float followSpeed;
+
 	[SerializeField]
 	private bool isFollowing;
+
 	[SerializeField]
 	private Transform[] followTargets;
+
 	[SerializeField]
 	private float minZoom = 10f;
 

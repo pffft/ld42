@@ -51,22 +51,37 @@ namespace AI
 
             if (sequence == null)
             {
-                Debug.LogError("Uninitialized Move added to queue. Make sure you're Load()ing the right classes.");
+                Debug.LogError("Null AISequence added to queue.");
                 return;
             }
 
-            if (sequence.Name == null)
-            {
-                Debug.LogWarning("Move did not have name. Description: " + (sequence.Description ?? "none found."));
+            // Generate warning if there's a named sequence without a description.
+            //
+            // Note that "glue" AISequences are allowed; those that don't subclass AISequence 
+            // don't need to provide a description. This includes subclassed AISequences that
+            // have additional Wait()s or Then()s called.
+            if (sequence.Description == null && !sequence.Name.Equals("AISequence")) {
+                Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
             }
 
-            if (sequence.Description == null)
-            {
-                Debug.LogWarning("Move did not have description. Name:" + (sequence.Name ?? "none found."));
+            // Generate warning if there's a sequence with too high a difficulty.
+            if (sequence.Difficulty >= 8f) {
+                Debug.LogWarning("Found AISequence \"" + sequence.Name + "\" with very high difficulty: " + sequence.Difficulty + ". ");
             }
 
-            Debug.Log("Added Move \"" + sequence.Name + "\" to queue. Here's what it says it'll do: \"" + sequence.Description + "\".");
+            Debug.Log("Added AISequence" + 
+                      (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") + 
+                      "to queue. Here's what it says it'll do: \"" +
+                      (sequence.Description ?? sequence.ToString()) + "\".");
 
+            /*
+             * TODO: be as lazy as possible when evaluating AISequences for their events.
+             * 
+             * If we flatten in one update, then later AISequences may not have the latest
+             * information. I.e., a generation function that creates 10 sequences, which each
+             * wait for 0.05 seconds. Flattening immediate causes the last one to be (10 * 0.05)
+             * seconds out of date.
+             */
             AIEvent[] coercedEvents = sequence.Flatten();
             for (int i = 0; i < coercedEvents.Length; i++)
             {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using static BossController;
-using static AI.SequenceGenerators;
 using static Projectiles.Projectile;
 using static World.Arena;
 using Projectiles;

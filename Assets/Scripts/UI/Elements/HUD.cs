@@ -37,7 +37,7 @@ public class HUD : MonoBehaviour
 	}
 
 	[SerializeField]
-	private Vector3 followOffset;
+    private Vector3 followOffset;
 
 	public void Update()
 	{

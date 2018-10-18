@@ -13,10 +13,6 @@ namespace Moves.Test
 {
     public class Lightning_With_AOE : AISequence
     {
-
-        public override string Description => "Lightning with aoe";
-        public override float Difficulty => 6f;
-
         public Lightning_With_AOE() : base
         (
             new ShootAOE(AOE
@@ -44,6 +40,9 @@ namespace Moves.Test
             ).Wait(1.5f),
             new Lightning_Arena().Wait(2.5f)
         )
-        { }
+        { 
+            Description = "Lightning with aoe";
+            Difficulty = 6f;
+        }
     }
 }
