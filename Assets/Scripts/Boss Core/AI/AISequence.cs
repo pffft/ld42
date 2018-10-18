@@ -26,7 +26,6 @@ namespace AI
         /// </summary>
         public static bool ShouldAllowInstantiation = false;
 
-        [System.Diagnostics.DebuggerHidden]
         private static void CheckAllowInstantiation()
         {
             if (!ShouldAllowInstantiation)
@@ -36,23 +35,60 @@ namespace AI
         }
 
         // A list of events to execute.
-        public AIEvent[] events;
+        private AIEvent[] events;
         private AISequence[] children;
 
         public delegate AISequence[] AISequenceGenerator();
         public AISequenceGenerator GetChildren;
 
-        // A description string. 
-        public string description;
+        /*
+         * A relative difficulty parameter. 
+         * 
+         * This is from a scale of 0 - 10, where a "10" is the point where any person
+         * would call the move "actual bullshit". That means that the move may guarantee
+         * damage, might not have safespots, might be too fast, or all of the above.
+         * 
+         * Most moves that make it to the game should be at most an 8.
+         * 
+         * This can go above 10, but that's for testing purposes (or masochism).
+         */
+        public virtual float Difficulty
+        {
+            get; private set;
+        }
 
-        public AISequence Description(string desc) {
-            this.description = desc;
-            return this;
+        /*
+         * What's the name of this Move?
+         * 
+         * The default value is the name of the class.
+         */
+        public virtual string Name
+        {
+            get
+            {
+                return GetType().Name.Replace('_', ' ');
+            }
+
+            private set
+            {
+                Name = value;
+            }
+        }
+
+        /*
+         * What does this Move do?
+         * 
+         * You should override this method with a more descriptive bit of text;
+         * a warning is generated if this value isn't set.
+         */
+        public virtual string Description
+        {
+            get; set;
         }
 
         public override string ToString() {
-            if (description != null) {
-                return description;
+            if (Description != null) {
+                return Description;
             }
 
             string fullDesc = null;
@@ -124,7 +160,7 @@ namespace AI
             this.children = null;
 
             this.GetChildren = () => genFunction();
-            this.description = ShouldTryExpandFunctions ? null : "Some sequences were generated from a function.";
+            this.Description = ShouldTryExpandFunctions ? null : "Some sequences were generated from a function.";
         }
 
         /*
@@ -138,7 +174,7 @@ namespace AI
             this.children = null;
 
             this.GetChildren = () => new AISequence[] { genFunction() };
-            this.description = ShouldTryExpandFunctions ? null : "A sequence was generated from a function.";
+            this.Description = ShouldTryExpandFunctions ? null : "A sequence was generated from a function.";
         }
 
         #endregion
@@ -237,7 +273,8 @@ namespace AI
             }
 
             AIEvent[] events = new AIEvent[sequences.Length];
-            for (int i = 0; i < sequences.Length; i++) {
+            for (int i = 0; i < sequences.Length; i++)
+            {
                 indicies[i] = 0;
                 startTimes[i] = 0;
                 events[i] = referenceEvents[i][indicies[i]];
@@ -247,11 +284,14 @@ namespace AI
             // Then remove them from processing. The merged event duration is equal to the minimum
             // duration of all the events combined; this ensures all events can run as before.
             List<AIEvent> finalEventsList = new List<AIEvent>();
-            while(true) {
+            while (true)
+            {
                 //AIEvent nextEvent = events[0];
                 float nextStartTime = float.PositiveInfinity;
-                for (int i = 0; i < events.Length; i++) {
-                    if (indicies[i] >= referenceEvents[i].Length) {
+                for (int i = 0; i < events.Length; i++)
+                {
+                    if (indicies[i] >= referenceEvents[i].Length)
+                    {
                         continue;
                     }
 
@@ -279,21 +319,27 @@ namespace AI
                     }
                 }
 
-                if (eventsToMerge.Count == 0) {
+                if (eventsToMerge.Count == 0)
+                {
                     break;
-                } else {
+                }
+                else
+                {
                     finalEventsList.Add(BasicMerge(eventsToMerge.ToArray()));
                 }
             }
 
             string mergedDesc = "Merged( ";
-            for (int i = 0; i < sequences.Length - 1; i++) {
+            for (int i = 0; i < sequences.Length - 1; i++)
+            {
                 mergedDesc += sequences[i] + " And ";
             }
             mergedDesc += sequences[sequences.Length - 1];
             mergedDesc += ").";
 
-            return new AISequence(finalEventsList.ToArray()).Description(mergedDesc);
+            return new AISequence(finalEventsList.ToArray()) { 
+                Description = mergedDesc 
+            };
         }
 
         public static AISequence Merge(List<AISequence> sequences)
@@ -319,7 +365,9 @@ namespace AI
             for (int i = 0; i < times; i++) {
                 newSequences[i] = this;
             }
-            return new AISequence(newSequences).Description(times + " times: ");
+            return new AISequence(newSequences) { 
+                Description = times + " times: " 
+            };
         }
 
         /*
@@ -337,7 +385,9 @@ namespace AI
          */
         public static AISequence Pause(float duration)
         {
-            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) }).Description("Wait for " + duration + " seconds.");
+            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) }) { 
+                Description = "Wait for " + duration + " seconds." 
+            };
         }
 
         /*

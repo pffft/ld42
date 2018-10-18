@@ -37,6 +37,7 @@ namespace AI
         //    }).Description("Shot three " + (skeleton == null ? "default projectiles at the player." : skeleton + ".")); ;
         //}
 
+        /*
         public static AISequence ShootArc(int density = 50, float from = 0, float to = 360, Projectile skeleton=null)
         {
             return new AISequence(() =>
@@ -53,22 +54,30 @@ namespace AI
 
                 float step = 360f / density;
                 Projectile clone = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
-                for (float i = from; i <= to; i += step) {
+                for (float i = from; i <= to; i += step)
+                {
                     Projectile newStruc = clone.Clone();
                     newStruc.AngleOffset(newStruc.angleOffset + i).Create();
                 }
-            }).Description("Shot an arc (density=" + density + ", from=" + from + ", to=" + to + ") of " + 
-                            (skeleton == null ? "default projectiles at the player." : skeleton + "."));
+            })
+            {
+                Description = "Shot an arc (density=" + density + ", from=" + from + ", to=" + to + ") of " +
+                    (skeleton == null ? "default projectiles at the player." : skeleton + ".")
+            };
         }
+        */
 
         // Deprecated; can be created from two merged ShootArc calls.
+        /*
         public static AISequence ShootWall(float angleOffset)
         {
-            return AISequence.Merge(
+            return new AISequence(AISequence.Merge(
                 ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, Projectile.New(self).Speed(Speed.SLOW)),
                 ShootArc(100, angleOffset + 20, angleOffset + 60, Projectile.New(self).Speed(Speed.SLOW))
-            ).Description("Shot a wall with offset " + angleOffset + " at the player.");
+            ))
+            { Description = "Shot a wall with offset " + angleOffset + " at the player." };
         }
+        */
 
         public static AISequence ShootHexCurve(bool clockwise = true, Projectile skeleton=null)
         {
@@ -87,8 +96,11 @@ namespace AI
                          .Create()
                          .Curving(curveSpeed, true);
                 }
-            }).Description("Shot a " + (clockwise ? "clockwise" : "counterclockwise") + " hex curve " + 
-                           (skeleton == null ? "with a default projectile." : skeleton + "."));
+            })
+            {
+                Description = "Shot a " + (clockwise ? "clockwise" : "counterclockwise") + " hex curve " +
+                    (skeleton == null ? "with a default projectile." : skeleton + ".")
+            };
         }
 
         public static AISequence ShootLine(int amount = 50, float width = 75f, Vector3? target = null, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM)
@@ -109,8 +121,11 @@ namespace AI
                               .Size(size)
                               .Create();
                 }
-            }).Description("Shot a line (amount=" + amount + ", width=" + width + ") at " + (target == null ? " the player" : target.ToString()) + 
-                           " with speed " + speed + " and size " + size + ".");
+            })
+            {
+                Description = "Shot a line (amount=" + amount + ", width=" + width + ") at " + (target == null ? " the player" : target.ToString()) +
+                    " with speed " + speed + " and size " + size + "."
+            };
         }
 
         public static AISequence ShootDeathHex(float maxTime = 1f)
@@ -126,20 +141,24 @@ namespace AI
                               .Create()
                               .DeathHex();
                 }
-            }).Description("Shot a death hex with a lifetime of " + maxTime + " seconds.");
+            })
+            { Description = "Shot a death hex with a lifetime of " + maxTime + " seconds." };
         }
 
         public static AISequence ShootHomingStrafe(bool clockwise=true, int strafeAmount=5, int speed=25) {
             return new AISequence(
                 Strafe(clockwise, strafeAmount, speed),
-                new Moves.Basic.Shoot1(Projectile.New(self).Size(Size.MEDIUM).Homing()).GetSequence()
-            ).Description("Strafed " + strafeAmount + " degrees " + (clockwise ? "clockwise" : "counterclockwise") + " and shot a homing projectile.");
+                new Moves.Basic.Shoot1(Projectile.New(self).Size(Size.MEDIUM).Homing())
+            )
+            { Description = "Strafed " + strafeAmount + " degrees " + (clockwise ? "clockwise" : "counterclockwise") + " and shot a homing projectile." };
         }
 
+        /*
         public static AISequence ShootAOE(AOE structure)
         {
-            return new AISequence(() => { Glare(); structure.Clone().Create(); }).Description("Shot " + structure.ToString());
+            return new AISequence(() => { Glare(); structure.Clone().Create(); }) { Description = "Shot " + structure };
         }
+        */
 
         public static AISequence Teleport(Vector3? target = null, int speed = 25)
         {
@@ -191,7 +210,8 @@ namespace AI
                 GameManager.Boss.StartCoroutine(Dashing(rawPosition));
 
                 Glare();
-            }).Description("Teleports to " + (target == null ? "some random position" : target.Value.ToString()) + ".");
+            })
+            { Description = "Teleports to " + (target == null ? "some random position" : target.Value.ToString()) + "." };
         }
 
         public static IEnumerator Dashing(Vector3 targetPosition)
@@ -244,7 +264,8 @@ namespace AI
                 {
                     CameraController.GetInstance().Goto(targetPosition.Value, 1);
                 }
-            }).Description("Moved the camera to " + targetPosition + ". Camera is now " + (isFollow ? "" : "not") + " following.");
+            })
+            { Description = "Moved the camera to " + targetPosition + ". Camera is now " + (isFollow ? "" : "not") + " following." };
         }
 
         public static AISequence PlayerLock(bool enableLock = true)
@@ -256,7 +277,8 @@ namespace AI
                     playerLockPosition = GameManager.Player.transform.position;
                 }
                 isPlayerLocked = enableLock;
-            }).Description((enableLock ? "Locked onto" : "Unlocked from") + " the player.");
+            })
+            { Description = (enableLock ? "Locked onto" : "Unlocked from") + " the player." };
         }
     }
 }

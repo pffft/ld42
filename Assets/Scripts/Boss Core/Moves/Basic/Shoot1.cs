@@ -4,38 +4,26 @@ using static BossController;
 
 namespace Moves.Basic
 {
-    public class Shoot1 : Move
+    public class Shoot1 : AISequence
     {
+        public override string Description => "Shot one " + (skeleton == null ? "default projectile at the player." : skeleton + ".");
+
+        public override float Difficulty => 1.5f;
+
         private readonly Projectile skeleton;
 
-        public Shoot1() : this(null) {}
-
-        public Shoot1(Projectile skeleton = null) {
-            this.skeleton = skeleton != null ? skeleton.Clone() : Projectile.New(self);
-        }
-
-        public override string GetDescription()
-        {
-            return "Shot a single " + (skeleton == null ? "default projectile at the player." : skeleton + ".");
-        }
-
-        public override float GetDifficulty()
-        {
-            return 1f;
-        }
-
-        public override bool DoesTeleportAtStart()
-        {
-            return false;
-        }
-
-        public override AISequence GetSequence()
-        {
-            return new AISequence(() =>
+        public Shoot1(Projectile skeleton = null) : base
+        (
+            () =>
             {
                 Glare();
-                skeleton.Create();
-            });
+
+                Projectile newStruc = skeleton != null ? skeleton.Clone() : Projectile.New(self);
+                newStruc.Create();
+            }
+        )
+        {
+            this.skeleton = skeleton != null ? skeleton.Clone() : Projectile.New(self);
         }
     }
 }

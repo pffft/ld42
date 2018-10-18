@@ -8,34 +8,22 @@ using static AI.SequenceGenerators;
 
 namespace Moves.Basic
 {
-    public class Shoot_Wave_Middle_Gap : Move
+    public class Shoot_Wave_Middle_Gap : AISequence
     {
-        public override string GetDescription()
-        {
-            return "Shoots two 60 degree waves with a 45 degree gap in the middle.";
-        }
 
-        public override float GetDifficulty()
-        {
-            return 3f;
-        }
+        public override string Description => "Shoots two 60 degree waves with a 45 degree gap in the middle.";
 
-        public override float GetBeforeDelay()
-        {
-            return 0.5f;
-        }
+        public override float Difficulty => 3f;
 
-        public override float GetAfterDelay()
-        {
-            return 1f;
-        }
-
-        public override AISequence GetSequence()
-        {
-            return Merge(
+        public Shoot_Wave_Middle_Gap() : base
+        (
+            Teleport().Wait(0.5f),
+            Merge(
                 ShootArc(150, 22.5f, 22.5f + 60f),
                 ShootArc(150, -22.5f, -22.5f - 60f)
-            );
-        }
+            ),
+            Pause(1f)
+        )
+        { }
     }
 }

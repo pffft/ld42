@@ -7,39 +7,20 @@ using static AI.SequenceGenerators;
 
 namespace Moves.Basic
 {
-    public class ShootAOE : Move
+    public class ShootAOE : AISequence
     {
+        public override string Description => "Shot " + skeleton;
+
         private readonly AOE skeleton;
 
-        public ShootAOE() : this(null) {}
-
-        public ShootAOE(AOE skeleton) {
+        public ShootAOE(AOE skeleton = null) : base(() => { 
+            Glare();
+            skeleton = skeleton != null ? skeleton.Clone() : AOE.New(self);
+            skeleton.Create(); 
+        })
+        {
             this.skeleton = skeleton != null ? skeleton.Clone() : AOE.New(self);
         }
 
-        public override string GetDescription()
-        {
-            return "Shot " + skeleton;
-        }
-
-        public override float GetDifficulty()
-        {
-            return 1.5f;
-        }
-
-        public override float GetBeforeDelay()
-        {
-            return 0.5f;
-        }
-
-        public override float GetAfterDelay()
-        {
-            return 0.5f;
-        }
-
-        public override AISequence GetSequence()
-        {
-            return new AISequence(() => { Glare(); skeleton.Create(); });
-        }
     }
 }

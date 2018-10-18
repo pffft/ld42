@@ -78,6 +78,7 @@ namespace AI
         public static void Load() {
             AISequence.ShouldAllowInstantiation = true;
 
+            /*
             Profiler.BeginSample("Loading Moves");
             Assembly assembly = Assembly.GetExecutingAssembly();
 
@@ -120,9 +121,13 @@ namespace AI
             }
 
             Profiler.EndSample();
+            */
 
             PHASE_TEST = new AIPhase()
                 //.AddSequence(10, Moves.Basic.PINCER)
+                //.AddSequence(10, Moves.Test.Definitions.LIGHTNING_ARENA)
+                .AddSequence(10, new Moves.Test.Lightning_Arena());
+                //.AddSequence(10, new Moves.Test.Lightning_With_AOE())
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()
@@ -130,7 +135,7 @@ namespace AI
                 .SetMaxArenaRadius(0.75f * 50f)
                 //.AddSequence(10, Moves.Basic.Definitions.SHOOT_1)
                 //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
-                .AddSequence(10, Moves.Basic.Definitions.SWEEP.Wait(1f))
+                .AddSequence(10, new Moves.Basic.Sweep().Wait(1f))
                 //.AddSequence(10, Moves.Basic.SWEEP_BACK_AND_FORTH.Wait(1f))
                 //.AddSequence(10, Moves.Basic.SWEEP_BOTH.Wait(1f))
                 //.AddSequence(10, Moves.Tutorial1.SHOOT_1_SEVERAL)
@@ -159,10 +164,10 @@ namespace AI
 
             PHASE1 = new AIPhase()
                 //.AddSequence(10, SHOOT3_WAVE3)
-                .AddSequence(10, Moves.Basic.Definitions.SHOOT_2_WAVES)
-                .AddSequence(10, Moves.Basic.Definitions.AOE_90)
-                .AddSequence(10, Moves.Basic.Definitions.AOE_120)
-                .AddSequence(10, Moves.Basic.Definitions.AOE_360)
+                .AddSequence(10, new Moves.Basic.Shoot_2_Waves())
+                .AddSequence(10, new Moves.Basic.AOE_90())
+                .AddSequence(10, new Moves.Basic.AOE_120())
+                .AddSequence(10, new Moves.Basic.AOE_360())
 
                 //.AddSequence(10, HEX_CURVE_INTRO)
                 //.AddSequence(10, DOUBLE_HEX_CURVE)
