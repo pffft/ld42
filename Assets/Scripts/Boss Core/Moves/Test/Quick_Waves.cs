@@ -43,7 +43,7 @@ namespace Moves.Test
                         new ShootArc(100, -60, 60, Projectile.New(self).Speed(Speed.VERY_FAST).Size(Size.TINY)).Wait(0.1f).Times(7)
                         ); break;
                     }
-                    sequences.Add(Pause(0.75f));
+                    sequences.Add(Pause(0.6f));
                 }
 
                 return sequences.ToArray();

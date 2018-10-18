@@ -5723,7 +5723,7 @@ Prefab:
     - target: {fileID: 114841838092227364, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
         type: 2}
       propertyPath: shieldsMax
-      value: 1000
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
@@ -9827,7 +9827,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 113d85a88ffe20f40a5b279040106743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  followRadius: 0
   followSpeed: 10
   isFollowing: 1
   followTargets:
