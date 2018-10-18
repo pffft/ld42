@@ -5,7 +5,7 @@ using UnityEngine;
 public class BossHealthBar : MonoBehaviour
 {
 	[SerializeField]
-	private Entity target;
+	private Entity target = null;
 
 	[SerializeField]
 	private int numberOfPhases = 5;
@@ -27,7 +27,7 @@ public class BossHealthBar : MonoBehaviour
 	}
 	
 	[SerializeField]
-	private GameObject resourceBarPrefab;
+	private GameObject resourceBarPrefab = null;
 
 	[SerializeField]
 	private Color barColor = Color.red;

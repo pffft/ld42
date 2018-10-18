@@ -1,5 +1,4 @@
 ﻿using CombatCore;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,16 +6,19 @@ using UnityEngine.UI;
 public class HUD : MonoBehaviour
 {
 	[SerializeField]
-	private Entity player, shield;
+	private Entity player = null;
+	
+	[SerializeField]	
+	private Entity shield = null;
 
 	[SerializeField]
-	private Image shieldIndicator;
+	private Image shieldIndicator = null;
 
 	[SerializeField]
 	private Color[] shieldIndicatorColors = new Color[2];
 
 	[SerializeField]
-	private Color unavailableShieldIndicatorColor;
+	private Color unavailableShieldIndicatorColor = Color.gray;
 	public Color UnavailableShieldIndicatorColor
 	{
 		get { return unavailableShieldIndicatorColor; }
@@ -26,10 +28,10 @@ public class HUD : MonoBehaviour
 	public bool shieldAvailable = true;
 
 	[SerializeField]
-	private Image dashIndicator;
+	private Image dashIndicator = null;
 
 	[SerializeField]
-	private Color dashIndicatorColor;
+	private Color dashIndicatorColor = Color.cyan;
 	public Color DashIndicatorColor
 	{
 		get { return dashIndicatorColor; }
@@ -37,7 +39,7 @@ public class HUD : MonoBehaviour
 	}
 
 	[SerializeField]
-	private Vector3 followOffset;
+	private Vector3 followOffset = new Vector3(0f, 0f, 0.1f);
 
 	public void Update()
 	{
