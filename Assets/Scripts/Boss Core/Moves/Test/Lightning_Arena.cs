@@ -22,8 +22,7 @@ namespace Moves.Test
                 for (int i = 0; i < 4; i++)
                 {
                     sequences.Add(new Shoot1(
-                       Projectile
-                           .New(self)
+                       new Projectile()
                            .AngleOffset(i * 90f)
                            .Lightning(0)
                            .Speed(Speed.LIGHTNING)

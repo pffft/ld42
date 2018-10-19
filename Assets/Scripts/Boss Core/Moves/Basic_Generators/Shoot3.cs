@@ -15,7 +15,7 @@ namespace Moves.Basic
 
                 for (int i = 0; i < 3; i++)
                 {
-                    Projectile newStruc = skeleton != null ? skeleton.Clone() : Projectile.New(self);
+                    Projectile newStruc = skeleton != null ? skeleton.Clone() : new Projectile();
                     newStruc.angleOffset = -30 + (30 * i) + newStruc.angleOffset;
                     newStruc.Create();
                 }

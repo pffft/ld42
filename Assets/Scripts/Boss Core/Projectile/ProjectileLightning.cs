@@ -33,7 +33,7 @@ namespace Projectiles
             if (data.currentTime > count / numSpawners)
             {
                 count++;
-                Projectile.New(data.entity)
+                new Projectile()
                         .Start(transform.position)
                         .MaxTime(1f - data.currentTime)
                         .Size(Size.SMALL)

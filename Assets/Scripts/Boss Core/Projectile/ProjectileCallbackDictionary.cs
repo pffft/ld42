@@ -12,8 +12,7 @@ namespace Projectiles
 
         public static ProjectileCallbackDelegate FREEZE = (self) =>
         {
-            Projectile
-                .New(self.data.entity)
+            new Projectile(self.data.entity)
                 .Start(self.transform.position)
                 .Target(null)
                 .MaxTime(5f)
@@ -27,7 +26,7 @@ namespace Projectiles
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.New(self.data.entity)
+                new Projectile(self.data.entity)
                           .Start(self.transform.position)
                           .Target(body.velocity)
                           .AngleOffset(i * 60f)
@@ -43,7 +42,7 @@ namespace Projectiles
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                Projectile.New(self.data.entity)
+                new Projectile(self.data.entity)
                           .Start(self.transform.position)
                           .Target(body.velocity)
                           .AngleOffset(i * 60f)
@@ -62,8 +61,7 @@ namespace Projectiles
 
         public static ProjectileCallbackDelegate SPAWN_1_TOWARDS_PLAYER = (self) =>
         {
-            Projectile
-                .New(self.data.entity)
+            new Projectile(self.data.entity)
                 .Start(self.transform.position)
                 .Target(null)
                 .MaxTime(self.data.maxTime)
@@ -74,8 +72,7 @@ namespace Projectiles
 
         public static ProjectileCallbackDelegate SPAWN_1_HOMING_TOWARDS_PLAYER = (self) =>
         {
-            Projectile
-                .New(self.data.entity)
+            new Projectile(self.data.entity)
                 .Start(self.transform.position)
                 .Target(null)
                 .Size(self.data.size)
@@ -87,8 +84,7 @@ namespace Projectiles
 
         public static ProjectileCallbackDelegate REVERSE = (self) =>
         {
-            Projectile
-                .New(self.data.entity)
+            new Projectile(self.data.entity)
                 .Start(self.transform.position)
                 .Target(self.data.start)
                 .MaxTime(self.data.maxTime)
@@ -108,8 +104,7 @@ namespace Projectiles
             Speed[] speeds = (Speed[])System.Enum.GetValues(currentSpeed.GetType());
             Speed nextSpeed = speeds[System.Array.IndexOf(speeds, currentSpeed) + 1];
 
-            Projectile
-                .New(self.data.entity)
+            new Projectile(self.data.entity)
                 .Start(self.transform.position)
                 .Target(self.data.start)
                 .Size(self.data.size)
@@ -134,8 +129,7 @@ namespace Projectiles
 
             for (int i = 0; i < times; i++)
             {
-                Projectile
-                    .New(self.data.entity)
+                new Projectile(self.data.entity)
                     .Start(self.transform.position)
                     .Target(lightningSelf.initialTarget)
                     .AngleOffset(self.data.angleOffset - 45f + Random.Range(0, 90f))

@@ -11,8 +11,8 @@ namespace Moves.Basic
         public Shoot_2_Waves() : base
         (
             new Teleport().Wait(0.5f),
-            new ShootArc(100, -45f, 45f, Projectile.New(self).AngleOffset(-2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
-            new ShootArc(100, -45f, 45f, Projectile.New(self).AngleOffset(2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
+            new ShootArc(100, -45f, 45f, new Projectile().AngleOffset(-2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
+            new ShootArc(100, -45f, 45f, new Projectile().AngleOffset(2.5f).Size(Size.MEDIUM).Speed(Speed.VERY_FAST)),
             new Pause(1f)
         )
         { 

@@ -19,7 +19,7 @@ namespace CombatCore.StatusComponents
             GameManager.HeldShield.SetActive(false);
 
             // Spawns a homing projectile
-            ProjectileComponent homingProj = Projectile.New(subject)
+            ProjectileComponent homingProj = new Projectile(subject)
                                               .Target(target)
                                               .MaxTime(2f)
                                               .Speed(BossCore.Speed.VERY_FAST)

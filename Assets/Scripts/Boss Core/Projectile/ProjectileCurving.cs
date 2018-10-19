@@ -5,6 +5,38 @@ using UnityEngine;
 
 namespace Projectiles
 {
+
+    public class ProjectileCurving : Projectile
+    {
+
+        public Rigidbody body;
+        public float curveAmount;
+
+        public int count;
+        public float numSpawners = 30f;
+
+        public bool leavesTrail;
+
+        public ProjectileCurving(Entity self, float curveAmount, bool leavesTrail)
+            : base(self)
+        {
+            this.curveAmount = curveAmount;
+            this.leavesTrail = leavesTrail;
+        }
+
+        public ProjectileCurving(float curveAmount, bool leavesTrail) 
+            : this(BossController.self, curveAmount, leavesTrail)
+        {}
+
+        public new ProjectileComponent Create()
+        {
+            return base.Create();
+            // TODO make either a new ProjectileComponent subclass, or ideally find a way
+            // to set the proper overrides on a base ProjectileComponent object & return it
+        }
+    }
+
+    /*
     public class ProjectileCurving : ProjectileComponent
     {
         public Rigidbody body;
@@ -30,7 +62,7 @@ namespace Projectiles
                 if (data.currentTime > count / numSpawners)
                 {
                     count++;
-                    Projectile.New(data.entity)
+                    new Projectile(data.entity)
                             .Start(transform.position)
                             .MaxTime(data.maxTime - data.currentTime)
                             .Size(Size.SMALL)
@@ -60,4 +92,5 @@ namespace Projectiles
             return structure;
         }
     }
+    */
 }

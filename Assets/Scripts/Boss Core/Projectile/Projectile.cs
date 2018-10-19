@@ -69,9 +69,13 @@ namespace Projectiles
         }
         #endregion
 
+        /*
         public static Projectile New(Entity entity) {
             return new Projectile(entity);
         }
+        */
+
+        public Projectile() : this(BossController.self) { }
 
         public Projectile(Entity entity)
         {

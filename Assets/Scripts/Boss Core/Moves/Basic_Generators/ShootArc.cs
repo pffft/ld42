@@ -22,7 +22,7 @@ namespace Moves.Basic
                 }
 
                 float step = 360f / density;
-                Projectile clone = skeleton ?? Projectile.New(self).Size(Size.MEDIUM);
+                Projectile clone = skeleton ?? new Projectile().Size(Size.MEDIUM);
                 for (float i = from; i <= to; i += step)
                 {
                     Projectile newStruc = clone.Clone();
