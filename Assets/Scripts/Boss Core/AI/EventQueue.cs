@@ -3,19 +3,23 @@ using System.Collections.Generic;
 using CombatCore;
 using Moves;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace AI
 {
-    public class EventQueue
+    public class EventQueue : MonoBehaviour
     {
-
-        private readonly Queue<AIEvent> events;
+        private Queue<AISequence> queuedSequences;
+        private Queue<AIEvent> events;
         private AIEvent lastEvent;
         private float lastTime;
 
         private float internalTime;
         private bool paused;
 
+        private bool running;
+
+        /*
         public EventQueue()
         {
             events = new Queue<AIEvent>();
@@ -23,6 +27,20 @@ namespace AI
             lastTime = 0;
             internalTime = 0;
             paused = false;
+        }
+        */
+
+        public void Awake()
+        {
+            queuedSequences = new Queue<AISequence>();
+            events = new Queue<AIEvent>();
+            lastEvent = null;
+            lastTime = 0;
+            internalTime = 0;
+            paused = false;
+            running = true;
+
+            StartCoroutine(Execute());
         }
 
         /*
@@ -82,32 +100,51 @@ namespace AI
              * wait for 0.05 seconds. Flattening immediate causes the last one to be (10 * 0.05)
              * seconds out of date.
              */
+            /*
             AIEvent[] coercedEvents = sequence.Flatten();
             for (int i = 0; i < coercedEvents.Length; i++)
             {
                 Add(coercedEvents[i]);
             }
+            */
+            queuedSequences.Enqueue(sequence);
+            //StartCoroutine(Execute(sequence));
         }
 
-        /*
-         * Adds a single action "times" times to the queue.
-         */
-        public void AddRepeat(float duration, AIEvent.Action action, int times)
-        {
-            for (int i = 0; i < times; i++)
+        private IEnumerator Execute() {
+            while (running)
             {
-                Add(new AIEvent(duration, action));
+                //Profiler.BeginSample("Event Queue");
+                while (queuedSequences.Count == 0)
+                {
+                    yield return new WaitForSeconds(0.05f);
+                }
+
+                AISequence nextSequence = queuedSequences.Dequeue();
+                yield return WalkNext(nextSequence);
+                //Profiler.EndSample();
             }
         }
 
-        /*
-         * Adds a given sequence to the queue "times" number of times.
-         */
-        public void AddRepeat(int times, AISequence sequence)
-        {
-            for (int i = 0; i < times; i++)
+        private IEnumerator WalkNext(AISequence sequence) {
+            //Debug.Log("Walking over " + sequence.Name);
+            if (sequence.events != null)
             {
-                Add(sequence);
+                for (int i = 0; i < sequence.events.Length; i++) {
+                    Add(sequence.events[i]);
+                    yield return new WaitForSeconds(sequence.events[i].duration);
+                }
+            }
+            else
+            {
+                AISequence[] children = sequence.GetChildren();
+                for (int i = 0; i < children.Length; i++) 
+                {
+                    //Debug.Log("Diving into child node: " + seq.Name);
+                    yield return WalkNext(children[i]);
+                    //Debug.Log("Finished diving into child node: " + seq.Name);
+                    //WalkNext(seq);
+                }
             }
         }
 
@@ -175,7 +212,8 @@ namespace AI
         }
 
         public bool Empty() {
-            return this.events.Count == 0;
+            return this.queuedSequences.Count == 0;
+            //return isEmpty;
         }
     }
 }

@@ -83,7 +83,7 @@ namespace AOEs
                 data.currentTime += Time.deltaTime;
                 if (data.currentTime > data.maxTime)
                 {
-                    Debug.Log("Time is over! " + data.currentTime + " max: " + data.maxTime);
+                    //Debug.Log("Time is over! " + data.currentTime + " max: " + data.maxTime);
                     data.OnDestroyTimeoutImpl(data);
                     Destroy(this.gameObject);
                 }
@@ -92,7 +92,7 @@ namespace AOEs
                 // should be "innerscale"- what about AOE attacks without hole in center?
                 if (data.scale > GameManager.Arena.RadiusInWorldUnits + data.start.magnitude)
                 {
-                    Debug.Log("Ring hit arena. Returning.");
+                    //Debug.Log("Ring hit arena. Returning.");
                     data.OnDestroyOutOfBoundsImpl(data);
                     if (data.shouldDestroyOnOutOfBounds)
                     {

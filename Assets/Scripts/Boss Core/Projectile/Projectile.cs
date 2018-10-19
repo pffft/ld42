@@ -26,8 +26,6 @@ namespace Projectiles
 
         public BossCore.Speed speed;
         public Size size;
-        public Type type;
-        public object[] _typeParameters;
 
         public float currentTime;
         public float maxTime;
@@ -67,6 +65,17 @@ namespace Projectiles
             this.OnDestroyCollisionImpl = deleg;
             return this;
         }
+
+        /*
+         * Can be overridden to provide custom behavior for components
+         */
+        public virtual void CustomUpdate(ProjectileComponent component) { }
+
+        /*
+         * Can be overridden to provide a custom material.
+         */
+        public virtual Material CustomMaterial() { return null; }
+
         #endregion
 
         /*
@@ -89,8 +98,6 @@ namespace Projectiles
 
             this.speed = BossCore.Speed.MEDIUM;
             this.size = Projectiles.Size.SMALL;
-            this.type = Type.BASIC;
-            this._typeParameters = null;
 
             this.currentTime = 0f;
             this.maxTime = 10f;
@@ -103,49 +110,49 @@ namespace Projectiles
         }
 
         // Builder method
-        public Projectile Start(Vector3? start)
+        public virtual Projectile Start(Vector3? start)
         {
             this.preStart = start;
             return this;
         }
 
         // Builder method
-        public Projectile Target(Vector3? target)
+        public virtual Projectile Target(Vector3? target)
         {
             this.preTarget = target;
             return this;
         }
 
         // Builder method
-        public Projectile AngleOffset(float offsetDegrees)
+        public virtual Projectile AngleOffset(float offsetDegrees)
         {
             this.angleOffset = offsetDegrees;
             return this;
         }
 
         // Builder method
-        public Projectile MaxTime(float seconds)
+        public virtual Projectile MaxTime(float seconds)
         {
             this.maxTime = seconds;
             return this;
         }
 
         // Builder method
-        public Projectile Damage(float damage)
+        public virtual Projectile Damage(float damage)
         {
             this.damage = damage;
             return this;
         }
 
         // Builder method
-        public Projectile Speed(BossCore.Speed speed)
+        public virtual Projectile Speed(BossCore.Speed speed)
         {
             this.speed = speed;
             return this;
         }
 
         // Builder method
-        public Projectile Size(Size size)
+        public virtual Projectile Size(Size size)
         {
             this.size = size;
             this.damage = ((float)size + 0.5f) * 2f;
@@ -155,28 +162,7 @@ namespace Projectiles
         // Clone method
         public Projectile Clone()
         {
-            Projectile clone = new Projectile(this.entity);
-
-            clone.preStart = preStart;
-            clone.start = start;
-            clone.preTarget = preTarget;
-            clone.target = target;
-            clone.angleOffset = angleOffset;
-
-            clone.speed = speed;
-            clone.size = size;
-            clone.type = type;
-            clone._typeParameters = _typeParameters;
-
-            clone.currentTime = 0f;
-            clone.maxTime = maxTime;
-
-            clone.damage = damage;
-
-            clone.OnDestroyTimeoutImpl = OnDestroyTimeoutImpl;
-            clone.OnDestroyOutOfBoundsImpl = OnDestroyOutOfBoundsImpl;
-            clone.OnDestroyCollisionImpl = OnDestroyCollisionImpl;
-            return clone;
+            return MemberwiseClone() as Projectile;
         }
 
         // Clone method - sets the callbacks to do nothing. This prevents recursive behavior.
@@ -192,15 +178,32 @@ namespace Projectiles
         // Generates a new GameObject based on this structure.
         public ProjectileComponent Create()
         {
+            Profiler.BeginSample("Projectile.Create");
+
+            Profiler.BeginSample("Projectile.Create GameObject Instantiate");
             // Create new GameObject
             GameObject newObj = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Projectile"));
+            Profiler.EndSample();
 
+            Profiler.BeginSample("Projectile.Create Component Instantiate");
             // Create a new Projectile component
             ProjectileComponent projectile = newObj.GetComponent<ProjectileComponent>();
-            //Debug.Log("Is projectile null?: " + (projectile != null));
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Projectile.Create data Clone()");
+            // Make a memberwise clone of the most derived type
             projectile.data = Clone();
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Projectile.Create data Initialize()");
+            // Do the initialization (resolve null variables -> live variables)
             projectile.Initialize();
-            //Debug.Log("Is projectile data null?: " + (projectile.data != null));
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Projectile.Create data CustomCreate()");
+            // Do any custom derived initialization logic (you can access the component now)
+            projectile.data.CustomCreate(projectile);
+            Profiler.EndSample();
 
             // Assign and init the RigidBody (or create one if it doesn't exist)
             Rigidbody body = newObj.GetComponent<Rigidbody>();
@@ -210,27 +213,26 @@ namespace Projectiles
             }
             body.useGravity = false;
 
-            // Assign the type with any parameters that were forced in.
-            switch (type)
-            {
-                case Type.BASIC: break;
-                case Type.CURVING: projectile.Curving((float)_typeParameters[0], (bool)_typeParameters[1]); break;
-                case Type.DEATHHEX: projectile.DeathHex(); break;
-                case Type.HOMING: projectile.Homing(); break;
-                case Type.LIGHTNING: projectile.Lightning((int)_typeParameters[0]); break;
-                case Type.INDESTRUCTIBLE: break;
-            }
 
+            Profiler.EndSample();
             return projectile;
         }
+
+        /*
+         * Allows for custom instantiation once the component is created and can
+         * be referenced. Things like accessing the RigidBody are done here, as well
+         * as being able to reference live variables, like the updated target value
+         * (via component.data.target).
+         */
+        public virtual void CustomCreate(ProjectileComponent component) { }
 
         public override string ToString()
         {
             // TODO can make this more descriptive; i.e. if entity is boss and preTarget is null, then add "aimed at the player".
             return "Projectile"
                 + " with speed " + speed
-                + ", size " + size
-                + ((type != Type.BASIC) ? ", and type " + type.ToString() : "");
+                + ", size " + size;
+                //+ ((type != Type.BASIC) ? ", and type " + type.ToString() : "");
         }
     }
 }

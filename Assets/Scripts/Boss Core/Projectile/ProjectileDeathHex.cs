@@ -1,29 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using CombatCore;
 using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileDeathHex : ProjectileComponent
+    public class ProjectileDeathHex : Projectile
     {
 
-        public override Material GetCustomMaterial() {
+        public ProjectileDeathHex() : this(BossController.self) { }
+
+        public ProjectileDeathHex(Entity self) : base(self) {
+            OnDestroyTimeout(CallbackDictionary.SPAWN_6_CURVING);
+        }
+
+        public override Material CustomMaterial() {
             return Resources.Load<Material>("Art/Materials/GreenTransparent");
-        }
-    }
-
-    public static class ProjectileDeathHexHelper
-    {
-        public static ProjectileDeathHex DeathHex(this ProjectileComponent projectile)
-        {
-            return (ProjectileDeathHex)projectile
-                .CastTo<ProjectileDeathHex>();
-        }
-
-        public static Projectile DeathHex(this Projectile structure) {
-            structure.type = Type.DEATHHEX;
-            structure.OnDestroyTimeout(CallbackDictionary.SPAWN_6_CURVING);
-            return structure;
         }
     }
 }

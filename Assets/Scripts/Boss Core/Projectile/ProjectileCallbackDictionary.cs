@@ -17,7 +17,6 @@ namespace Projectiles
                 .Target(null)
                 .MaxTime(5f)
                 .Size(self.data.size)
-                .Speed(Speed.FROZEN)
                 .Create();
         };
 
@@ -26,14 +25,12 @@ namespace Projectiles
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                new Projectile(self.data.entity)
-                          .Start(self.transform.position)
-                          .Target(body.velocity)
-                          .AngleOffset(i * 60f)
-                          .MaxTime(3f)
-                          .Speed(self.data.speed)
-                          .Curving((float)self.data.speed * 2f, true)
-                          .Create();
+                new ProjectileCurving(self.data.entity, (float)self.data.speed * 2f, true)
+                    .Start(self.transform.position)
+                    .Target(body.velocity)
+                    .AngleOffset(i * 60f)
+                    .MaxTime(3f)
+                    .Create();
             }
         };
 
@@ -42,14 +39,12 @@ namespace Projectiles
             Rigidbody body = self.GetComponent<Rigidbody>();
             for (int i = 0; i < 6; i++)
             {
-                new Projectile(self.data.entity)
-                          .Start(self.transform.position)
-                          .Target(body.velocity)
-                          .AngleOffset(i * 60f)
-                          .MaxTime(3f)
-                          .Speed(self.data.speed)
-                          .Curving(0f, false)
-                          .Create();
+                new ProjectileCurving(self.data.entity, 0f, false)
+                    .Start(self.transform.position)
+                    .Target(body.velocity)
+                    .AngleOffset(i * 60f)
+                    .MaxTime(3f)
+                    .Create();
             }
         };
 
@@ -66,20 +61,17 @@ namespace Projectiles
                 .Target(null)
                 .MaxTime(self.data.maxTime)
                 .Size(self.data.size)
-                .Speed(Speed.SNIPE)
                 .Create();
         };
 
         public static ProjectileCallbackDelegate SPAWN_1_HOMING_TOWARDS_PLAYER = (self) =>
         {
-            new Projectile(self.data.entity)
+            new ProjectileHoming(self.data.entity)
                 .Start(self.transform.position)
                 .Target(null)
                 .Size(self.data.size)
-                .Speed(Speed.LIGHTNING)
                 .MaxTime(self.data.maxTime)
-                .Create()
-                .Homing();
+                .Create();
         };
 
         public static ProjectileCallbackDelegate REVERSE = (self) =>
@@ -89,7 +81,6 @@ namespace Projectiles
                 .Target(self.data.start)
                 .MaxTime(self.data.maxTime)
                 .Size(self.data.size)
-                .Speed(self.data.speed)
                 .Create();
         };
 
@@ -108,37 +99,9 @@ namespace Projectiles
                 .Start(self.transform.position)
                 .Target(self.data.start)
                 .Size(self.data.size)
-                .Speed(nextSpeed)
                 .MaxTime(2f * 1.5f * (float)Speed.FAST / (float)nextSpeed)
                 .OnDestroyTimeout(REVERSE_FASTER)
                 .Create();
-        };
-
-        public static ProjectileCallbackDelegate LIGHTNING_RECUR = (self) =>
-        {
-            ProjectileLightning lightningSelf = self as ProjectileLightning;
-            int times;
-            if (lightningSelf.level < 3)
-            {
-                times = Random.Range(2, 3);
-            }
-            else
-            {
-                times = Random.Range(1, 2);
-            }
-
-            for (int i = 0; i < times; i++)
-            {
-                new Projectile(self.data.entity)
-                    .Start(self.transform.position)
-                    .Target(lightningSelf.initialTarget)
-                    .AngleOffset(self.data.angleOffset - 45f + Random.Range(0, 90f))
-                    .Speed(Speed.LIGHTNING)
-                    .MaxTime(Random.Range(0.05f, 0.15f))
-                    .OnDestroyTimeout(LIGHTNING_RECUR)
-                    .Lightning(lightningSelf.level + 1)
-                    .Create();
-            }
         };
     }
 }

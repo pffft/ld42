@@ -79,14 +79,12 @@ namespace AI
 
             PHASE_TEST = new AIPhase()
                 //.AddSequence(10, Moves.Basic.PINCER)
-                .AddSequence(10, new Moves.Test.Lightning_Arena().Times(2))
-                //.AddSequence(10, new Moves.Test.Lightning_With_AOE())
-                //.AddSequence(10, new Moves.Basic.Shoot1());
-                //.AddSequence(10, new Moves.Test.Laser())
-                .AddSequence(10, new Moves.Test.Quick_Waves())
-                .AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
-                .AddSequence(10, new Moves.Test.Double_Laser_Sweep())
-                .AddSequence(10, new Moves.Test.Pincer_Sweep())
+                //.AddSequence(10, new Moves.Test.Lightning_Arena().Times(2))
+                //.AddSequence(10, new Moves.Test.Quick_Waves())
+                //.AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
+                //.AddSequence(10, new Moves.Test.Double_Laser_Sweep())
+                //.AddSequence(10, new Moves.Test.Pincer_Sweep())
+                .AddSequence(10, new Moves.Test.Test())
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()

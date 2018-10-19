@@ -35,7 +35,7 @@ namespace AI
         }
 
         // A list of events to execute.
-        private AIEvent[] events;
+        public AIEvent[] events;
         private AISequence[] children;
 
         public delegate AISequence[] AISequenceGenerator();

@@ -19,16 +19,14 @@ namespace CombatCore.StatusComponents
             GameManager.HeldShield.SetActive(false);
 
             // Spawns a homing projectile
-            ProjectileComponent homingProj = new Projectile(subject)
-                                              .Target(target)
-                                              .MaxTime(2f)
-                                              .Speed(BossCore.Speed.VERY_FAST)
-                                              .Size(Size.MEDIUM)
-                                              .Homing()
-                                              .OnDestroyTimeout(StopMoving)
-                                              .OnDestroyOutOfBounds(StopMoving)
-                                              .OnDestroyCollision(Bounce)
-                                              .Create();
+            ProjectileComponent homingProj = new ProjectileHoming(subject)
+                .Target(target)
+                .MaxTime(2f)
+                .Size(Size.MEDIUM)
+                .OnDestroyTimeout(StopMoving)
+                .OnDestroyOutOfBounds(StopMoving)
+                .OnDestroyCollision(Bounce)
+                .Create();
 
             //.. and then makes a shield instance as a child of the projectile
             GameObject.Destroy(homingProj.GetComponent<MeshRenderer>());

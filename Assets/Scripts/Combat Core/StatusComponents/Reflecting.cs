@@ -31,7 +31,6 @@ namespace CombatCore.StatusComponents
                           .Target(subject.transform.forward)
                           .MaxTime(2f)
                           .AngleOffset(i * 30f)
-                          .Speed(BossCore.Speed.VERY_FAST)
                           .Create();
             }
 

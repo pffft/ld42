@@ -41,7 +41,8 @@ public class BossController : MonoBehaviour
 
     private void Awake()
     {
-        eventQueue = new EventQueue();
+        //eventQueue = new EventQueue();
+        //eventQueue = GameManager.EventQueue;
 
         self = GetComponent<CombatCore.Entity>();
         self.name = BOSS_NAME;
@@ -66,16 +67,18 @@ public class BossController : MonoBehaviour
         NextPhase();
     }
 
+    //private bool test = true;
+
     // Update is called once per frame
     void Update()
     {
         // Every frame, prompt the queue for then next event.
-        eventQueue.Update();
+        GameManager.EventQueue.Update();
 
         // If the queue ran out of events, pull the next AISequence in the phase
-        if (eventQueue.Empty())
+        if (GameManager.EventQueue.Empty())
         {
-            eventQueue.Add(currentPhase.GetNext());
+            GameManager.EventQueue.Add(currentPhase.GetNext());
         }
     }
 
@@ -96,8 +99,8 @@ public class BossController : MonoBehaviour
         CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
 
         self.SetInvincible(true);
-        eventQueue.Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
-        eventQueue.Add(new AISequence(() => { self.SetInvincible(false); }));
+        GameManager.EventQueue.Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
+        GameManager.EventQueue.Add(new AISequence(() => { self.SetInvincible(false); }));
     }
 
     /*
@@ -109,7 +112,7 @@ public class BossController : MonoBehaviour
     public static IEnumerator Dash(Vector3 targetPosition)
     {
 
-        eventQueue.Pause();
+        GameManager.EventQueue.Pause();
 
         Vector3 dashDir = (targetPosition - GameManager.Boss.transform.position).normalized;
 
@@ -131,7 +134,7 @@ public class BossController : MonoBehaviour
         }
 
         self.movespeed.LockTo(25);
-        eventQueue.Unpause();
+        GameManager.EventQueue.Unpause();
     }
 
     /*

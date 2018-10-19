@@ -51,24 +51,33 @@ namespace Projectiles {
             }
             data.target = targetPosition;
 
-            // Sets size (and assigns default material)
+            // Sets size (and assigns default material, if none set)
             gameObject.transform.localScale = SizeToScale(data.size) * Vector3.one;
-            switch (data.size)
+
+            Material material = data.CustomMaterial();
+            if (material != null)
             {
-                case Projectiles.Size.TINY:
-                case Projectiles.Size.SMALL:
-                    gameObject.GetComponent<MeshRenderer>().material = blueMaterial;
-                    break;
-                case Projectiles.Size.MEDIUM:
-                    gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
-                    break;
-                case Projectiles.Size.LARGE:
-                case Projectiles.Size.HUGE:
-                    gameObject.GetComponent<MeshRenderer>().material = orangeRedMaterial;
-                    break;
-                default:
-                    gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
-                    break;
+                gameObject.GetComponent<MeshRenderer>().material = material;
+            }
+            else
+            {
+                switch (data.size)
+                {
+                    case Projectiles.Size.TINY:
+                    case Projectiles.Size.SMALL:
+                        gameObject.GetComponent<MeshRenderer>().material = blueMaterial;
+                        break;
+                    case Projectiles.Size.MEDIUM:
+                        gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
+                        break;
+                    case Projectiles.Size.LARGE:
+                    case Projectiles.Size.HUGE:
+                        gameObject.GetComponent<MeshRenderer>().material = orangeRedMaterial;
+                        break;
+                    default:
+                        gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
+                        break;
+                }
             }
 
             UpdateOrientationAndVelocity();
@@ -118,12 +127,13 @@ namespace Projectiles {
 
             if (transform.position.magnitude > 100f)
             {
-                //data.OnDestroyOutOfBoundsImpl(this);
-                //Destroy(this.gameObject);
+                data.OnDestroyOutOfBoundsImpl(this);
+                Destroy(this.gameObject);
             }
 
             Profiler.BeginSample("Projectile custom update");
-            CustomUpdate();
+            //CustomUpdate();
+            data.CustomUpdate(this);
             Profiler.EndSample();
             Profiler.EndSample();
         }
@@ -132,7 +142,7 @@ namespace Projectiles {
          * Called at the end of every frame on update.
          * Will stop as soon as object dies.
          */
-        public virtual void CustomUpdate() { }
+        //public virtual void CustomUpdate() { }
 
         /*
          * Called on collision with player. Triggers collison death.
@@ -146,7 +156,7 @@ namespace Projectiles {
                 // All projectiles break if they do damage
                 if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
                 {
-                    Debug.Log("Projectile collided, should apply damage");
+                    //Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, data.entity, data.damage);
                     data.OnDestroyCollisionImpl(this);
                     Destroy(this.gameObject);

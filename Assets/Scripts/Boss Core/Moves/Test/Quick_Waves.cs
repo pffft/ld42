@@ -31,7 +31,7 @@ namespace Moves.Test
                         new ShootAOE(AOE.New(self).On(-60, 60).FixedWidth(3f).Speed(Speed.VERY_FAST))); break;
                         case 2:
                             sequences.Add(
-                        new Shoot1(new Projectile().Lightning(0).Speed(Speed.LIGHTNING).MaxTime(0.05f).OnDestroyTimeout(CallbackDictionary.LIGHTNING_RECUR))); break;
+                            new Shoot1(new ProjectileLightning())); break;
                         case 3:
                             sequences.Add(
                         Merge(
@@ -40,7 +40,7 @@ namespace Moves.Test
                         )); break;
                         case 4:
                             sequences.Add(
-                        new ShootArc(100, -60, 60, new Projectile().Speed(Speed.VERY_FAST).Size(Size.TINY)).Wait(0.1f).Times(7)
+                            new ShootArc(100, -60, 60, new Projectile().Speed(Speed.VERY_FAST).Size(Size.SMALL)).Wait(0.1f).Times(5)
                         ); break;
                     }
                     sequences.Add(Pause(0.6f));
