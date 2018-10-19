@@ -117,19 +117,36 @@ namespace Projectiles {
         void Update()
         {
             Profiler.BeginSample("Projectile update loop");
+            Profiler.BeginSample("Adding to current time");
             data.currentTime += Time.deltaTime;
+            Profiler.EndSample();
 
+            Profiler.BeginSample("Checking timeout");
             if (data.currentTime >= data.maxTime)
             {
                 data.OnDestroyTimeoutImpl(this);
-                Destroy(this.gameObject);
+                //Destroy(this.gameObject);
+                Cleanup();
             }
+            Profiler.EndSample();
 
-            if (transform.position.magnitude > 100f)
+            Profiler.BeginSample("Checking out of bounds");
+
+            /*
+            float cutoff = 10000f;
+            if (ProjectileManager.cullingAggression == ProjectileManager.CullingAggression.MEDIUM) {
+                cutoff = 5625f;
+            } else if (ProjectileManager.cullingAggression == ProjectileManager.CullingAggression.HIGH) {
+                cutoff = 2500f;
+            }
+            */
+
+            if (transform.position.sqrMagnitude > 2500f)
             {
                 data.OnDestroyOutOfBoundsImpl(this);
-                Destroy(this.gameObject);
+                Cleanup();
             }
+            Profiler.EndSample();
 
             Profiler.BeginSample("Projectile custom update");
             //CustomUpdate();
@@ -138,17 +155,16 @@ namespace Projectiles {
             Profiler.EndSample();
         }
 
-        /*
-         * Called at the end of every frame on update.
-         * Will stop as soon as object dies.
-         */
-        //public virtual void CustomUpdate() { }
+        private void Cleanup() {
+            ProjectileManager.Return(this.data.cacheIndex, this.gameObject);
+        }
 
         /*
          * Called on collision with player. Triggers collison death.
          */
         public virtual void OnTriggerEnter(Collider other)
         {
+            Profiler.BeginSample("Projectile Collision");
             GameObject otherObject = other.gameObject;
             Entity otherEntity = otherObject.GetComponentInParent<Entity>();
             if (otherEntity != null)
@@ -172,6 +188,7 @@ namespace Projectiles {
                     }
                 }
             }
+            Profiler.EndSample();
         }
 
         /*

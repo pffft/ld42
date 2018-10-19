@@ -32,6 +32,8 @@ namespace Projectiles
 
         public float damage;
 
+        public int cacheIndex;
+
         #region callbacks
         /*
          * Called after object is destroyed due to time limit.
@@ -182,7 +184,9 @@ namespace Projectiles
 
             Profiler.BeginSample("Projectile.Create GameObject Instantiate");
             // Create new GameObject
-            GameObject newObj = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Projectile"));
+            //GameObject newObj = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Projectile"));
+            cacheIndex = ProjectileManager.NextSlot();
+            GameObject newObj = ProjectileManager.Checkout(cacheIndex);
             Profiler.EndSample();
 
             Profiler.BeginSample("Projectile.Create Component Instantiate");

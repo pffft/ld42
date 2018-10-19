@@ -15,7 +15,7 @@ namespace Moves.Test
     {
         public Test() : base
         (
-            new ShootArc(100, 0, 360, new Projectile().Size(Size.SMALL)).Wait(0.1f)
+            new ShootArc(100, 0, 360, new Projectile().Size(Size.SMALL)).Wait(0f)
         )
         {
 

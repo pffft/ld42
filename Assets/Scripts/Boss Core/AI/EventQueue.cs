@@ -79,7 +79,7 @@ namespace AI
             // don't need to provide a description. This includes subclassed AISequences that
             // have additional Wait()s or Then()s called.
             if (sequence.Description == null && !sequence.Name.Equals("AISequence")) {
-                Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
+                //Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
             }
 
             // Generate warning if there's a sequence with too high a difficulty.
@@ -87,10 +87,10 @@ namespace AI
                 Debug.LogWarning("Found AISequence \"" + sequence.Name + "\" with very high difficulty: " + sequence.Difficulty + ". ");
             }
 
-            Debug.Log("Added AISequence" + 
-                      (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") + 
-                      "to queue. Here's what it says it'll do: \"" +
-                      (sequence.Description ?? sequence.ToString()) + "\".");
+            //Debug.Log("Added AISequence" + 
+                      //(sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") + 
+                      //"to queue. Here's what it says it'll do: \"" +
+                      //(sequence.Description ?? sequence.ToString()) + "\".");
 
             /*
              * TODO: be as lazy as possible when evaluating AISequences for their events.
