@@ -99,10 +99,13 @@ namespace World
 					p.isKinematic = false;
 					p.useGravity = true;
 					p.AddForceAtPosition ((center - p.transform.position).normalized * 15f, center, ForceMode.Impulse);
+
+					if(p.gameObject != GameManager.Player.gameObject)
+						Destroy (p.gameObject, 5f);
 				}
 				enabled = false;
 
-				Time.timeScale = 0.3f;  Time.fixedDeltaTime = 0.02f * Time.timeScale;
+				GameManager.TimeScale = 0.3f;
 
                 GameManager.Player.GetComponent<Entity>().OnDeath ();
 			}

@@ -5728,6 +5728,22 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &943402143 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1531581295551972, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+    type: 2}
+  m_PrefabInternal: {fileID: 943402142}
+--- !u!1 &943402144 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1740473415712136, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+    type: 2}
+  m_PrefabInternal: {fileID: 943402142}
+--- !u!114 &943402145 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114744886842337002, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+    type: 2}
+  m_PrefabInternal: {fileID: 943402142}
+  m_Script: {fileID: 11500000, guid: 43b55afaa3edcd847a705ca151d1cf5a, type: 3}
 --- !u!1001 &957761747
 Prefab:
   m_ObjectHideFlags: 0
@@ -6537,6 +6553,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08b92900ec1a042998d89bf0cfe4e533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boss: {fileID: 1299480890}
+  player: {fileID: 943402145}
+  arena: {fileID: 1286897563}
+  heldShield: {fileID: 943402144}
+  placedShield: {fileID: 943402143}
+  thrownShield: {fileID: 0}
+  hud: {fileID: 1366463254}
 --- !u!4 &1117252382
 Transform:
   m_ObjectHideFlags: 0
@@ -7663,6 +7686,12 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1299480888}
   m_Script: {fileID: 11500000, guid: 70dae659e9d6bae4db41c2b2fc0b7d77, type: 3}
+--- !u!114 &1299480890 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
+    type: 2}
+  m_PrefabInternal: {fileID: 1299480888}
+  m_Script: {fileID: 11500000, guid: 281669b33e37543babdb0261c006392e, type: 3}
 --- !u!1001 &1308306554
 Prefab:
   m_ObjectHideFlags: 0
@@ -8103,6 +8132,12 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb41b54f16c577b4394b91efd8f95232, type: 2}
   m_IsPrefabAsset: 0
+--- !u!114 &1366463254 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114315413463394226, guid: bb41b54f16c577b4394b91efd8f95232,
+    type: 2}
+  m_PrefabInternal: {fileID: 1366463253}
+  m_Script: {fileID: 11500000, guid: fae87115b5d35c04790c9e97a3f4e548, type: 3}
 --- !u!1 &1369181890
 GameObject:
   m_ObjectHideFlags: 0
