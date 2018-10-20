@@ -10,7 +10,7 @@ public class Controller : MonoBehaviour
 	private float dashRange = 15f;
 
 	private Rigidbody physbody;
-	private CombatCore.Entity self;
+	private Entity self;
 
 	private Vector3 facePos;
 	private bool dashing;
@@ -29,6 +29,12 @@ public class Controller : MonoBehaviour
 		self.AddAbility (Ability.Get (ABILITY_3));
 
 		self.tookDamage += Self_tookDamage;
+		self.died += Self_died;
+	}
+
+	private void Self_died()
+	{
+
 	}
 
 	private void Self_tookDamage(Entity victim, Entity attacker, float rawDamage, float calcDamage, bool damageApplied, bool hitShields)

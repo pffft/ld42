@@ -5725,6 +5725,16 @@ Prefab:
       propertyPath: shieldsMax
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95172841293179122, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114744886842337002, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
   m_IsPrefabAsset: 0

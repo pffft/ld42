@@ -2,6 +2,7 @@
 using UnityEngine;
 using World;
 
+[ExecuteInEditMode]
 public class GameManager : MonoBehaviour
 {
 	#region STATIC_VARS
@@ -74,9 +75,6 @@ public class GameManager : MonoBehaviour
 			return;
 		}
 
-		//general game stuff
-		TimeScale = 1f;
-
 		//boss boy
 		Boss.transform.position = instance.startingBossPosition;
 		Entity bossData = Player.GetComponent<Entity> ();
@@ -86,10 +84,18 @@ public class GameManager : MonoBehaviour
 
 		Debug.Log ("Reset boss");
 
-		//player (just nuke humpty-dumpty; we can't put him back together again) 
-		//TODO
+		//player
+		Player.transform.position = instance.startingPlayerPosition;
+		Entity playerData = Player.GetComponent<Entity> ();
+		Entity.HealEntity (playerData, float.PositiveInfinity);
+		playerData.ClearStatuses ();
+		Player.gameObject.SetActive (true);
 
 		Debug.Log ("Reset player");
+
+		//general game stuff
+		TimeScale = 1f;
+		instance.arena.enabled = true;
 
 		Debug.Log ("Finished game reset");
 	}
