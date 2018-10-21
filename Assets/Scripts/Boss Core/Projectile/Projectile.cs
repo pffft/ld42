@@ -32,7 +32,7 @@ namespace Projectiles
 
         public float damage;
 
-        public int cacheIndex;
+        public Vector3 velocity;
 
         #region callbacks
         /*
@@ -105,6 +105,8 @@ namespace Projectiles
             this.maxTime = 10f;
 
             this.damage = ((float)size + 0.5f) * 2f;
+
+            this.velocity = Vector3.forward;
 
             OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
             OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
@@ -185,8 +187,7 @@ namespace Projectiles
             Profiler.BeginSample("Projectile.Create GameObject Instantiate");
             // Create new GameObject
             //GameObject newObj = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Projectile"));
-            cacheIndex = ProjectileManager.NextSlot();
-            GameObject newObj = ProjectileManager.Checkout(cacheIndex);
+            GameObject newObj = ProjectileManager.Checkout();
             Profiler.EndSample();
 
             Profiler.BeginSample("Projectile.Create Component Instantiate");
@@ -210,13 +211,14 @@ namespace Projectiles
             Profiler.EndSample();
 
             // Assign and init the RigidBody (or create one if it doesn't exist)
+            /*
             Rigidbody body = newObj.GetComponent<Rigidbody>();
             if (body == null)
             {
                 body = newObj.AddComponent<Rigidbody>();
             }
             body.useGravity = false;
-
+            */
 
             Profiler.EndSample();
             return projectile;

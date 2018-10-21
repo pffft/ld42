@@ -11,6 +11,7 @@ namespace Moves.Basic
         (
             () =>
             {
+                //long start = System.DateTime.Now.Ticks;
                 Glare();
 
                 // Ensure that "from" is always less than "to".
@@ -28,6 +29,8 @@ namespace Moves.Basic
                     Projectile newStruc = clone.Clone();
                     newStruc.AngleOffset(newStruc.angleOffset + i).Create();
                 }
+                //long time = System.DateTime.Now.Ticks - start;
+                //UnityEngine.Debug.Log("Time taken : " + (time / 10000f / 1000f));
             }
         )
         {

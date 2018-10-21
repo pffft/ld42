@@ -80,15 +80,8 @@ namespace Projectiles {
                 }
             }
 
-            UpdateOrientationAndVelocity();
-        }
+            // Computes the starting position, rotation, and velocity.
 
-
-        /* Updates this Projectile's orientation and velocity. Called when the start,
-         * target, angleOffset, or speed are changed using the builder methods.
-         */
-        private void UpdateOrientationAndVelocity()
-        {
             // Remove any height from the start and target vectors
             Vector3 topDownSpawn = new Vector3(data.start.x, 0, data.start.z);
             Vector3 topDownTarget = new Vector3(data.target.x, 0, data.target.z);
@@ -102,7 +95,8 @@ namespace Projectiles {
 
             this.gameObject.transform.position = data.start;
             this.gameObject.transform.rotation = rotation;
-            this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
+            //this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
+            this.data.velocity = rotation * (Vector3.forward * (float)data.speed);
         }
 
         /*
@@ -116,47 +110,34 @@ namespace Projectiles {
 
         void Update()
         {
-            Profiler.BeginSample("Projectile update loop");
-            Profiler.BeginSample("Adding to current time");
+            //Profiler.BeginSample("Projectile update loop");
             data.currentTime += Time.deltaTime;
-            Profiler.EndSample();
 
-            Profiler.BeginSample("Checking timeout");
             if (data.currentTime >= data.maxTime)
             {
                 data.OnDestroyTimeoutImpl(this);
                 //Destroy(this.gameObject);
                 Cleanup();
             }
-            Profiler.EndSample();
 
-            Profiler.BeginSample("Checking out of bounds");
+            //Profiler.BeginSample("Movement");
+            //transform.Translate(Time.deltaTime * data.velocity);
+            transform.position += (Time.deltaTime * data.velocity);
+            //Profiler.EndSample();
 
-            /*
-            float cutoff = 10000f;
-            if (ProjectileManager.cullingAggression == ProjectileManager.CullingAggression.MEDIUM) {
-                cutoff = 5625f;
-            } else if (ProjectileManager.cullingAggression == ProjectileManager.CullingAggression.HIGH) {
-                cutoff = 2500f;
-            }
-            */
-
-            if (transform.position.sqrMagnitude > 2500f)
+            if (transform.position.sqrMagnitude > 5625f)
             {
                 data.OnDestroyOutOfBoundsImpl(this);
                 Cleanup();
             }
-            Profiler.EndSample();
 
-            Profiler.BeginSample("Projectile custom update");
             //CustomUpdate();
             data.CustomUpdate(this);
-            Profiler.EndSample();
-            Profiler.EndSample();
+            //Profiler.EndSample();
         }
 
         private void Cleanup() {
-            ProjectileManager.Return(this.data.cacheIndex, this.gameObject);
+            ProjectileManager.Return(this.gameObject);
         }
 
         /*
@@ -199,36 +180,6 @@ namespace Projectiles {
          * If you want to use the standard projectile logic, simply return null here.
          */
         public virtual Material GetCustomMaterial() { return null; }
-
-        /*
-         * Copies the data of this Projectile into a new one.
-         * This then deletes the original Projectile component.
-         * 
-         * This method is used by extension methods to help cast to a given type.
-        */
-        public T CastTo<T>() where T : ProjectileComponent
-        {
-            gameObject.SetActive(false);
-            T other = gameObject.AddComponent<T>();
-
-            // Copy the data over
-            //other.data = new ProjectileStructure();
-            other.data = data.Clone();
-            gameObject.SetActive(true);
-
-            // Assign a different, custom material (if applicable)
-            Material customMaterial = other.GetCustomMaterial();
-            if (customMaterial != null)
-            {
-                gameObject.GetComponent<MeshRenderer>().material = customMaterial;
-            }
-
-            // Destroy this component so the other one takes priority
-            Destroy(this);
-
-            // Return the new component
-            return other;
-        }
     }
 
 }

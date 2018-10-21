@@ -40,11 +40,6 @@ public class GameManager : MonoBehaviour {
         get; set;
     }
 
-    public static AI.EventQueue EventQueue 
-    {
-        get; set;
-    }
-
 	// Use this for initialization
 	void Awake ()
     {
@@ -56,7 +51,6 @@ public class GameManager : MonoBehaviour {
         PlacedShield = GameObject.Find("Placed Shield");
         ThrownShield = GameObject.Find("Thrown Shield");
         HUD = GameObject.Find("HUD").GetComponent<HUD>();
-        EventQueue = GameObject.Find("Event Queue").GetComponent<AI.EventQueue>();
     }
 	
 	// Update is called once per frame
