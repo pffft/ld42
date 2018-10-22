@@ -18,6 +18,9 @@ namespace CombatCore.StatusComponents
         {
             GameManager.HeldShield.SetActive(false);
 
+            // TODO: fix this to work properly. Projectile system will be private to Boss
+            // in some future release.
+
             // Spawns a homing projectile
             ProjectileComponent homingProj = new ProjectileHoming(subject)
                 .Target(target)
@@ -47,6 +50,7 @@ namespace CombatCore.StatusComponents
         {
             Transform child = self.transform.GetChild(0);
             Rigidbody body = child.GetComponent<Rigidbody>();
+            self.gameObject.AddComponent<MeshRenderer>();
 
             body.useGravity = true;
             body.isKinematic = false;
@@ -60,6 +64,7 @@ namespace CombatCore.StatusComponents
         // Makes the shield "bounce" in a randomized direction
         private static readonly ProjectileCallbackDelegate Bounce = (self) =>
         {
+            self.gameObject.AddComponent<MeshRenderer>();
             if (self.transform.childCount < 1) return;
             Rigidbody body = self.transform.GetChild(0).GetComponent<Rigidbody>();
             body.useGravity = true;

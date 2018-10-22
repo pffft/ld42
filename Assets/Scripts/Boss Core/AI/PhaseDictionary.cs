@@ -44,6 +44,8 @@ namespace AI
 
         public static AIPhase PHASE1;
 
+        public static AIPhase PHASE_UNIT_TEST;
+
         //static AIPhase() {
         //    if (BossController.insaneMode)
         //    {
@@ -84,7 +86,7 @@ namespace AI
                 //.AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
                 //.AddSequence(10, new Moves.Test.Double_Laser_Sweep())
                 //.AddSequence(10, new Moves.Test.Pincer_Sweep())
-                .AddSequence(10, new Moves.Test.Test())
+                //.AddSequence(10, new Moves.Test.Test())
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()
@@ -147,6 +149,14 @@ namespace AI
                 //.AddSequence(10, SHOOT_4_WAVES_BEHIND)
 
                 ;
+
+            PHASE_UNIT_TEST = new AIPhase()
+                .AddScriptedSequence(0, new Moves.Basic.Shoot1(new Projectiles.Projectile()).Wait(1f))
+                .AddScriptedSequence(1, new Moves.Basic.Shoot1(new Projectiles.ProjectileCurving(30f, true)).Wait(1f))
+                .AddScriptedSequence(2, new Moves.Basic.Shoot1(new Projectiles.ProjectileCurving(-30f, false)).Wait(1f))
+                .AddScriptedSequence(3, new Moves.Basic.Shoot1(new Projectiles.ProjectileHoming()).Wait(1f))
+                .AddScriptedSequence(4, new Moves.Basic.Shoot1(new Projectiles.ProjectileLightning()).Wait(1f));
+            ;
         }
 
     }

@@ -9,7 +9,6 @@ namespace Projectiles
     public class ProjectileCurving : Projectile
     {
 
-        private Rigidbody body;
         private readonly float curveAmount;
 
         private int count;
@@ -28,12 +27,6 @@ namespace Projectiles
             this.leavesTrail = leavesTrail;
         }
 
-
-        public override void CustomCreate(ProjectileComponent component)
-        {
-            body = component.GetComponent<Rigidbody>();
-        }
-
         public override Material CustomMaterial()
         {
             return Resources.Load<Material>("Art/Materials/GreenTransparent");
@@ -42,7 +35,8 @@ namespace Projectiles
         public override void CustomUpdate(ProjectileComponent component)
         {
             Quaternion rot = Quaternion.AngleAxis(Time.deltaTime * curveAmount, Vector3.up);
-            body.velocity = rot * body.velocity;
+            //body.velocity = rot * body.velocity;
+            velocity = rot * velocity;
 
             if (leavesTrail)
             {

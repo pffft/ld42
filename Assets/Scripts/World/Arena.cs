@@ -78,20 +78,30 @@ namespace World
 				return;
 
 			//drop the player if they're outside the arena
-			if (Vector3.Distance (transform.position, GameManager.Player.transform.position) > 50f * transform.localScale.x)
+			if (Vector3.Distance (transform.position, GameManager.Player.transform.position) > RadiusInWorldUnits)
 			{
-				Rigidbody playerRB = GameManager.Player.GetComponent<Rigidbody> ();
+				//swap out a dummy and blow it up
+				GameManager.Player.gameObject.SetActive (false);
+				GameObject dummyPlayer = Instantiate(
+					Resources.Load<GameObject> ("Prefabs/Player"),
+					GameManager.Player.transform.position,
+					GameManager.Player.transform.rotation);
+					
 
+				//add force
+				Rigidbody playerRB = dummyPlayer.GetComponent<Rigidbody> ();
 				playerRB.constraints = playerRB.constraints & ~RigidbodyConstraints.FreezeAll;
 				playerRB.useGravity = true;
 				playerRB.AddForce (Vector3.down * 20f, ForceMode.Impulse);
 				playerRB.AddRelativeTorque (Vector3.right * 2f, ForceMode.Impulse);
 
-                GameManager.Player.GetComponent<Controller> ().enabled = false;
-                GameManager.Player.GetComponent<Animator> ().enabled = false;
+				//disable control
+				dummyPlayer.GetComponent<Controller> ().enabled = false;
+				dummyPlayer.GetComponent<Animator> ().enabled = false;
 
-                Rigidbody[] parts = GameManager.Player.GetComponentsInChildren<Rigidbody> ();
-				Vector3 center = Vector3.up + GameManager.Player.transform.position;
+				//boom
+                Rigidbody[] parts = dummyPlayer.GetComponentsInChildren<Rigidbody> ();
+				Vector3 center = Vector3.up + dummyPlayer.transform.position;
 				foreach (Rigidbody p in parts)
 				{
 					p.transform.parent = null;
@@ -99,10 +109,12 @@ namespace World
 					p.isKinematic = false;
 					p.useGravity = true;
 					p.AddForceAtPosition ((center - p.transform.position).normalized * 15f, center, ForceMode.Impulse);
+
+					Destroy (p.gameObject, 5f);
 				}
 				enabled = false;
 
-				Time.timeScale = 0.3f;  Time.fixedDeltaTime = 0.02f * Time.timeScale;
+				GameManager.TimeScale = 0.3f;
 
                 GameManager.Player.GetComponent<Entity>().OnDeath ();
 			}

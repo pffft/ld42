@@ -413,6 +413,63 @@ namespace AI
             });
         }
 
+        // A delegate that captures an iterator in a for loop
+        public delegate AISequence ForBody(float iterator);
+
+        public static AISequence For(float count, ForBody body)
+        {
+            if (count <= 0)
+            {
+                Debug.LogError("Found a for loop with negative count.");
+                return body(0);
+            }
+            return For(0, count, 1, body);
+        }
+
+        public static AISequence For(float start, float end, ForBody body)
+        {
+            if (end < start)
+            {
+                Debug.LogError("Found a for loop with end before start.");
+                return body(start);
+            }
+            return For(start, end, 1, body);
+        }
+
+        public static AISequence For(float start, float end, float step, ForBody body)
+        {
+            Debug.Log("For called!");
+            if (Mathf.Approximately(step, 0))
+            {
+                Debug.LogError("Found for loop with step size 0.");
+                return body(start);
+            }
+
+            if (Mathf.Abs(Mathf.Sign(end - start) - Mathf.Sign(step)) > 0.01f)
+            {
+                Debug.LogError("Found for loop that will never terminate.");
+                return body(start);
+            }
+
+            AISequence[] sequences = new AISequence[(int)Mathf.Abs((end - start) / step)];
+            int count = 0;
+            if (start > end)
+            {
+                for (float i = start; i > end; i += step)
+                {
+                    sequences[count++] = body(i);
+                }
+            }
+            else
+            {
+                for (float i = start; i < end; i += step)
+                {
+                    sequences[count++] = body(i);
+                }
+            }
+            return new AISequence(sequences);
+        }
+
         #endregion
     }
 }

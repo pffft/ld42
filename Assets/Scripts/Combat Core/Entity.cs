@@ -248,6 +248,22 @@ namespace CombatCore
 				statusRemoved (s);
 		}
 
+		/// <summary>
+		/// Ends all statuses
+		/// </summary>
+		public void ClearStatuses()
+		{
+			foreach (Status s in statuses.Values)
+			{
+				s.End ();
+				s.OnRevert (this);
+
+				if (statusRemoved != null)
+					statusRemoved (s);
+			}
+			statuses.Clear ();
+		}
+
 		// Check for a specific status in this Entity's status list
 		public bool HasStatus(string name)
 		{

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using BossCore;
 using CombatCore;
 using UnityEngine;
 
@@ -80,12 +81,6 @@ namespace Projectiles
 
         #endregion
 
-        /*
-        public static Projectile New(Entity entity) {
-            return new Projectile(entity);
-        }
-        */
-
         public Projectile() : this(BossController.self) { }
 
         public Projectile(Entity entity)
@@ -149,7 +144,7 @@ namespace Projectiles
         }
 
         // Builder method
-        public virtual Projectile Speed(BossCore.Speed speed)
+        public virtual Projectile Speed(Speed speed)
         {
             this.speed = speed;
             return this;

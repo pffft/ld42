@@ -15,6 +15,7 @@ namespace Moves.Test
     {
         public Pincer_Sweep() : base
         (
+            /*
             () => {
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = 150; i >= 0; i -= 5) {
@@ -22,9 +23,11 @@ namespace Moves.Test
                 }
                 return sequences.ToArray();
             }
+            */
+            For(150, 0, -5, i => new Pincer(i).Wait(0.05f))
         )
         {
-            Description = "Sweeps pincer projectiles from +30 to +150 degrees";
+            Description = "Sweeps pincer projectiles from +150 to +0 degrees";
         }
     }
 }

@@ -33,7 +33,8 @@ public class EndGameMenu : MonoBehaviour
 
 	public void RestartGame()
 	{
-		SceneManager.LoadScene (SceneManager.GetActiveScene().name);
+		GameManager.ResetGame ();
+		MenuManager.GetInstance ().NavigateTo (null);
 	}
 
 	public void ExitGame()

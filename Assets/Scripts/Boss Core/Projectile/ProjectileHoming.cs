@@ -9,7 +9,6 @@ namespace Projectiles
     {
 
         private GameObject targetObject;
-        private Rigidbody body;
 
         private float curDivergence;
         private float maxDivergence = 110f;
@@ -27,8 +26,7 @@ namespace Projectiles
 
         public override void CustomCreate(ProjectileComponent component)
         {
-            targetObject = component.data.entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player : GameManager.Boss.gameObject;
-            body = component.GetComponent<Rigidbody>();
+            targetObject = component.data.entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player.gameObject : GameManager.Boss.gameObject;
             wasClose = false;
             curDivergence = 0f;
             homingScale = (float)component.data.speed / 7f;
@@ -40,7 +38,7 @@ namespace Projectiles
         
         public override void CustomUpdate(ProjectileComponent component) {
             Vector3 idealVelocity = ((float)speed) * (targetObject.transform.position - component.transform.position).normalized;
-            float idealRotation = Vector3.SignedAngle(idealVelocity, body.velocity, Vector3.up);
+            float idealRotation = Vector3.SignedAngle(idealVelocity, velocity, Vector3.up);
 
             float distance = Vector3.Distance(targetObject.transform.position, component.transform.position);
 
@@ -64,8 +62,10 @@ namespace Projectiles
             if (Mathf.Abs(idealRotation) >= 10f && Mathf.Abs(idealRotation) < 120f)
             {
                 Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering * distanceScale, Vector3.up);
-                body.velocity = rot * body.velocity;
-                body.velocity = (distanceScale * (float)speed) * body.velocity.normalized;
+                //body.velocity = rot * body.velocity;
+                velocity = rot * velocity;
+                //body.velocity = (distanceScale * (float)speed) * body.velocity.normalized;
+                velocity = (distanceScale * (float)speed) * velocity.normalized;
                 curDivergence += homingScale;
             }
         }
