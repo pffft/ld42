@@ -59,12 +59,12 @@ namespace Projectiles
                 GameObject.Destroy(component.gameObject);
             }
 
-            if (currentTime > count / numSpawners)
+            if (component.currentTime > count / numSpawners)
             {
                 count++;
                 new Projectile()
                     .Start(component.transform.position)
-                    .MaxTime(initialMaxTime - currentTime)
+                    .MaxTime(initialMaxTime - component.currentTime)
                     .Size(Projectiles.Size.SMALL)
                     .Speed(BossCore.Speed.FROZEN)
                     .Create();
@@ -72,14 +72,14 @@ namespace Projectiles
         }
 
         // Recursively generates more lightning
-        private static ProjectileCallbackDelegate LIGHTNING_RECUR = (self) =>
+        private static ProjectileCallback LIGHTNING_RECUR = (self) =>
         {
             ProjectileLightning lightningSelf = self.data as ProjectileLightning;
 
             // Stop the recursion at level 7
             if (lightningSelf.level > 6) 
             {
-                return;
+                return AI.AISequence.Pause(0f);
             }
 
             int times;
@@ -92,8 +92,8 @@ namespace Projectiles
                 times = Random.Range(1, 2);
             }
 
-            for (int i = 0; i < times; i++)
-            {
+
+            return AI.AISequence.For(times, i => new Moves.Basic.Shoot1(
                 new ProjectileLightning(lightningSelf.entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.maxTime)
                     .Start(self.transform.position)
                     .Target(lightningSelf.initialTarget)
@@ -101,8 +101,7 @@ namespace Projectiles
                     .MaxTime(Random.Range(0.05f, 0.15f))
                     .Speed(BossCore.Speed.LIGHTNING)
                     .OnDestroyTimeout(LIGHTNING_RECUR)
-                    .Create();
-            }
+            ));
         };
     }
 }

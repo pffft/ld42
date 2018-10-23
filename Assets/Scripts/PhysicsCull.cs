@@ -5,15 +5,19 @@ using UnityEngine;
 public class PhysicsCull : MonoBehaviour {
 
     private SphereCollider col;
+    private Transform trans;
+    private Transform playerTrans;
 
 	// Use this for initialization
 	void Start () {
         col = GetComponent<SphereCollider>();
+        trans = transform;
+        playerTrans = GameManager.Player.transform;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        col.enabled = (GameManager.Player.transform.position - transform.position).sqrMagnitude < 10 * 10;
+	public void Update () {
+        col.enabled = (playerTrans.position - trans.position).sqrMagnitude < 10 * 10;
         /*
         if ((GameManager.Player.transform.position - transform.position).sqrMagnitude < 10 * 10)
         {

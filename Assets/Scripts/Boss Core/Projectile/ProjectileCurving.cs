@@ -40,12 +40,12 @@ namespace Projectiles
 
             if (leavesTrail)
             {
-                if (currentTime > count / numSpawners)
+                if (component.currentTime > count / numSpawners)
                 {
                     count++;
                     new Projectile(entity)
                             .Start(component.transform.position)
-                            .MaxTime(maxTime - currentTime)
+                            .MaxTime(maxTime - component.currentTime)
                             .Size(Projectiles.Size.SMALL)
                             .Speed(BossCore.Speed.FROZEN)
                             .Create();

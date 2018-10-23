@@ -11,6 +11,13 @@ namespace Projectiles {
     {
         public Projectile data;
 
+        private Transform trans;
+        private MeshRenderer rend;
+        private bool shouldUpdate = true;
+
+        public float currentTime;
+        private float maxTime;
+
         public static Material blueMaterial;
         public static Material orangeMaterial;
         public static Material orangeRedMaterial;
@@ -21,8 +28,12 @@ namespace Projectiles {
             {
                 blueMaterial = Resources.Load<Material>("Art/Materials/BlueTransparent");
                 orangeMaterial = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                //orangeMaterial = Resources.Load<Material>("Art/Materials/Orange");
                 orangeRedMaterial = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
             }
+
+            trans = transform;
+            rend = GetComponent<MeshRenderer>();
         }
 
         public void Initialize()
@@ -97,6 +108,11 @@ namespace Projectiles {
             this.gameObject.transform.rotation = rotation;
             //this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
             this.data.velocity = rotation * (Vector3.forward * (float)data.speed);
+
+            shouldUpdate = true;
+            rend.enabled = true;
+            currentTime = 0;
+            maxTime = data.maxTime;
         }
 
         /*
@@ -109,35 +125,57 @@ namespace Projectiles {
         }
 
         void Update()
-        {
-            //Profiler.BeginSample("Projectile update loop");
-            data.currentTime += Time.deltaTime;
-
-            if (data.currentTime >= data.maxTime)
+        {   
+            if (!shouldUpdate)
             {
-                data.OnDestroyTimeoutImpl(this);
+                return;
+            }
+            Profiler.BeginSample("Projectile update loop");
+            Profiler.BeginSample("Time check");
+            //data.currentTime += Time.deltaTime;
+            currentTime += Time.deltaTime;
+
+            if (currentTime >= maxTime)
+            {
+                BossController.ExecuteAsync(data.OnDestroyTimeoutImpl(this));
                 //Destroy(this.gameObject);
                 Cleanup();
             }
+            Profiler.EndSample();
 
-            //Profiler.BeginSample("Movement");
-            //transform.Translate(Time.deltaTime * data.velocity);
-            transform.position += (Time.deltaTime * data.velocity);
-            //Profiler.EndSample();
+            Profiler.BeginSample("Movement");
+            trans.position += (Time.deltaTime * data.velocity);
+            Profiler.EndSample();
 
-            if (transform.position.sqrMagnitude > 5625f)
+            Profiler.BeginSample("Bounds check");
+            if (trans.position.sqrMagnitude > 5625f)
             {
-                data.OnDestroyOutOfBoundsImpl(this);
+                BossController.ExecuteAsync(data.OnDestroyOutOfBoundsImpl(this));
                 Cleanup();
-            }
+                //gameObject.SetActive(false);
+                //shouldUpdate = false;
+                //rend.enabled = false;
+                //ProjectileManager.cache.Enqueue(gameObject);
 
-            //CustomUpdate();
+            }
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Custom update");
             data.CustomUpdate(this);
-            //Profiler.EndSample();
+            Profiler.EndSample();
+            Profiler.EndSample();
         }
 
         private void Cleanup() {
-            ProjectileManager.Return(this.gameObject);
+            Profiler.BeginSample("Cleanup");
+            shouldUpdate = false;
+            rend.enabled = false;
+            //ProjectileManager.cache.Enqueue(gameObject);
+            //StartCoroutine(ProjectileManager.ReturnWhenever(gameObject));
+            ProjectileManager.Return(gameObject);
+            Profiler.EndSample();
+
+            //ProjectileManager.Return(this.gameObject);
         }
 
         /*
@@ -155,7 +193,7 @@ namespace Projectiles {
                 {
                     //Debug.Log("Projectile collided, should apply damage");
                     Entity.DamageEntity(otherEntity, data.entity, data.damage);
-                    data.OnDestroyCollisionImpl(this);
+                    BossController.ExecuteAsync(data.OnDestroyCollisionImpl(this));
                     Destroy(this.gameObject);
                 }
 

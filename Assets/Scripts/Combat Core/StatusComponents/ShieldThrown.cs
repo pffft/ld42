@@ -46,7 +46,7 @@ namespace CombatCore.StatusComponents
         }
 
         // Just make the shield freeze
-        private static readonly ProjectileCallbackDelegate StopMoving = (self) =>
+        private static readonly ProjectileCallback StopMoving = (self) =>
         {
             Transform child = self.transform.GetChild(0);
             Rigidbody body = child.GetComponent<Rigidbody>();
@@ -58,14 +58,14 @@ namespace CombatCore.StatusComponents
 
             self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
-
+            return AI.AISequence.Pause(0f);
         };
 
         // Makes the shield "bounce" in a randomized direction
-        private static readonly ProjectileCallbackDelegate Bounce = (self) =>
+        private static readonly ProjectileCallback Bounce = (self) =>
         {
             self.gameObject.AddComponent<MeshRenderer>();
-            if (self.transform.childCount < 1) return;
+            if (self.transform.childCount < 1) return AI.AISequence.Pause(0f);
             Rigidbody body = self.transform.GetChild(0).GetComponent<Rigidbody>();
             body.useGravity = true;
             body.isKinematic = false;
@@ -82,6 +82,7 @@ namespace CombatCore.StatusComponents
             body.AddForce(250f * (rotation * self.GetComponent<Rigidbody>().velocity.normalized), ForceMode.Impulse);
             self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
+            return AI.AISequence.Pause(0f);
         };
 
         public override void OnRevert(Entity subject)

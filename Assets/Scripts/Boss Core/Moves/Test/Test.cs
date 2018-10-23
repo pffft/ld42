@@ -35,6 +35,7 @@ namespace Moves.Test
             new PlayerLock(false)
             */
             //For(6, i => new Shoot1(new Projectile().AngleOffset(i * 60)).Wait(0.25f)).Wait(0.5f)
+            new ShootArc(500, 0, 360, new Projectile().MaxTime(2f)).Wait(0.05f)
         )
         {
 

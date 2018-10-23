@@ -9,10 +9,11 @@ using UnityEngine.Profiling;
 namespace Projectiles
 {
     /*
-* Used for handling death events for Projectiles.
-* In the future, other callbacks might be added.
-*/
-    public delegate void ProjectileCallbackDelegate(ProjectileComponent self);
+    * Used for handling death events for Projectiles.
+    * In the future, other callbacks might be added.
+    */
+    //public delegate void ProjectileCallbackDelegate(ProjectileComponent self);
+    public delegate AI.AISequence ProjectileCallback(ProjectileComponent self);
 
     public class Projectile
     {
@@ -28,7 +29,6 @@ namespace Projectiles
         public BossCore.Speed speed;
         public Size size;
 
-        public float currentTime;
         public float maxTime;
 
         public float damage;
@@ -39,9 +39,9 @@ namespace Projectiles
         /*
          * Called after object is destroyed due to time limit.
          */
-        public ProjectileCallbackDelegate OnDestroyTimeoutImpl;
+        public ProjectileCallback OnDestroyTimeoutImpl;
 
-        public Projectile OnDestroyTimeout(ProjectileCallbackDelegate deleg)
+        public Projectile OnDestroyTimeout(ProjectileCallback deleg)
         {
             this.OnDestroyTimeoutImpl = deleg;
             return this;
@@ -50,9 +50,9 @@ namespace Projectiles
         /*
          * Called after object is destroyed due to hitting the arena.
          */
-        public ProjectileCallbackDelegate OnDestroyOutOfBoundsImpl;
+        public ProjectileCallback OnDestroyOutOfBoundsImpl;
 
-        public Projectile OnDestroyOutOfBounds(ProjectileCallbackDelegate deleg)
+        public Projectile OnDestroyOutOfBounds(ProjectileCallback deleg)
         {
             this.OnDestroyOutOfBoundsImpl = deleg;
             return this;
@@ -61,9 +61,9 @@ namespace Projectiles
         /*
          * Called when the object hits the player
          */
-        public ProjectileCallbackDelegate OnDestroyCollisionImpl;
+        public ProjectileCallback OnDestroyCollisionImpl;
 
-        public Projectile OnDestroyCollision(ProjectileCallbackDelegate deleg)
+        public Projectile OnDestroyCollision(ProjectileCallback deleg)
         {
             this.OnDestroyCollisionImpl = deleg;
             return this;
@@ -96,7 +96,6 @@ namespace Projectiles
             this.speed = BossCore.Speed.MEDIUM;
             this.size = Projectiles.Size.SMALL;
 
-            this.currentTime = 0f;
             this.maxTime = 10f;
 
             this.damage = ((float)size + 0.5f) * 2f;
