@@ -86,8 +86,9 @@ namespace AI
                 //.AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
                 //.AddSequence(10, new Moves.Test.Double_Laser_Sweep())
                 //.AddSequence(10, new Moves.Test.Pincer_Sweep())
-                .AddScriptedSequence(0, new Moves.Test.Test().Times(75))
-                .AddSequence(10, AISequence.Pause(100f))
+                //.AddScriptedSequence(0, new Moves.Test.Test().Times(75))
+                //.AddSequence(10, AISequence.Pause(100f))
+                .AddSequence(10, new Moves.Test.ReverseTest().Wait(1f));
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()

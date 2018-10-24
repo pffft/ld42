@@ -467,7 +467,7 @@ namespace AI
                     sequences[count++] = body(i);
                 }
             }
-            return new AISequence(sequences);
+            return Merge(sequences);
         }
 
         #endregion
