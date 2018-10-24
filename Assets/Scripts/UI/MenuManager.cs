@@ -11,7 +11,29 @@ namespace GameUI
 	{
 		#region STATIC_VARS
 
+		private const string PATH_SEP = "/";
+
 		private static MenuManager instance;
+
+		/// <summary>
+		/// Get the path from the root menu to the current menu
+		/// </summary>
+		public static string CurrentMenuPath
+		{
+			get
+			{
+				if (instance == null)
+					return "";
+
+				string path = "";
+				foreach(Menu m in instance.menuStack)
+				{
+					path = m.Name + PATH_SEP + path;
+				}
+
+				return PATH_SEP + path;
+			}
+		}
 		#endregion
 
 		#region INSTANCE_VARS
