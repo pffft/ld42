@@ -17,7 +17,7 @@ namespace Moves.Basic
                 Vector3 oldPosVector = GameManager.Boss.transform.position - center;
                 Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);
 
-                GameManager.Boss.StartCoroutine(Dash(rot * oldPosVector));
+                GameManager.Boss.StartCoroutine(Dash((rot * oldPosVector) + center));
             }
         )
         {}

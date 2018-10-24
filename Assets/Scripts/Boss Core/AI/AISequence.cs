@@ -34,6 +34,22 @@ namespace AI
             }
         }
 
+        protected enum Live {
+            PLAYER_POSITION,
+            BOSS_POSITION,
+            RANDOM_WITHIN_ARENA
+        }
+
+        protected static Vector3 Resolve(Live magic) {
+            switch (magic)
+            {
+                case Live.PLAYER_POSITION: return GameManager.Player.transform.position;
+                case Live.BOSS_POSITION: return GameManager.Boss.transform.position;
+                //case Live.RANDOM_WITHIN_ARENA: return GameManager.Player.transform.position;
+                default: return Vector3.zero;
+            }
+        }
+
         // A list of events to execute.
         public AIEvent[] events;
         private AISequence[] children;
