@@ -28,7 +28,6 @@ namespace Projectiles {
             {
                 blueMaterial = Resources.Load<Material>("Art/Materials/BlueTransparent");
                 orangeMaterial = Resources.Load<Material>("Art/Materials/OrangeTransparent");
-                //orangeMaterial = Resources.Load<Material>("Art/Materials/Orange");
                 orangeRedMaterial = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
             }
 
@@ -38,34 +37,9 @@ namespace Projectiles {
 
         public void Initialize()
         {
-            // Sets start
-            //data.start = data.preStart ?? data.entity.transform.position;
+            // Resolve the proxy variables for start and target
             data.start = data.preStart.GetValue();
-            Debug.Log("Start: " + data.start);
-
-            // Sets target
-            /*
-            Vector3 targetPosition;
-            if (data.preTarget == null)
-            {
-                if (data.entity.name.Equals(BossController.BOSS_NAME))
-                {
-                    targetPosition = BossController.isPlayerLocked ?
-                       BossController.playerLockPosition :
-                       GameManager.Player.transform.position;
-                }
-                else
-                {
-                    targetPosition = Vector3.forward;
-                }
-            }
-            else
-            {
-                targetPosition = data.preTarget.Value;
-            }
-            */
             data.target = data.preTarget.GetValue();
-            Debug.Log("Target: " + data.target);
 
             // Sets size (and assigns default material, if none set)
             gameObject.transform.localScale = SizeToScale(data.size) * Vector3.one;
@@ -157,10 +131,6 @@ namespace Projectiles {
             {
                 BossController.ExecuteAsync(data.OnDestroyOutOfBoundsImpl(this));
                 Cleanup();
-                //gameObject.SetActive(false);
-                //shouldUpdate = false;
-                //rend.enabled = false;
-                //ProjectileManager.cache.Enqueue(gameObject);
 
             }
             Profiler.EndSample();
@@ -175,12 +145,8 @@ namespace Projectiles {
             Profiler.BeginSample("Cleanup");
             shouldUpdate = false;
             rend.enabled = false;
-            //ProjectileManager.cache.Enqueue(gameObject);
-            //StartCoroutine(ProjectileManager.ReturnWhenever(gameObject));
             ProjectileManager.Return(gameObject);
             Profiler.EndSample();
-
-            //ProjectileManager.Return(this.gameObject);
         }
 
         /*

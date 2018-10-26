@@ -107,13 +107,13 @@ namespace Projectiles
             OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
         }
 
-        // TODO if preStart had an offset, it is lost
+        // Builder method
         public virtual Projectile Start(ProxyVector3 start) {
             this.preStart = start;
             return this;
         }
 
-        // TODO if preTarget had an offset, it is lost
+        // Builder method
         public virtual Projectile Target(ProxyVector3 target)
         {
             this.preTarget = target;

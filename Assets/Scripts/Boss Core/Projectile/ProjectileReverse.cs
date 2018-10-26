@@ -10,7 +10,6 @@ namespace Projectiles
 
         public override void CustomCreate(ProjectileComponent component)
         {
-            //component.transform.position = GameManager.Player.transform.position + start;
             component.currentTime = 0;
             initialTarget = (target - start).normalized;
         }

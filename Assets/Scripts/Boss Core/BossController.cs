@@ -18,9 +18,6 @@ using UnityEngine.Profiling;
  */
 public class BossController : MonoBehaviour
 {
-    // The event queue that we use for planning attacks.
-    //public static EventQueue eventQueue;
-
     // Toggles insane mode. This just makes everything a living hell.
     // Specifically, every waiting period is reduced and movement speed is buffed.
     public static bool insaneMode;
@@ -29,17 +26,17 @@ public class BossController : MonoBehaviour
     public static CombatCore.Entity self;
     public static string BOSS_NAME = "Boss";
 
-    // Used for the "CameraLock" action. Keeps track of the current player position
+    // Used for the "PlayerLock" move. Keeps track of the current player position
     // for events and sequences that need a slightly out of date version.
     public static Vector3 playerLockPosition;
     public static bool isPlayerLocked;
 
-    //private static AIPhase phase;
+    // Phase iteration logic
     private static List<AIPhase> phases;
     private static AIPhase currentPhase;
     private static int phaseIndex = -1;
 
-    // event queue stuff
+    // Event queue variables. How we schedule our attacks.
     private static Queue<AISequence> queuedSequences;
     private static Queue<AIEvent> events;
     private static bool paused;
@@ -205,7 +202,6 @@ public class BossController : MonoBehaviour
      */
     public static IEnumerator Dash(Vector3 targetPosition)
     {
-
         paused = true;
 
         Vector3 dashDir = (targetPosition - GameManager.Boss.transform.position).normalized;
