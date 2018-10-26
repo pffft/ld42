@@ -11,7 +11,7 @@ namespace Moves.Tutorial1
     {
         public Shoot_1_Several() : base
         (
-            new Teleport().Wait(0.25f),
+            new Teleport().Wait(0.5f),
             new AISequence(() =>
             {
                 return new Shoot1().Wait(0.1f).Times(Random.Range(5, 10));

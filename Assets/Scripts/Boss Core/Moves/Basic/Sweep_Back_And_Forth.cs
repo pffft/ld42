@@ -20,12 +20,12 @@ namespace Moves.Basic
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = -30; i < 90; i += 5)
                 {
-                    sequences.Add(new Shoot1(Projectile.New(self).AngleOffset(i)).Wait(0.05f));
+                    sequences.Add(new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f));
                 }
                 sequences.Add(Pause(0.25f));
                 for (int i = 30; i > -90; i -= 5)
                 {
-                    sequences.Add(new Shoot1(Projectile.New(self).AngleOffset(i)).Wait(0.05f));
+                    sequences.Add(new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f));
                 }
                 return sequences.ToArray();
             }),

@@ -19,17 +19,10 @@ namespace Moves.Test
             {
                 List<AISequence> sequences = new List<AISequence>();
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     sequences.Add(new Shoot1(
-                       Projectile
-                           .New(self)
-                           .AngleOffset(i * 90f)
-                           .Lightning(0)
-                           .Speed(Speed.LIGHTNING)
-                           .MaxTime(0.05f)
-                           .OnDestroyTimeout(CallbackDictionary.LIGHTNING_RECUR)
-                       ).Wait(0.1f));
+                    new ProjectileLightning { AngleOffset = i * 90f }).Wait(0.1f));
                 }
                 return sequences.ToArray();
             }),

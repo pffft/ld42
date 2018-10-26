@@ -5,31 +5,42 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileHoming : ProjectileComponent
+    public class ProjectileHoming : Projectile
     {
 
-        public GameObject targetObject;
-        public Rigidbody body;
+        private GameObject targetObject;
 
-        public float curDivergence;
-        public float maxDivergence = 110f;
+        private float curDivergence;
+        private float maxDivergence = 110f;
 
         // How many degrees per update can the projectile turn?
         // Proportional to the speed; more curve at higher speeds.
-        public float homingScale;
+        private float homingScale;
 
         // Was this projectile once close to the player?
-        public bool wasClose;
+        private bool wasClose;
 
-        public override Material GetCustomMaterial() {
+        public ProjectileHoming() : this(BossController.self) { }
+
+        public ProjectileHoming(Entity self) : base(self) { }
+
+        public override void CustomCreate(ProjectileComponent component)
+        {
+            targetObject = component.data.Entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player.gameObject : GameManager.Boss.gameObject;
+            wasClose = false;
+            curDivergence = 0f;
+            homingScale = (float)component.data.Speed / 7f;
+        }
+
+        public override Material CustomMaterial() {
             return Resources.Load<Material>("Art/Materials/PurpleTransparent");
         }
         
-        public override void CustomUpdate() {
-            Vector3 idealVelocity = ((float)data.speed) * (targetObject.transform.position - transform.position).normalized;
-            float idealRotation = Vector3.SignedAngle(idealVelocity, body.velocity, Vector3.up);
+        public override void CustomUpdate(ProjectileComponent component) {
+            Vector3 idealVelocity = ((float)Speed) * (targetObject.transform.position - component.transform.position).normalized;
+            float idealRotation = Vector3.SignedAngle(idealVelocity, Velocity, Vector3.up);
 
-            float distance = Vector3.Distance(targetObject.transform.position, transform.position);
+            float distance = Vector3.Distance(targetObject.transform.position, component.transform.position);
 
             if (!wasClose && distance < 10f)
             {
@@ -51,30 +62,12 @@ namespace Projectiles
             if (Mathf.Abs(idealRotation) >= 10f && Mathf.Abs(idealRotation) < 120f)
             {
                 Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering * distanceScale, Vector3.up);
-                body.velocity = rot * body.velocity;
-                body.velocity = (distanceScale * (float)data.speed) * body.velocity.normalized;
+                //body.velocity = rot * body.velocity;
+                Velocity = rot * Velocity;
+                //body.velocity = (distanceScale * (float)speed) * body.velocity.normalized;
+                Velocity = (distanceScale * (float)Speed) * Velocity.normalized;
                 curDivergence += homingScale;
             }
-        }
-    }
-
-    public static class ProjectileHomingHelper {
-        public static ProjectileHoming Homing(this ProjectileComponent projectile)
-        {
-            ProjectileHoming homing = projectile.CastTo<ProjectileHoming>();
-
-            homing.targetObject = projectile.data.entity.GetFaction() == Entity.Faction.enemy? GameManager.Player.gameObject : GameManager.Boss.gameObject;
-            homing.body = projectile.GetComponent<Rigidbody>();
-            homing.wasClose = false;
-            homing.curDivergence = 0f;
-            homing.homingScale = (float)projectile.data.speed / 7f;
-
-            return homing;
-        }
-
-        public static Projectile Homing(this Projectile structure) {
-            structure.type = Type.HOMING;
-            return structure;
         }
     }
 }

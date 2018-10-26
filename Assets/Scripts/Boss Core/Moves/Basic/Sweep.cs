@@ -15,6 +15,12 @@ namespace Moves.Basic
         (
             new Teleport().Wait(0.25f),
             new PlayerLock(true),
+            For(reverse ? 90 : -30, 
+                reverse ? -30 : 90, 
+                reverse ? -5 : 5, 
+                i => new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f)
+               ),
+            /*
             new AISequence(() =>
             {
                 int start = reverse ? 90 : -30;
@@ -24,10 +30,11 @@ namespace Moves.Basic
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = start; i != end; i += step)
                 {
-                    sequences.Add(new Shoot1(Projectile.New(self).AngleOffset(i)).Wait(0.05f));
+                    sequences.Add(new Shoot1(new Projectile().AngleOffset(i)).Wait(0.05f));
                 }
                 return sequences.ToArray();
             }),
+            */
             new PlayerLock(false),
             Pause(0.25f)
         )

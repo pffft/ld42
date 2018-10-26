@@ -3,62 +3,120 @@ using System.Collections.Generic;
 using CombatCore;
 using UnityEngine;
 
+using static AI.AISequence;
+
 namespace Projectiles
 {
-    public class ProjectileLightning : ProjectileComponent
+    public class ProjectileLightning : Projectile
     {
-        public int level;
-        public Vector3 initialTarget;
+        private readonly int level;
+        private Vector3 initialTarget;
+        private float initialMaxTime;
 
         private int count;
-        private int numSpawners = 30;
+        private readonly int numSpawners = 30;
 
-        public override Material GetCustomMaterial()
+        public ProjectileLightning(int level=0) : this(BossController.self, level) { }
+
+        public ProjectileLightning(Entity self, int level) : this(self, level, 1f) { }
+
+        private ProjectileLightning(Entity self, int level, float initialMaxTime) : base(self) 
+        {
+            this.level = level;
+            this.initialMaxTime = initialMaxTime;
+
+            base.MaxTime = 0.05f;
+
+            Speed = BossCore.Speed.LIGHTNING;
+            OnDestroyTimeout = LIGHTNING_RECUR;
+        }
+
+        public override float MaxTime
+        {
+            get
+            {
+                return base.MaxTime;
+            }
+
+            set
+            {
+                if (level == 0) {
+                    this.initialMaxTime = value;
+                } else {
+                    base.MaxTime = value;
+                }
+            }
+        }
+
+        public override void CustomCreate(ProjectileComponent component)
+        {
+            // Make the target the player position, but at a radius of 100.
+            // This prevents "bunching" around the true target.
+            initialTarget = (100f / component.data.Target.GetValue().magnitude) * component.data.Target.GetValue();
+        }
+
+        public override Material CustomMaterial()
         {
             return Resources.Load<Material>("Art/Materials/BlueTransparent");
         }
 
-        public override void CustomUpdate()
+        public override void CustomUpdate(ProjectileComponent component)
         {
-            if (level >= 7)
+            if ((component.transform.position - GameManager.Player.transform.position).magnitude < 5f)
             {
-                Destroy(this.gameObject);
+                GameObject.Destroy(component.gameObject);
             }
 
-            if ((transform.position - GameManager.Player.transform.position).magnitude < 5f)
-            {
-                Destroy(this.gameObject);
-            }
-
-            if (data.currentTime > count / numSpawners)
+            if (component.currentTime > count / numSpawners)
             {
                 count++;
-                Projectile.New(data.entity)
-                        .Start(transform.position)
-                        .MaxTime(1f - data.currentTime)
-                        .Size(Size.SMALL)
-                        .Speed(BossCore.Speed.FROZEN)
-                        .Create();
+                new Projectile
+                {
+                    Start = component.transform.position,
+                    MaxTime = initialMaxTime - component.currentTime,
+                    Size = Size.SMALL,
+                    Speed = BossCore.Speed.FROZEN
+                }.Create();
+            }
+        }
+
+        // Recursively generates more lightning
+        private static ProjectileCallback LIGHTNING_RECUR = (self) =>
+        {
+            ProjectileLightning lightningSelf = self.data as ProjectileLightning;
+
+            // Stop the recursion at level 7
+            if (lightningSelf.level > 6) 
+            {
+                return AI.AISequence.Pause(0f);
             }
 
-        }
-    }
+            int times;
+            if (lightningSelf.level < 3)
+            {
+                times = Random.Range(2, 3);
+            }
+            else
+            {
+                times = Random.Range(1, 2);
+            }
 
-    public static class ProjectileLightningHelper
-    {
-        public static ProjectileLightning Lightning(this ProjectileComponent projectile, int level)
-        {
-            ProjectileLightning lightning = projectile.CastTo<ProjectileLightning>();
-            lightning.level = level;
-            lightning.initialTarget = projectile.data.target;
-            return lightning;
-        }
 
-        public static Projectile Lightning(this Projectile structure, int level)
-        {
-            structure.type = Type.LIGHTNING;
-            structure._typeParameters = new object[] { level };
-            return structure;
-        }
+            return Merge(
+                For(times, i => 
+                    new Moves.Basic.Shoot1(
+                        new ProjectileLightning(lightningSelf.Entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.MaxTime)
+                        {
+                            Start = self.transform.position,
+                            Target = lightningSelf.initialTarget,
+                            AngleOffset = lightningSelf.AngleOffset - 45f + Random.Range(0, 90f),
+                            MaxTime = Random.Range(0.05f, 0.15f),
+                            Speed = BossCore.Speed.LIGHTNING,
+                            OnDestroyTimeout = LIGHTNING_RECUR
+                        }
+                    )
+                )
+            );
+        };
     }
 }

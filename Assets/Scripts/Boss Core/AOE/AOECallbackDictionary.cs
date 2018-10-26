@@ -10,6 +10,6 @@ namespace AOEs
     {
         public static AOECallbackDelegate NOTHING = (self) => { Debug.Log("AOE callback nothing"); };
 
-        public static AOECallbackDelegate DONT_DESTROY_OOB = (self) => { self.ShouldDestroyOnOutOfBounds(false); };
+        public static AOECallbackDelegate DONT_DESTROY_OOB = (self) => { self.data.ShouldDestroyOnOutOfBounds(false); };
     }
 }

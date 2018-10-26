@@ -12,7 +12,7 @@ namespace Moves.Basic
             {
                 Glare();
 
-                Projectile newStruc = skeleton != null ? skeleton.Clone() : Projectile.New(self);
+                Projectile newStruc = skeleton != null ? skeleton.Clone() : new Projectile();
                 newStruc.Create();
             }
         )

@@ -1,0 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using AI;
+using AOEs;
+using BossCore;
+using Moves.Basic;
+using Projectiles;
+using static BossController;
+
+namespace Moves.User 
+{
+	public class #SCRIPTNAME# : AISequence 
+	{
+		public #SCRIPTNAME#() : base
+		(
+			// Your AISequence here
+		)
+		{
+			Description = "Your description here";
+			Difficulty = 1f; 
+		}
+	}
+}

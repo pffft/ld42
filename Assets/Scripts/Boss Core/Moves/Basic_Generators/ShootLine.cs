@@ -19,12 +19,12 @@ namespace Moves.Basic
                 for (int i = 0; i < amount; i++)
                 {
                     Vector3 spawn = GameManager.Boss.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
-                    Projectile.New(self)
-                              .Start(spawn)
-                              .Target(spawn + targetPos)
-                              .Speed(speed)
-                              .Size(size)
-                              .Create();
+                    new Projectile()
+                    {
+                        Start = spawn,
+                        Target = spawn + targetPos,
+                        Size = size
+                    }.Create();
                 }
             }
         )

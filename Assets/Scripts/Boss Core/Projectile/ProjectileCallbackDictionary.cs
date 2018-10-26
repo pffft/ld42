@@ -3,148 +3,104 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using BossCore;
+using static AI.AISequence;
+using Moves.Basic;
 
 namespace Projectiles
 {
     public static class CallbackDictionary
     {
-        public static ProjectileCallbackDelegate NOTHING = (self) => { };
+        public static ProjectileCallback NOTHING = self => new Pause(0f);
 
-        public static ProjectileCallbackDelegate FREEZE = (self) =>
-        {
-            Projectile
-                .New(self.data.entity)
-                .Start(self.transform.position)
-                .Target(null)
-                .MaxTime(5f)
-                .Size(self.data.size)
-                .Speed(Speed.FROZEN)
-                .Create();
-        };
+        public static ProjectileCallback FREEZE = self =>
+            new Shoot1(
+                new Projectile(self.data.Entity)
+                {
+                    Start = self.transform.position,
+                    MaxTime = 5f,
+                    Size = self.data.Size
+                }
+            );
 
-        public static ProjectileCallbackDelegate SPAWN_6_CURVING = (self) =>
-        {
-            Rigidbody body = self.GetComponent<Rigidbody>();
-            for (int i = 0; i < 6; i++)
-            {
-                Projectile.New(self.data.entity)
-                          .Start(self.transform.position)
-                          .Target(body.velocity)
-                          .AngleOffset(i * 60f)
-                          .MaxTime(3f)
-                          .Speed(self.data.speed)
-                          .Curving((float)self.data.speed * 2f, true)
-                          .Create();
-            }
-        };
+        public static ProjectileCallback SPAWN_6_CURVING = self =>
+            ForConcurrent(6, i => new Shoot1(
+                new ProjectileCurving(self.data.Entity, (float)self.data.Speed * 2f, true)
+                {
+                    Start = self.transform.position,
+                    Target = self.data.Velocity,
+                    AngleOffset = i * 60f,
+                    MaxTime = 3f
+                }
+            ));
 
-        public static ProjectileCallbackDelegate SPAWN_6 = (self) =>
-        {
-            Rigidbody body = self.GetComponent<Rigidbody>();
-            for (int i = 0; i < 6; i++)
-            {
-                Projectile.New(self.data.entity)
-                          .Start(self.transform.position)
-                          .Target(body.velocity)
-                          .AngleOffset(i * 60f)
-                          .MaxTime(3f)
-                          .Speed(self.data.speed)
-                          .Curving(0f, false)
-                          .Create();
-            }
-        };
+        public static ProjectileCallback SPAWN_6 = self =>
+            ForConcurrent(6, i => new Shoot1(
+                new ProjectileCurving(self.data.Entity, 0f, true)
+                {
+                    Start = self.transform.position,
+                    Target = self.data.Velocity,
+                    AngleOffset = i * 60f,
+                    MaxTime = 3f
+                }
+            ));
 
         // Spawns a wave at the death position.
-        public static ProjectileCallbackDelegate SPAWN_WAVE = (self) =>
-        {
-            AOEs.AOE.New(self.data.entity).Start(self.transform.position).On(0, 360f).Create();
-        };
+        public static ProjectileCallback SPAWN_WAVE = self =>
+            new ShootAOE(new AOEs.AOE(self.data.Entity) { Start = self.transform.position }.On(0, 360f));
+        
+        public static ProjectileCallback SPAWN_1_TOWARDS_PLAYER = self =>
+            new Shoot1(
+                new Projectile(self.data.Entity)
+                {
+                    Start = self.transform.position,
+                    MaxTime = self.data.MaxTime,
+                    Size = self.data.Size
+                }
+            );
 
-        public static ProjectileCallbackDelegate SPAWN_1_TOWARDS_PLAYER = (self) =>
-        {
-            Projectile
-                .New(self.data.entity)
-                .Start(self.transform.position)
-                .Target(null)
-                .MaxTime(self.data.maxTime)
-                .Size(self.data.size)
-                .Speed(Speed.SNIPE)
-                .Create();
-        };
+        public static ProjectileCallback SPAWN_1_HOMING_TOWARDS_PLAYER = self =>
+            new Shoot1(
+                new ProjectileHoming(self.data.Entity)
+                {
+                    Start = self.transform.position,
+                    MaxTime = self.data.MaxTime,
+                    Size = self.data.Size,
+                    Speed = Speed.LIGHTNING
+                }
+            );
 
-        public static ProjectileCallbackDelegate SPAWN_1_HOMING_TOWARDS_PLAYER = (self) =>
-        {
-            Projectile
-                .New(self.data.entity)
-                .Start(self.transform.position)
-                .Target(null)
-                .Size(self.data.size)
-                .Speed(Speed.LIGHTNING)
-                .MaxTime(self.data.maxTime)
-                .Create()
-                .Homing();
-        };
+        public static ProjectileCallback REVERSE = (self) =>
+            new Shoot1(
+                new Projectile(self.data.Entity)
+                {
+                    Start = self.transform.position,
+                    Target = self.data.Start,
+                    MaxTime = self.data.MaxTime,
+                    Size = self.data.Size
+                }
+            );
 
-        public static ProjectileCallbackDelegate REVERSE = (self) =>
+        public static ProjectileCallback REVERSE_FASTER = (self) =>
         {
-            Projectile
-                .New(self.data.entity)
-                .Start(self.transform.position)
-                .Target(self.data.start)
-                .MaxTime(self.data.maxTime)
-                .Size(self.data.size)
-                .Speed(self.data.speed)
-                .Create();
-        };
-
-        public static ProjectileCallbackDelegate REVERSE_FASTER = (self) =>
-        {
-            if (self.data.speed == Speed.LIGHTNING)
+            if (self.data.Speed == Speed.LIGHTNING)
             {
-                return;
+                return NOTHING(self);
             }
 
-            Speed currentSpeed = self.data.speed;
+            Speed currentSpeed = self.data.Speed;
             Speed[] speeds = (Speed[])System.Enum.GetValues(currentSpeed.GetType());
             Speed nextSpeed = speeds[System.Array.IndexOf(speeds, currentSpeed) + 1];
 
-            Projectile
-                .New(self.data.entity)
-                .Start(self.transform.position)
-                .Target(self.data.start)
-                .Size(self.data.size)
-                .Speed(nextSpeed)
-                .MaxTime(2f * 1.5f * (float)Speed.FAST / (float)nextSpeed)
-                .OnDestroyTimeout(REVERSE_FASTER)
-                .Create();
-        };
-
-        public static ProjectileCallbackDelegate LIGHTNING_RECUR = (self) =>
-        {
-            ProjectileLightning lightningSelf = self as ProjectileLightning;
-            int times;
-            if (lightningSelf.level < 3)
-            {
-                times = Random.Range(2, 3);
-            }
-            else
-            {
-                times = Random.Range(1, 2);
-            }
-
-            for (int i = 0; i < times; i++)
-            {
-                Projectile
-                    .New(self.data.entity)
-                    .Start(self.transform.position)
-                    .Target(lightningSelf.initialTarget)
-                    .AngleOffset(self.data.angleOffset - 45f + Random.Range(0, 90f))
-                    .Speed(Speed.LIGHTNING)
-                    .MaxTime(Random.Range(0.05f, 0.15f))
-                    .OnDestroyTimeout(LIGHTNING_RECUR)
-                    .Lightning(lightningSelf.level + 1)
-                    .Create();
-            }
+            return new Shoot1(
+                new Projectile(self.data.Entity)
+                {
+                    Start = self.transform.position,
+                    Target = self.data.Start,
+                    Size = self.data.Size,
+                    MaxTime = 2f * 1.5f * (float)Speed.FAST / (float)nextSpeed,
+                    OnDestroyTimeout = REVERSE_FASTER
+                }
+            );
         };
     }
 }

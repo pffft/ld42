@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using BossCore;
 using UnityEngine;
 
 namespace AI
@@ -34,8 +35,22 @@ namespace AI
             }
         }
 
+        // TODO put these in a publically accessable location. Possibly in world or game manager.
+        public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
+        public static ProxyVector3 DELAYED_PLAYER_POSITION = new ProxyVector3(() =>
+        {
+            return BossController.isPlayerLocked ? BossController.playerLockPosition : GameManager.Player.transform.position + World.Arena.CENTER;
+        });
+        public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position; });
+        public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>
+        {
+            float angle = Random.value * 360;
+            float distance = Random.Range(0, GameManager.Arena.RadiusInWorldUnits);
+            return distance * (Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward) + World.Arena.CENTER;
+        });
+
         // A list of events to execute.
-        private AIEvent[] events;
+        public AIEvent[] events;
         private AISequence[] children;
 
         public delegate AISequence[] AISequenceGenerator();
@@ -405,6 +420,9 @@ namespace AI
             return new AISequence(this, seq);
         }
 
+        /*
+         * Picks a random sequence from the provided list.
+         */
         public static AISequence Either(params AISequence[] sequences)
         {
             return new AISequence(() =>
@@ -412,6 +430,95 @@ namespace AI
                 return sequences[(int)(Random.value * sequences.Length)];
             });
         }
+
+        // A delegate that captures an iterator in a for loop
+        public delegate AISequence ForBody(float iterator);
+
+        public static AISequence For(float count, ForBody body)
+        {
+            if (count <= 0)
+            {
+                Debug.LogError("Found a for loop with negative count.");
+                return body(0);
+            }
+            return For(0, count, 1, body);
+        }
+
+        public static AISequence For(float start, float end, ForBody body)
+        {
+            if (end < start)
+            {
+                Debug.LogError("Found a for loop with end before start.");
+                return body(start);
+            }
+            return For(start, end, 1, body);
+        }
+
+        /*
+         * Iterates over the given boundaries, and passes the step value to the ForBody
+         * provided in the last parameter. Useful for replacing delegates with basic
+         * for loops inside of them. The events returned by this function happen as
+         * separate events; if the ForBody's AISequence has a delay, this will appear
+         * between all the events produced.
+         */
+        public static AISequence For(float start, float end, float step, ForBody body)
+        {
+            Debug.Log("For called!");
+            if (Mathf.Approximately(step, 0))
+            {
+                Debug.LogError("Found for loop with step size 0.");
+                return body(start);
+            }
+
+            if (Mathf.Abs(Mathf.Sign(end - start) - Mathf.Sign(step)) > 0.01f)
+            {
+                Debug.LogError("Found for loop that will never terminate.");
+                return body(start);
+            }
+
+            AISequence[] sequences = new AISequence[(int)Mathf.Abs((end - start) / step)];
+            int count = 0;
+            if (start > end)
+            {
+                for (float i = start; i > end; i += step)
+                {
+                    sequences[count++] = body(i);
+                }
+            }
+            else
+            {
+                for (float i = start; i < end; i += step)
+                {
+                    sequences[count++] = body(i);
+                }
+            }
+            return new AISequence(sequences);
+        }
+
+        public static AISequence ForConcurrent(float count, ForBody body)
+        {
+            return ForConcurrent(0, count, 1, body);
+        }
+
+        public static AISequence ForConcurrent(float start, float end, ForBody body)
+        {
+            return ForConcurrent(start, end, 1, body);
+        }
+
+        /*
+         * Does the same as "For", but all the events generated happen in one frame.
+         * Useful for generating sequences with multiple projectiles appearing at once.
+         * 
+         * This means a wait returned by ForBody will happen at the end, rather than
+         * between each sequence.
+         */
+        public static AISequence ForConcurrent(float start, float end, float step, ForBody body)
+        {
+            return Merge(For(start, end, step, body).GetChildren());
+        }
+
+
+
 
         #endregion
     }

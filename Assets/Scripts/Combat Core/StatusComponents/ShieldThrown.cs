@@ -18,17 +18,20 @@ namespace CombatCore.StatusComponents
         {
             GameManager.HeldShield.SetActive(false);
 
+            // TODO: fix this to work properly. Projectile system will be private to Boss
+            // in some future release.
+
             // Spawns a homing projectile
-            ProjectileComponent homingProj = Projectile.New(subject)
-                                              .Target(target)
-                                              .MaxTime(2f)
-                                              .Speed(BossCore.Speed.VERY_FAST)
-                                              .Size(Size.MEDIUM)
-                                              .Homing()
-                                              .OnDestroyTimeout(StopMoving)
-                                              .OnDestroyOutOfBounds(StopMoving)
-                                              .OnDestroyCollision(Bounce)
-                                              .Create();
+            ProjectileComponent homingProj = new ProjectileHoming(subject)
+            {
+                Target = target,
+                MaxTime = 2f,
+                Size = Size.MEDIUM,
+                OnDestroyTimeout = StopMoving,
+                OnDestroyOutOfBounds = StopMoving,
+                OnDestroyCollision = Bounce
+            }.Create();
+
 
             //.. and then makes a shield instance as a child of the projectile
             GameObject.Destroy(homingProj.GetComponent<MeshRenderer>());
@@ -45,10 +48,11 @@ namespace CombatCore.StatusComponents
         }
 
         // Just make the shield freeze
-        private static readonly ProjectileCallbackDelegate StopMoving = (self) =>
+        private static readonly ProjectileCallback StopMoving = (self) =>
         {
             Transform child = self.transform.GetChild(0);
             Rigidbody body = child.GetComponent<Rigidbody>();
+            self.gameObject.AddComponent<MeshRenderer>();
 
             body.useGravity = true;
             body.isKinematic = false;
@@ -56,13 +60,14 @@ namespace CombatCore.StatusComponents
 
             self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
-
+            return AI.AISequence.Pause(0f);
         };
 
         // Makes the shield "bounce" in a randomized direction
-        private static readonly ProjectileCallbackDelegate Bounce = (self) =>
+        private static readonly ProjectileCallback Bounce = (self) =>
         {
-            if (self.transform.childCount < 1) return;
+            self.gameObject.AddComponent<MeshRenderer>();
+            if (self.transform.childCount < 1) return AI.AISequence.Pause(0f);
             Rigidbody body = self.transform.GetChild(0).GetComponent<Rigidbody>();
             body.useGravity = true;
             body.isKinematic = false;
@@ -79,6 +84,7 @@ namespace CombatCore.StatusComponents
             body.AddForce(250f * (rotation * self.GetComponent<Rigidbody>().velocity.normalized), ForceMode.Impulse);
             self.transform.GetChild(0).GetComponent<KeepOnArena>().shouldReset = true;
             self.transform.GetChild(0).parent = null;
+            return AI.AISequence.Pause(0f);
         };
 
         public override void OnRevert(Entity subject)

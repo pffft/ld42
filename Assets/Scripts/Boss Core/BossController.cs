@@ -18,30 +18,42 @@ using UnityEngine.Profiling;
  */
 public class BossController : MonoBehaviour
 {
-    // The event queue that we use for planning attacks.
-    public static EventQueue eventQueue;
-
     // Toggles insane mode. This just makes everything a living hell.
     // Specifically, every waiting period is reduced and movement speed is buffed.
     public static bool insaneMode;
+
+    [SerializeField]
+    public bool DebugMode = true;
 
     // The Entity representing this faction. Assigned to projectiles we create.
     public static CombatCore.Entity self;
     public static string BOSS_NAME = "Boss";
 
-    // Used for the "CameraLock" action. Keeps track of the current player position
+    // Used for the "PlayerLock" move. Keeps track of the current player position
     // for events and sequences that need a slightly out of date version.
     public static Vector3 playerLockPosition;
     public static bool isPlayerLocked;
 
-    //private static AIPhase phase;
+    // Phase iteration logic
     private static List<AIPhase> phases;
     private static AIPhase currentPhase;
     private static int phaseIndex = -1;
 
+    // Event queue variables. How we schedule our attacks.
+    private static Queue<AISequence> queuedSequences;
+    private static Queue<AIEvent> events;
+    private static bool paused;
+    private static bool running;
+
     private void Awake()
     {
-        eventQueue = new EventQueue();
+        //eventQueue = new EventQueue();
+        //eventQueue = GameManager.EventQueue;
+
+        queuedSequences = new Queue<AISequence>();
+        events = new Queue<AIEvent>();
+        paused = false;
+        running = true;
 
         self = GetComponent<CombatCore.Entity>();
         self.name = BOSS_NAME;
@@ -62,21 +74,10 @@ public class BossController : MonoBehaviour
         //phases.Add(AIPhase.PHASE_TUTORIAL_3);
         //phases.Add(AIPhase.PHASE1);
         phases.Add(AIPhase.PHASE_TEST);
+        //phases.Add(AIPhase.PHASE_UNIT_TEST);
 
+        StartCoroutine(ExecuteQueue());
         NextPhase();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // Every frame, prompt the queue for then next event.
-        eventQueue.Update();
-
-        // If the queue ran out of events, pull the next AISequence in the phase
-        if (eventQueue.Empty())
-        {
-            eventQueue.Add(currentPhase.GetNext());
-        }
     }
 
     /*
@@ -96,8 +97,106 @@ public class BossController : MonoBehaviour
         CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
 
         self.SetInvincible(true);
-        eventQueue.Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
-        eventQueue.Add(new AISequence(() => { self.SetInvincible(false); }));
+        Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
+        Add(new AISequence(() => { self.SetInvincible(false); }));
+    }
+
+    public static void Add(AISequence sequence)
+    {
+        if (GameManager.Boss.DebugMode)
+        {
+            if (sequence == null)
+            {
+                Debug.LogError("Null AISequence added to queue.");
+                return;
+            }
+
+            // Generate warning if there's a named sequence without a description.
+            //
+            // Note that "glue" AISequences are allowed; those that don't subclass AISequence 
+            // don't need to provide a description. This includes subclassed AISequences that
+            // have additional Wait()s or Then()s called.
+            if (sequence.Description == null && !sequence.Name.Equals("AISequence"))
+            {
+                Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
+            }
+
+            // Generate warning if there's a sequence with too high a difficulty.
+            if (sequence.Difficulty >= 8f)
+            {
+                Debug.LogWarning("Found AISequence \"" + sequence.Name + "\" with very high difficulty: " + sequence.Difficulty + ". ");
+            }
+
+            Debug.Log("Added AISequence" +
+                      (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") +
+                      "to queue. Here's what it says it'll do: \"" +
+                      (sequence.Description ?? sequence.ToString()) + "\".");
+        }
+
+        queuedSequences.Enqueue(sequence);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        // Every frame, prompt the queue for then next event.
+        //GameManager.EventQueue.Update();
+
+        // If the queue ran out of events, pull the next AISequence in the phase
+        if (queuedSequences.Count == 0)
+        {
+            Add(currentPhase.GetNext());
+        }
+    }
+
+
+    // event queue
+    private IEnumerator ExecuteQueue()
+    {
+        while (running)
+        {
+            //Profiler.BeginSample("Event Queue");
+            while (queuedSequences.Count == 0)
+            {
+                yield return new WaitForSeconds(0.05f);
+            }
+
+            AISequence nextSequence = queuedSequences.Dequeue();
+            yield return Execute(nextSequence);
+            //Profiler.EndSample();
+        }
+    }
+
+    // event queue
+    private static IEnumerator Execute(AISequence sequence)
+    {
+        if (sequence.events != null)
+        {
+            for (int i = 0; i < sequence.events.Length; i++)
+            {
+                while (paused)
+                {
+                    yield return new WaitForSecondsRealtime(0.05f);
+                }
+
+                sequence.events[i].action?.Invoke();
+                // TODO reduce the wait time if the above invocation takes too long 
+                yield return new WaitForSecondsRealtime(sequence.events[i].duration);
+            }
+        }
+        else
+        {
+            AISequence[] children = sequence.GetChildren();
+            for (int i = 0; i < children.Length; i++)
+            {
+                yield return Execute(children[i]);
+            }
+        }
+    }
+
+    public static void ExecuteAsync(AISequence sequence)
+    {
+        GameManager.Boss.StartCoroutine(Execute(sequence));
     }
 
     /*
@@ -108,8 +207,7 @@ public class BossController : MonoBehaviour
      */
     public static IEnumerator Dash(Vector3 targetPosition)
     {
-
-        eventQueue.Pause();
+        paused = true;
 
         Vector3 dashDir = (targetPosition - GameManager.Boss.transform.position).normalized;
 
@@ -131,7 +229,7 @@ public class BossController : MonoBehaviour
         }
 
         self.movespeed.LockTo(25);
-        eventQueue.Unpause();
+        paused = false;
     }
 
     /*

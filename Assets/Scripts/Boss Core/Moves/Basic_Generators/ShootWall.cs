@@ -10,9 +10,9 @@ namespace Moves.Basic
     {
         public ShootWall(float angleOffset) : base
         (
-            AISequence.Merge(
-                new ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, Projectile.New(self).Speed(Speed.SLOW)),
-                new ShootArc(100, angleOffset + 20, angleOffset + 60, Projectile.New(self).Speed(Speed.SLOW))
+            Merge(
+                new ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, new Projectile { Speed = Speed.SLOW }),
+                new ShootArc(100, angleOffset + 20, angleOffset + 60, new Projectile { Speed = Speed.SLOW })
             )
         )
         {
