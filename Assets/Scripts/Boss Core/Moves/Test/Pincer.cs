@@ -29,8 +29,8 @@ namespace Moves.Test
                 float maxTime = Mathf.Deg2Rad * offset / Mathf.Sin(Mathf.Deg2Rad * offset) * ((GameManager.Boss.transform.position - GameManager.Player.transform.position).magnitude / 50f);
                 maxTime += 0.1f;
 
-                sequences.Add(new Shoot1(new ProjectileCurving(curveAmount, false).Speed(Speed.SNIPE).AngleOffset(offset).MaxTime(maxTime)));
-                sequences.Add(new Shoot1(new ProjectileCurving(-curveAmount, false).Speed(Speed.SNIPE).AngleOffset(-offset).MaxTime(maxTime)));
+                sequences.Add(new Shoot1(new ProjectileCurving(curveAmount, false) { Speed = Speed.SNIPE, AngleOffset = offset, MaxTime = maxTime }));
+                sequences.Add(new Shoot1(new ProjectileCurving(-curveAmount, false) { Speed = Speed.SNIPE, AngleOffset = -offset, MaxTime = maxTime }));
 
                 return sequences.ToArray();
             }

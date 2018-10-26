@@ -37,11 +37,13 @@ namespace Moves.Test
             */
             new Shoot1(
                 new ProjectileReverse()
-                .Start(RANDOM_IN_ARENA)
-                .Target(PLAYER_POSITION)
-                .Size(Size.HUGE)
-                .Speed(BossCore.Speed.FAST)
-                .MaxTime(4f)
+                {
+                    Start = RANDOM_IN_ARENA,
+                    Target = PLAYER_POSITION,
+                    Size = Size.HUGE,
+                    Speed = BossCore.Speed.FAST,
+                    MaxTime = 4f
+                }
             ).Wait(0.15f).Times(count),
             new ShootAOE(AOE.New(BossController.self).On(0, 360).Speed(BossCore.Speed.MEDIUM).FixedWidth(5f)).Wait(0.5f),
             new Laser(-60, 480, 5, 60),

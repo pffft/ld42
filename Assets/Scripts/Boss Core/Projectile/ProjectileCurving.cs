@@ -36,19 +36,20 @@ namespace Projectiles
         {
             Quaternion rot = Quaternion.AngleAxis(Time.deltaTime * curveAmount, Vector3.up);
             //body.velocity = rot * body.velocity;
-            velocity = rot * velocity;
+            Velocity = rot * Velocity;
 
             if (leavesTrail)
             {
                 if (component.currentTime > count / numSpawners)
                 {
                     count++;
-                    new Projectile(entity)
-                            .Start(component.transform.position)
-                            .MaxTime(maxTime - component.currentTime)
-                            .Size(Projectiles.Size.SMALL)
-                            .Speed(BossCore.Speed.FROZEN)
-                            .Create();
+                    new Projectile(Entity)
+                    {
+                        Start = component.transform.position,
+                        MaxTime = MaxTime - component.currentTime,
+                        Size = Size.SMALL,
+                        Speed = BossCore.Speed.FROZEN
+                    }.Create();
                 }
             }
         }

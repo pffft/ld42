@@ -18,9 +18,11 @@ namespace Moves.User
             new Teleport().Wait(0.5f),
             new Shoot1(
                 new ProjectileCurving(0f, false)
-                .MaxTime(0.25f)
-                .Speed(Speed.VERY_FAST)
-                .OnDestroyTimeout(CallbackDictionary.SPAWN_6)
+                {
+                    MaxTime = 0.25f,
+                    Speed = Speed.VERY_FAST,
+                    OnDestroyTimeout = CallbackDictionary.SPAWN_6
+                }
             ),
             new Pause(0.5f)
         )

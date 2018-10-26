@@ -22,6 +22,9 @@ public class BossController : MonoBehaviour
     // Specifically, every waiting period is reduced and movement speed is buffed.
     public static bool insaneMode;
 
+    [SerializeField]
+    public bool DebugMode = true;
+
     // The Entity representing this faction. Assigned to projectiles we create.
     public static CombatCore.Entity self;
     public static string BOSS_NAME = "Boss";
@@ -66,11 +69,11 @@ public class BossController : MonoBehaviour
 
         phases = new List<AIPhase>();
 
-        phases.Add(AIPhase.PHASE_TUTORIAL_1);
+        //phases.Add(AIPhase.PHASE_TUTORIAL_1);
         //phases.Add(AIPhase.PHASE_TUTORIAL_2);
         //phases.Add(AIPhase.PHASE_TUTORIAL_3);
         //phases.Add(AIPhase.PHASE1);
-        //phases.Add(AIPhase.PHASE_TEST);
+        phases.Add(AIPhase.PHASE_TEST);
         //phases.Add(AIPhase.PHASE_UNIT_TEST);
 
         StartCoroutine(ExecuteQueue());
@@ -100,33 +103,35 @@ public class BossController : MonoBehaviour
 
     public static void Add(AISequence sequence)
     {
-
-        if (sequence == null)
+        if (GameManager.Boss.DebugMode)
         {
-            Debug.LogError("Null AISequence added to queue.");
-            return;
-        }
+            if (sequence == null)
+            {
+                Debug.LogError("Null AISequence added to queue.");
+                return;
+            }
 
-        // Generate warning if there's a named sequence without a description.
-        //
-        // Note that "glue" AISequences are allowed; those that don't subclass AISequence 
-        // don't need to provide a description. This includes subclassed AISequences that
-        // have additional Wait()s or Then()s called.
-        if (sequence.Description == null && !sequence.Name.Equals("AISequence"))
-        {
-            Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
-        }
+            // Generate warning if there's a named sequence without a description.
+            //
+            // Note that "glue" AISequences are allowed; those that don't subclass AISequence 
+            // don't need to provide a description. This includes subclassed AISequences that
+            // have additional Wait()s or Then()s called.
+            if (sequence.Description == null && !sequence.Name.Equals("AISequence"))
+            {
+                Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
+            }
 
-        // Generate warning if there's a sequence with too high a difficulty.
-        if (sequence.Difficulty >= 8f)
-        {
-            Debug.LogWarning("Found AISequence \"" + sequence.Name + "\" with very high difficulty: " + sequence.Difficulty + ". ");
-        }
+            // Generate warning if there's a sequence with too high a difficulty.
+            if (sequence.Difficulty >= 8f)
+            {
+                Debug.LogWarning("Found AISequence \"" + sequence.Name + "\" with very high difficulty: " + sequence.Difficulty + ". ");
+            }
 
-        Debug.Log("Added AISequence" +
-                  (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") +
-                  "to queue. Here's what it says it'll do: \"" +
-                  (sequence.Description ?? sequence.ToString()) + "\".");
+            Debug.Log("Added AISequence" +
+                      (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") +
+                      "to queue. Here's what it says it'll do: \"" +
+                      (sequence.Description ?? sequence.ToString()) + "\".");
+        }
 
         queuedSequences.Enqueue(sequence);
     }

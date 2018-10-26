@@ -13,13 +13,15 @@ namespace Moves.User
 {
 	public class Shoot_Split_6_Curve : AISequence 
 	{
-		public Shoot_Split_6_Curve() : base
-		(
+        public Shoot_Split_6_Curve() : base
+        (
             new Teleport().Wait(0.5f),
             new Shoot1(
-                new ProjectileDeathHex()
-                .MaxTime(0.25f)
-                .Speed(Speed.VERY_FAST)
+                new ProjectileDeathHex
+                {
+                    MaxTime = 0.25f,
+                    Speed = Speed.VERY_FAST
+                }
             ),
             new Pause(0.5f)
         )

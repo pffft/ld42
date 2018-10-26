@@ -25,28 +25,34 @@ namespace Projectiles
             this.level = level;
             this.initialMaxTime = initialMaxTime;
 
-            this.maxTime = 0.05f;
+            base.MaxTime = 0.05f;
 
-            Speed(BossCore.Speed.LIGHTNING);
-            OnDestroyTimeout(LIGHTNING_RECUR);
+            Speed = BossCore.Speed.LIGHTNING;
+            OnDestroyTimeout = LIGHTNING_RECUR;
         }
 
-        public override Projectile MaxTime(float seconds) {
-            if (level == 0)
+        public override float MaxTime
+        {
+            get
             {
-                this.initialMaxTime = seconds;
-            } else 
-            {
-                base.MaxTime(seconds);
+                return base.MaxTime;
             }
-            return this;
+
+            set
+            {
+                if (level == 0) {
+                    this.initialMaxTime = value;
+                } else {
+                    base.MaxTime = value;
+                }
+            }
         }
 
         public override void CustomCreate(ProjectileComponent component)
         {
             // Make the target the player position, but at a radius of 100.
             // This prevents "bunching" around the true target.
-            initialTarget = (100f / component.data.target.magnitude) * component.data.target;
+            initialTarget = (100f / component.data.Target.GetValue().magnitude) * component.data.Target.GetValue();
         }
 
         public override Material CustomMaterial()
@@ -64,12 +70,13 @@ namespace Projectiles
             if (component.currentTime > count / numSpawners)
             {
                 count++;
-                new Projectile()
-                    .Start(component.transform.position)
-                    .MaxTime(initialMaxTime - component.currentTime)
-                    .Size(Projectiles.Size.SMALL)
-                    .Speed(BossCore.Speed.FROZEN)
-                    .Create();
+                new Projectile
+                {
+                    Start = component.transform.position,
+                    MaxTime = initialMaxTime - component.currentTime,
+                    Size = Size.SMALL,
+                    Speed = BossCore.Speed.FROZEN
+                }.Create();
             }
         }
 
@@ -98,13 +105,15 @@ namespace Projectiles
             return Merge(
                 For(times, i => 
                     new Moves.Basic.Shoot1(
-                        new ProjectileLightning(lightningSelf.entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.maxTime)
-                            .Start(self.transform.position)
-                            .Target(lightningSelf.initialTarget)
-                            .AngleOffset(lightningSelf.angleOffset - 45f + Random.Range(0, 90f))
-                            .MaxTime(Random.Range(0.05f, 0.15f))
-                            .Speed(BossCore.Speed.LIGHTNING)
-                            .OnDestroyTimeout(LIGHTNING_RECUR)
+                        new ProjectileLightning(lightningSelf.Entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.MaxTime)
+                        {
+                            Start = self.transform.position,
+                            Target = lightningSelf.initialTarget,
+                            AngleOffset = lightningSelf.AngleOffset - 45f + Random.Range(0, 90f),
+                            MaxTime = Random.Range(0.05f, 0.15f),
+                            Speed = BossCore.Speed.LIGHTNING,
+                            OnDestroyTimeout = LIGHTNING_RECUR
+                        }
                     )
                 )
             );

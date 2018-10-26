@@ -39,8 +39,8 @@ namespace Moves.Test
                     new ShootAOE(AOE.New(self).On(-45, -15).On(15, 45).Speed(Speed.MEDIUM).FixedWidth(20f).Target(SOUTH_FAR)).Wait(0.75f),
                     new ShootAOE(AOE.New(self).On(-80, 80).Speed(Speed.MEDIUM).FixedWidth(7f).Target(SOUTH_FAR)).Wait(1f)
                 ).Times(2),
-                new Shoot1(new Projectile().Speed(Speed.SNAIL).Size(Size.HUGE).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)).Wait(2.5f),
-                new Shoot1(new Projectile().Speed(Speed.SNAIL).Size(Size.HUGE).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)).Wait(2.5f)
+                new Shoot1(new Projectile { Speed = Speed.SNAIL, Size = Size.HUGE, MaxTime = 1f, OnDestroyTimeout = CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER }).Wait(2.5f),
+                new Shoot1(new Projectile { Speed = Speed.SNAIL, Size = Size.HUGE, MaxTime = 1f, OnDestroyTimeout = CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER }).Wait(2.5f)
             ).Times(3)
         )
         { }

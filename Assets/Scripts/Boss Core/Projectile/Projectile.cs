@@ -9,170 +9,100 @@ using UnityEngine.Profiling;
 namespace Projectiles
 {
     /*
-    * Used for handling death events for Projectiles.
-    * In the future, other callbacks might be added.
+    * Used for handling events for Projectiles. Currently death events are supported.
     */
-    //public delegate void ProjectileCallbackDelegate(ProjectileComponent self);
     public delegate AI.AISequence ProjectileCallback(ProjectileComponent self);
 
     public class Projectile
     {
-        public Entity entity;
+        public Entity Entity { get; set; }
 
-        // Used internally for the builder notation
-        public ProxyVector3 preStart;
-        public Vector3 start;
-        public ProxyVector3 preTarget;
-        public Vector3 target;
-        public float angleOffset;
+        public virtual ProxyVector3 Start { get; set; } = AI.AISequence.BOSS_POSITION;
+        public virtual ProxyVector3 Target { get; set; } = AI.AISequence.DELAYED_PLAYER_POSITION;
+        public virtual float AngleOffset { get; set; } = 0f;
 
-        public BossCore.Speed speed;
-        public Size size;
+        public virtual Speed Speed { get; set; } = Speed.MEDIUM;
+        public virtual Size Size { get; set; } = Size.SMALL;
 
-        public float maxTime;
+        public virtual float MaxTime { get; set; } = 10f;
+        public virtual float Damage { get; set; } = ((float)Size.SMALL + 0.5f) * 2f;
 
-        public float damage;
+        public virtual Vector3 Velocity { get; set; } = Vector3.forward;
 
-        public Vector3 velocity;
-
-        #region callbacks
         /*
          * Called after object is destroyed due to time limit.
          */
-        public ProjectileCallback OnDestroyTimeoutImpl;
-
-        public Projectile OnDestroyTimeout(ProjectileCallback deleg)
-        {
-            this.OnDestroyTimeoutImpl = deleg;
-            return this;
-        }
+        public ProjectileCallback OnDestroyTimeout { get; set; } = CallbackDictionary.NOTHING;
 
         /*
          * Called after object is destroyed due to hitting the arena.
          */
-        public ProjectileCallback OnDestroyOutOfBoundsImpl;
-
-        public Projectile OnDestroyOutOfBounds(ProjectileCallback deleg)
-        {
-            this.OnDestroyOutOfBoundsImpl = deleg;
-            return this;
-        }
+        public ProjectileCallback OnDestroyOutOfBounds { get; set; } = CallbackDictionary.NOTHING;
 
         /*
          * Called when the object hits the player
          */
-        public ProjectileCallback OnDestroyCollisionImpl;
+        public ProjectileCallback OnDestroyCollision { get; set; } = CallbackDictionary.NOTHING;
 
-        public Projectile OnDestroyCollision(ProjectileCallback deleg)
-        {
-            this.OnDestroyCollisionImpl = deleg;
-            return this;
-        }
-
-        /*
-         * Can be overridden to provide custom behavior for components
-         */
-        public virtual void CustomUpdate(ProjectileComponent component) { }
-
-        /*
-         * Can be overridden to provide a custom material.
-         */
-        public virtual Material CustomMaterial() { return null; }
-
-        #endregion
+        #region Constructors
 
         public Projectile() : this(BossController.self) { }
 
         public Projectile(Entity entity)
         {
-            this.entity = entity;
-
-            this.preStart = AI.AISequence.BOSS_POSITION;
-            this.start = Vector3.zero;
-            this.preTarget = AI.AISequence.DELAYED_PLAYER_POSITION;
-            this.target = Vector3.zero;
-            this.angleOffset = 0f;
-
-            this.speed = BossCore.Speed.MEDIUM;
-            this.size = Projectiles.Size.SMALL;
-
-            this.maxTime = 10f;
-
-            this.damage = ((float)size + 0.5f) * 2f;
-
-            this.velocity = Vector3.forward;
-
-            OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
-            OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
-            OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
+            Entity = entity;
         }
 
-        // Builder method
-        public virtual Projectile Start(ProxyVector3 start) {
-            this.preStart = start;
-            return this;
-        }
+        #endregion
 
-        // Builder method
-        public virtual Projectile Target(ProxyVector3 target)
-        {
-            this.preTarget = target;
-            return this;
-        }
+        /// <summary>
+        /// This method is called at the end of every Update() call. When overridden,
+        /// this can be used to specify custom movement.
+        /// </summary>
+        /// <param name="component">The ProjectileComponent of this active GameObject.</param>
+        public virtual void CustomUpdate(ProjectileComponent component) { }
 
-        // Builder method
-        public virtual Projectile AngleOffset(float offsetDegrees)
-        {
-            this.angleOffset = offsetDegrees;
-            return this;
-        }
+        /// <summary>
+        /// Provides a custom material. By default, material is chosen based on the size
+        /// of the Projectile.
+        /// </summary>
+        /// <returns>The material to render with.</returns>
+        public virtual Material CustomMaterial() { return null; }
 
-        // Builder method
-        public virtual Projectile MaxTime(float seconds)
-        {
-            this.maxTime = seconds;
-            return this;
-        }
-
-        // Builder method
-        public virtual Projectile Damage(float damage)
-        {
-            this.damage = damage;
-            return this;
-        }
-
-        // Builder method
-        public virtual Projectile Speed(Speed speed)
-        {
-            this.speed = speed;
-            return this;
-        }
-
-        // Builder method
-        public virtual Projectile Size(Size size)
-        {
-            this.size = size;
-            this.damage = ((float)size + 0.5f) * 2f;
-            return this;
-        }
-
-        // Clone method
+        /// <summary>
+        /// Clones this Projectile data object. 
+        /// 
+        /// This is mostly used internally by the ShootX() AISequences. If you try to
+        /// use Projectiles without first cloning them, then any time you reuse a reference,
+        /// you will be modifying the position of the same one every time. 
+        /// </summary>
+        /// <returns>The clone.</returns>
         public Projectile Clone()
         {
             return MemberwiseClone() as Projectile;
         }
 
-        // Clone method - sets the callbacks to do nothing. This prevents recursive behavior.
+        /*
+        /// <summary>
+        /// Same as Clone(), but all callbacks are set to default. Useful for preventing
+        /// recursive behavior (by clearing the future callbacks).
+        /// </summary>
+        /// <returns>The clone, but without callbacks.</returns>
         public Projectile CloneWithoutCallbacks()
         {
             Projectile clone = Clone();
-            clone.OnDestroyTimeoutImpl = CallbackDictionary.NOTHING;
-            clone.OnDestroyOutOfBoundsImpl = CallbackDictionary.NOTHING;
-            clone.OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
+            clone.OnDestroyTimeout = CallbackDictionary.NOTHING;
+            clone.OnDestroyOutOfBounds = CallbackDictionary.NOTHING;
+            clone.OnDestroyCollision = CallbackDictionary.NOTHING;
             return clone;
         }
+        */
 
-        // Generates a new GameObject based on this structure.
+        /// <summary>
+        /// Generates a new GameObject with a ProjectileComponent that references this
+        /// data object.
+        /// </summary>
+        /// <returns>The ProjectileComponent added to the new GameObject.</returns>
         public ProjectileComponent Create()
         {
             Profiler.BeginSample("Projectile.Create");
@@ -203,16 +133,6 @@ namespace Projectiles
             projectile.data.CustomCreate(projectile);
             Profiler.EndSample();
 
-            // Assign and init the RigidBody (or create one if it doesn't exist)
-            /*
-            Rigidbody body = newObj.GetComponent<Rigidbody>();
-            if (body == null)
-            {
-                body = newObj.AddComponent<Rigidbody>();
-            }
-            body.useGravity = false;
-            */
-
             Profiler.EndSample();
             return projectile;
         }
@@ -229,8 +149,8 @@ namespace Projectiles
         {
             // TODO can make this more descriptive; i.e. if entity is boss and preTarget is null, then add "aimed at the player".
             return "Projectile"
-                + " with speed " + speed
-                + ", size " + size;
+                + " with speed " + Speed
+                + ", size " + Size;
                 //+ ((type != Type.BASIC) ? ", and type " + type.ToString() : "");
         }
     }

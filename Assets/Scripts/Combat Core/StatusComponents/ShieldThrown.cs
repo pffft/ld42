@@ -23,13 +23,15 @@ namespace CombatCore.StatusComponents
 
             // Spawns a homing projectile
             ProjectileComponent homingProj = new ProjectileHoming(subject)
-                .Target(target)
-                .MaxTime(2f)
-                .Size(Size.MEDIUM)
-                .OnDestroyTimeout(StopMoving)
-                .OnDestroyOutOfBounds(StopMoving)
-                .OnDestroyCollision(Bounce)
-                .Create();
+            {
+                Target = target,
+                MaxTime = 2f,
+                Size = Size.MEDIUM,
+                OnDestroyTimeout = StopMoving,
+                OnDestroyOutOfBounds = StopMoving,
+                OnDestroyCollision = Bounce
+            }.Create();
+
 
             //.. and then makes a shield instance as a child of the projectile
             GameObject.Destroy(homingProj.GetComponent<MeshRenderer>());

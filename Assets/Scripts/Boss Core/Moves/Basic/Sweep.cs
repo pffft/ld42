@@ -18,7 +18,7 @@ namespace Moves.Basic
             For(reverse ? 90 : -30, 
                 reverse ? -30 : 90, 
                 reverse ? -5 : 5, 
-                i => new Shoot1(new Projectile().AngleOffset(i)).Wait(0.05f)
+                i => new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f)
                ),
             /*
             new AISequence(() =>

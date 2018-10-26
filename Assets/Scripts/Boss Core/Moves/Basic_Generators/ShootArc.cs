@@ -23,11 +23,12 @@ namespace Moves.Basic
                 }
 
                 float step = 360f / density;
-                Projectile clone = skeleton ?? new Projectile().Size(Size.MEDIUM);
+                Projectile clone = skeleton ?? new Projectile { Size = Size.MEDIUM };
                 for (float i = from; i <= to; i += step)
                 {
                     Projectile newStruc = clone.Clone();
-                    newStruc.AngleOffset(newStruc.angleOffset + i).Create();
+                    newStruc.AngleOffset = newStruc.AngleOffset + i;
+                    newStruc.Create();
                 }
                 //long time = System.DateTime.Now.Ticks - start;
                 //UnityEngine.Debug.Log("Time taken : " + (time / 10000f / 1000f));

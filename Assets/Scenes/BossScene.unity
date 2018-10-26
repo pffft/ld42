@@ -5745,6 +5745,11 @@ Prefab:
       propertyPath: shieldsMax
       value: 5000
       objectReference: {fileID: 0}
+    - target: {fileID: 198749797921285654, guid: 0a4bf3da0a89acc43a328f456d51b1cf,
+        type: 2}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a4bf3da0a89acc43a328f456d51b1cf, type: 2}
   m_IsPrefabAsset: 0
@@ -7707,6 +7712,11 @@ Prefab:
     - target: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
         type: 2}
       propertyPath: healthMax
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: DebugMode
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

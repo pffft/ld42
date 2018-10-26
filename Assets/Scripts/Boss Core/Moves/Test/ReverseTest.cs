@@ -31,23 +31,25 @@ namespace Moves.Test
             }),
             new PlayerLock(false)
             */
-            ForConcurrent(count, i => 
+            ForConcurrent(count, i =>
                 new Shoot1(
                     new ProjectileCurving(187, false)
-                    .Start(PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward))
-                    .Target(PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward) + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.right))
-                    .Speed(BossCore.Speed.FAST)
-                    .MaxTime(0.75f)
-                    .OnDestroyTimeout(
-                    self => 
-                        new Shoot1(
-                            new ProjectileReverse()
-                            .Start(self.transform.position)
-                            .Target(PLAYER_POSITION)
-                            .Speed(BossCore.Speed.SNIPE)
-                            .MaxTime(0.75f)
-                       )
-                   )
+                    {
+                        Start = (PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward)),
+                        Target = (PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward) + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.right)),
+                        Speed = (BossCore.Speed.FAST),
+                        MaxTime = (0.75f),
+                        OnDestroyTimeout = self =>
+                            new Shoot1(
+                                new ProjectileReverse()
+                                {
+                                    Start = (self.transform.position),
+                                    Target = (PLAYER_POSITION),
+                                    Speed = (BossCore.Speed.SNIPE),
+                                    MaxTime = (0.75f)
+                                }
+                           )
+                    }
                )
             )
         )

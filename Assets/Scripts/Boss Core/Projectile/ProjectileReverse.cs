@@ -11,12 +11,12 @@ namespace Projectiles
         public override void CustomCreate(ProjectileComponent component)
         {
             component.currentTime = 0;
-            initialTarget = (target - start).normalized;
+            initialTarget = (Target.GetValue() - Start.GetValue()).normalized;
         }
 
         public override void CustomUpdate(ProjectileComponent component)
         {
-            velocity = (float)speed * func(component.currentTime) * initialTarget;
+            Velocity = (float)Speed * func(component.currentTime) * initialTarget;
         }
 
         private static float func(float x)

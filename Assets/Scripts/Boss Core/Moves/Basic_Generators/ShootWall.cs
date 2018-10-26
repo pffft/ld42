@@ -11,8 +11,8 @@ namespace Moves.Basic
         public ShootWall(float angleOffset) : base
         (
             Merge(
-                new ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, new Projectile().Speed(Speed.SLOW)),
-                new ShootArc(100, angleOffset + 20, angleOffset + 60, new Projectile().Speed(Speed.SLOW))
+                new ShootArc(100, angleOffset + -60, angleOffset + -60 + 28, new Projectile { Speed = Speed.SLOW }),
+                new ShootArc(100, angleOffset + 20, angleOffset + 60, new Projectile { Speed = Speed.SLOW })
             )
         )
         {

@@ -22,7 +22,7 @@ namespace Moves.Test
                 for (int i = 0; i < 1; i++)
                 {
                     sequences.Add(new Shoot1(
-                    new ProjectileLightning().AngleOffset(i * 90f)).Wait(0.1f));
+                    new ProjectileLightning { AngleOffset = i * 90f }).Wait(0.1f));
                 }
                 return sequences.ToArray();
             }),

@@ -26,10 +26,10 @@ namespace Projectiles
 
         public override void CustomCreate(ProjectileComponent component)
         {
-            targetObject = component.data.entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player.gameObject : GameManager.Boss.gameObject;
+            targetObject = component.data.Entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player.gameObject : GameManager.Boss.gameObject;
             wasClose = false;
             curDivergence = 0f;
-            homingScale = (float)component.data.speed / 7f;
+            homingScale = (float)component.data.Speed / 7f;
         }
 
         public override Material CustomMaterial() {
@@ -37,8 +37,8 @@ namespace Projectiles
         }
         
         public override void CustomUpdate(ProjectileComponent component) {
-            Vector3 idealVelocity = ((float)speed) * (targetObject.transform.position - component.transform.position).normalized;
-            float idealRotation = Vector3.SignedAngle(idealVelocity, velocity, Vector3.up);
+            Vector3 idealVelocity = ((float)Speed) * (targetObject.transform.position - component.transform.position).normalized;
+            float idealRotation = Vector3.SignedAngle(idealVelocity, Velocity, Vector3.up);
 
             float distance = Vector3.Distance(targetObject.transform.position, component.transform.position);
 
@@ -63,9 +63,9 @@ namespace Projectiles
             {
                 Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering * distanceScale, Vector3.up);
                 //body.velocity = rot * body.velocity;
-                velocity = rot * velocity;
+                Velocity = rot * Velocity;
                 //body.velocity = (distanceScale * (float)speed) * body.velocity.normalized;
-                velocity = (distanceScale * (float)speed) * velocity.normalized;
+                Velocity = (distanceScale * (float)Speed) * Velocity.normalized;
                 curDivergence += homingScale;
             }
         }

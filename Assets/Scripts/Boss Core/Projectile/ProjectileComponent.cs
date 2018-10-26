@@ -9,12 +9,15 @@ using UnityEngine.Profiling;
 namespace Projectiles {
     public class ProjectileComponent : MonoBehaviour
     {
+        // The data representing this component's specific appearance and behavior.
         public Projectile data;
 
+        // Some cached GameObject values for increased performance.
         private Transform trans;
         private MeshRenderer rend;
         private bool shouldUpdate = true;
 
+        // Time is updated in the component rather than the Projectile for increased performance
         public float currentTime;
         private float maxTime;
 
@@ -38,11 +41,12 @@ namespace Projectiles {
         public void Initialize()
         {
             // Resolve the proxy variables for start and target
-            data.start = data.preStart.GetValue();
-            data.target = data.preTarget.GetValue();
+            // This also "locks" them so they don't keep updating.
+            data.Start = data.Start.GetValue();
+            data.Target = data.Target.GetValue();
 
             // Sets size (and assigns default material, if none set)
-            gameObject.transform.localScale = SizeToScale(data.size) * Vector3.one;
+            gameObject.transform.localScale = SizeToScale(data.Size) * Vector3.one;
 
             Material material = data.CustomMaterial();
             if (material != null)
@@ -51,17 +55,17 @@ namespace Projectiles {
             }
             else
             {
-                switch (data.size)
+                switch (data.Size)
                 {
-                    case Projectiles.Size.TINY:
-                    case Projectiles.Size.SMALL:
+                    case Size.TINY:
+                    case Size.SMALL:
                         gameObject.GetComponent<MeshRenderer>().material = blueMaterial;
                         break;
-                    case Projectiles.Size.MEDIUM:
+                    case Size.MEDIUM:
                         gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
                         break;
-                    case Projectiles.Size.LARGE:
-                    case Projectiles.Size.HUGE:
+                    case Size.LARGE:
+                    case Size.HUGE:
                         gameObject.GetComponent<MeshRenderer>().material = orangeRedMaterial;
                         break;
                     default:
@@ -73,25 +77,25 @@ namespace Projectiles {
             // Computes the starting position, rotation, and velocity.
 
             // Remove any height from the start and target vectors
-            Vector3 topDownSpawn = new Vector3(data.start.x, 0, data.start.z);
-            Vector3 topDownTarget = new Vector3(data.target.x, 0, data.target.z);
+            Vector3 topDownSpawn = new Vector3(data.Start.x, 0, data.Start.z);
+            Vector3 topDownTarget = new Vector3(data.Target.x, 0, data.Target.z);
 
             // Add in rotation offset from the angleOffset parameter
-            Quaternion offset = Quaternion.AngleAxis(data.angleOffset, Vector3.up);
+            Quaternion offset = Quaternion.AngleAxis(data.AngleOffset, Vector3.up);
 
             // Compute the final rotation
             // TODO update this to be rotation around the up axis to fix 180 degree bug
             Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
 
-            this.gameObject.transform.position = data.start;
+            this.gameObject.transform.position = (Vector3)data.Start;
             this.gameObject.transform.rotation = rotation;
             //this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
-            this.data.velocity = rotation * (Vector3.forward * (float)data.speed);
+            this.data.Velocity = rotation * (Vector3.forward * (float)data.Speed);
 
             shouldUpdate = true;
             rend.enabled = true;
             currentTime = 0;
-            maxTime = data.maxTime;
+            maxTime = data.MaxTime;
         }
 
         /*
@@ -116,20 +120,20 @@ namespace Projectiles {
 
             if (currentTime >= maxTime)
             {
-                BossController.ExecuteAsync(data.OnDestroyTimeoutImpl(this));
+                BossController.ExecuteAsync(data.OnDestroyTimeout(this));
                 //Destroy(this.gameObject);
                 Cleanup();
             }
             Profiler.EndSample();
 
             Profiler.BeginSample("Movement");
-            trans.position += (Time.deltaTime * data.velocity);
+            trans.position += (Time.deltaTime * data.Velocity);
             Profiler.EndSample();
 
             Profiler.BeginSample("Bounds check");
             if (trans.position.sqrMagnitude > 5625f)
             {
-                BossController.ExecuteAsync(data.OnDestroyOutOfBoundsImpl(this));
+                BossController.ExecuteAsync(data.OnDestroyOutOfBounds(this));
                 Cleanup();
 
             }
@@ -160,20 +164,20 @@ namespace Projectiles {
             if (otherEntity != null)
             {
                 // All projectiles break if they do damage
-                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.entity.GetFaction())
+                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.Entity.GetFaction())
                 {
                     //Debug.Log("Projectile collided, should apply damage");
-                    Entity.DamageEntity(otherEntity, data.entity, data.damage);
-                    BossController.ExecuteAsync(data.OnDestroyCollisionImpl(this));
+                    Entity.DamageEntity(otherEntity, data.Entity, data.Damage);
+                    BossController.ExecuteAsync(data.OnDestroyCollision(this));
                     Destroy(this.gameObject);
                 }
 
                 // Player's projectiles always break on the boss, even if he's invincible
-                if (data.entity.GetFaction() == Entity.Faction.player)
+                if (data.Entity.GetFaction() == Entity.Faction.player)
                 {
                     if (otherEntity.IsInvincible())
                     {
-                        data.OnDestroyCollisionImpl(this);
+                        data.OnDestroyCollision(this);
                         Destroy(this.gameObject);
                     }
                 }

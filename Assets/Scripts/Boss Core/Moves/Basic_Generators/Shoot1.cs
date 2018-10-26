@@ -13,7 +13,6 @@ namespace Moves.Basic
                 Glare();
 
                 Projectile newStruc = skeleton != null ? skeleton.Clone() : new Projectile();
-                UnityEngine.Debug.Log("Shoot1 called. Struc is " + newStruc.GetType());
                 newStruc.Create();
             }
         )
