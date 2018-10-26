@@ -15,7 +15,7 @@ namespace Moves.Tutorial3
         public Shoot_AOE(int width) : base
         (
             new Teleport().Wait(0.25f),
-            new ShootAOE(AOE.New(self).On(-width / 2, width / 2).FixedWidth(3f)),
+            new ShootAOE(new AOE { FixedWidth = 3f }.On(-width / 2, width / 2)),
             new Pause(0.5f)
         )
         {

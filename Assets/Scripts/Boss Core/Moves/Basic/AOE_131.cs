@@ -17,9 +17,9 @@ namespace Moves.Basic
         (
              new Teleport().Wait(0.5f),
              new PlayerLock(true),
-             new ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.19f),
-             new ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, -40).On(-10, 10).On(40, 60).FixedWidth(20)).Wait(0.76f),
-             new ShootAOE(AOE.New(self).Speed(Speed.MEDIUM).On(-60, 60).FixedWidth(5)).Wait(0.2f),
+             new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM, FixedWidth = 5 }.On(-60, 60)).Wait(0.19f),
+             new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM, FixedWidth = 20 }.On(-60, -40).On(-10, 10).On(40, 60)).Wait(0.76f),
+             new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM, FixedWidth = 5 }.On(-60, 60)).Wait(0.2f),
              new PlayerLock(false).Wait(1f)
         )
         {

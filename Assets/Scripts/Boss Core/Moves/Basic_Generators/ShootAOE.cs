@@ -13,7 +13,7 @@ namespace Moves.Basic
             () => 
             { 
                 Glare();
-                skeleton = skeleton != null ? skeleton.CloneWithCallbacks() : AOE.New(self);
+                skeleton = skeleton != null ? skeleton.Clone() : new AOE();
                 skeleton.Create(); 
             }
         )

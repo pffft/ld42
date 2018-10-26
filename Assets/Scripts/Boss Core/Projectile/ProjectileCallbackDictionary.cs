@@ -46,7 +46,7 @@ namespace Projectiles
 
         // Spawns a wave at the death position.
         public static ProjectileCallback SPAWN_WAVE = self =>
-            new ShootAOE(AOEs.AOE.New(self.data.Entity).Start(self.transform.position).On(0, 360f));
+            new ShootAOE(new AOEs.AOE(self.data.Entity) { Start = self.transform.position }.On(0, 360f));
         
         public static ProjectileCallback SPAWN_1_TOWARDS_PLAYER = self =>
             new Shoot1(

@@ -45,7 +45,7 @@ namespace Moves.Test
                     MaxTime = 4f
                 }
             ).Wait(0.15f).Times(count),
-            new ShootAOE(AOE.New(BossController.self).On(0, 360).Speed(BossCore.Speed.MEDIUM).FixedWidth(5f)).Wait(0.5f),
+            new ShootAOE(new AOE { OuterSpeed = BossCore.Speed.MEDIUM, FixedWidth = 5f }.On(0, 360)).Wait(0.5f),
             new Laser(-60, 480, 5, 60),
             new Laser(60, 480, 5, 45),
             new Laser(120, 480, 5, 30),
@@ -59,7 +59,7 @@ namespace Moves.Test
                     MaxTime = 4f
                 }
             ).Wait(0.15f).Times(count),
-            new ShootAOE(AOE.New(BossController.self).On(0, 360).Speed(BossCore.Speed.MEDIUM).FixedWidth(5f)).Wait(0.5f),
+            new ShootAOE(new AOE { OuterSpeed = BossCore.Speed.MEDIUM, FixedWidth = 5f }.On(0, 360)).Wait(0.5f),
             new Shoot1(
                 new ProjectileReverse()
                 {
@@ -70,7 +70,7 @@ namespace Moves.Test
                     MaxTime = 4f
                 }
             ).Wait(0.15f).Times(count),
-            new ShootAOE(AOE.New(BossController.self).On(0, 360).Speed(BossCore.Speed.MEDIUM).FixedWidth(5f)).Wait(0.5f)
+            new ShootAOE(new AOE { OuterSpeed = BossCore.Speed.MEDIUM, FixedWidth = 5f }.On(0, 360)).Wait(0.5f)
         )
         {
         }

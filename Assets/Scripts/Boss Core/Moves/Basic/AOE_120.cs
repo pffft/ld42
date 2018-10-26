@@ -12,7 +12,7 @@ namespace Moves.Basic
     {
         public AOE_120() : base
         (
-            new ShootAOE(AOE.New(self).On(-60, 60).FixedWidth(3f))
+            new ShootAOE(new AOE { FixedWidth = 3f }.On(-60, 60))
         ) 
         {
             Description = "Shoots a 120 degree wide AOE at the player.";

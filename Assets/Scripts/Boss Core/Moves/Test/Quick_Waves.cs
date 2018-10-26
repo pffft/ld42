@@ -53,7 +53,7 @@ namespace Moves.Test
 
             Either(
                 new ShootArc(100, -60, 60, new Projectile { Size = Size.HUGE, Speed = Speed.VERY_FAST }).Wait(0.05f).Times(3),
-                new ShootAOE(AOE.New(self).On(-60, 60).FixedWidth(3f).Speed(Speed.VERY_FAST)),
+                new ShootAOE(new AOE { OuterSpeed = Speed.VERY_FAST, FixedWidth = 3 }.On(-60, 60)),
                 new Shoot1(new ProjectileLightning()),
                 Merge(
                     new ShootArc(150, 22.5f, 22.5f + 60f, new Projectile { Size = Size.MEDIUM, Speed = Speed.VERY_FAST }),

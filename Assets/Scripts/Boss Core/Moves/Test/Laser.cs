@@ -13,18 +13,20 @@ namespace Moves.Test
 {
     public class Laser : AISequence
     {
-        public Laser(float startOffset=-90, float finalOffset=90, float width=5, float angularSpeed=90) : base
+        public Laser(float startOffset = -90, float finalOffset = 90, float width = 5, float angularSpeed = 90) : base
         (
             new ShootAOE(
-                AOE.New(self)
-                .On(0, width)
-                .InnerScale(0f)
-                .Scale(100f)
-                .AngleOffset(startOffset)
-                .Freeze()
-                .RotationSpeed(angularSpeed)
-                .MaxTime((finalOffset - startOffset) / angularSpeed)
-                .OnDestroyOutOfBounds(AOECallbackDictionary.DONT_DESTROY_OOB)
+                new AOE
+                {
+                    InnerSpeed = Speed.FROZEN,
+                    OuterSpeed = Speed.FROZEN,
+                    InnerScale = 0f,
+                    Scale = 100f,
+                    AngleOffset = startOffset,
+                    RotationSpeed = angularSpeed,
+                    MaxTime = (finalOffset - startOffset) / angularSpeed,
+                    OnDestroyOutOfBounds = AOECallbackDictionary.DONT_DESTROY_OOB
+                }.On(0, width)
             )
         ) 
         {
