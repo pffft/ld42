@@ -20,9 +20,9 @@ namespace Projectiles
         public Entity entity;
 
         // Used internally for the builder notation
-        public Vector3? preStart;
+        public ProxyVector3 preStart;
         public Vector3 start;
-        public Vector3? preTarget;
+        public ProxyVector3 preTarget;
         public Vector3 target;
         public float angleOffset;
 
@@ -87,9 +87,9 @@ namespace Projectiles
         {
             this.entity = entity;
 
-            this.preStart = null;
+            this.preStart = ProxyVector3.BOSS_POSITION;
             this.start = Vector3.zero;
-            this.preTarget = null;
+            this.preTarget = ProxyVector3.PLAYER_POSITION;
             this.target = Vector3.zero;
             this.angleOffset = 0f;
 
@@ -107,15 +107,14 @@ namespace Projectiles
             OnDestroyCollisionImpl = CallbackDictionary.NOTHING;
         }
 
-        // Builder method
-        public virtual Projectile Start(Vector3? start)
-        {
+        // TODO if preStart had an offset, it is lost
+        public virtual Projectile Start(ProxyVector3 start) {
             this.preStart = start;
             return this;
         }
 
-        // Builder method
-        public virtual Projectile Target(Vector3? target)
+        // TODO if preTarget had an offset, it is lost
+        public virtual Projectile Target(ProxyVector3 target)
         {
             this.preTarget = target;
             return this;

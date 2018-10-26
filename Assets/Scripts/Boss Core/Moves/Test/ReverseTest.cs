@@ -8,10 +8,11 @@ using Moves.Basic;
 
 namespace Moves.Test
 {
-    public class ReverseTest : AISequence
+    public class SpinReverse : AISequence
     {
-        public ReverseTest() : base
+        public SpinReverse(int count = 50) : base
         (
+            /*
             new PlayerLock(true),
             new AISequence(() =>
             {
@@ -29,6 +30,26 @@ namespace Moves.Test
                 return Merge(sequences.ToArray());
             }),
             new PlayerLock(false)
+            */
+            For(count, i => 
+                new Shoot1(
+                    new ProjectileCurving(187, false)
+                    .Start(PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward))
+                    .Target(PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward) + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.right))
+                    .Speed(BossCore.Speed.FAST)
+                    .MaxTime(0.75f)
+                    .OnDestroyTimeout(
+                    self => 
+                        new Shoot1(
+                            new ProjectileReverse()
+                            .Start(self.transform.position)
+                            .Target(PLAYER_POSITION)
+                            .Speed(BossCore.Speed.SNIPE)
+                            .MaxTime(0.75f)
+                       )
+                   )
+               )
+            )
         )
         {
         }

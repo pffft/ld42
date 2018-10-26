@@ -30,7 +30,7 @@ namespace Moves.Test
                 return sequences.ToArray();
             }
             */
-            For(6, i => new Strafe(true, 60, 25, Resolve(Live.PLAYER_POSITION)).Then(new ShootAOE(AOE.New(self).On(-60, 60))).Wait(0.75f))
+            For(6, i => new Strafe(true, 60, 25, GameManager.Player.transform.position)).Then(new ShootAOE(AOE.New(self).On(-60, 60))).Wait(0.75f)
         )
         {
 

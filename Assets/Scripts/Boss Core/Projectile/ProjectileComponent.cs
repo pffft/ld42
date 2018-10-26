@@ -39,9 +39,12 @@ namespace Projectiles {
         public void Initialize()
         {
             // Sets start
-            data.start = data.preStart ?? data.entity.transform.position;
+            //data.start = data.preStart ?? data.entity.transform.position;
+            data.start = data.preStart.GetValue();
+            Debug.Log("Start: " + data.start);
 
             // Sets target
+            /*
             Vector3 targetPosition;
             if (data.preTarget == null)
             {
@@ -60,7 +63,9 @@ namespace Projectiles {
             {
                 targetPosition = data.preTarget.Value;
             }
-            data.target = targetPosition;
+            */
+            data.target = data.preTarget.GetValue();
+            Debug.Log("Target: " + data.target);
 
             // Sets size (and assigns default material, if none set)
             gameObject.transform.localScale = SizeToScale(data.size) * Vector3.one;
