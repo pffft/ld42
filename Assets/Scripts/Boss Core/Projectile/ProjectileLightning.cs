@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using CombatCore;
 using UnityEngine;
 
+using static AI.AISequence;
+
 namespace Projectiles
 {
     public class ProjectileLightning : Projectile
@@ -93,15 +95,19 @@ namespace Projectiles
             }
 
 
-            return AI.AISequence.For(times, i => new Moves.Basic.Shoot1(
-                new ProjectileLightning(lightningSelf.entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.maxTime)
-                    .Start(self.transform.position)
-                    .Target(lightningSelf.initialTarget)
-                    .AngleOffset(lightningSelf.angleOffset - 45f + Random.Range(0, 90f))
-                    .MaxTime(Random.Range(0.05f, 0.15f))
-                    .Speed(BossCore.Speed.LIGHTNING)
-                    .OnDestroyTimeout(LIGHTNING_RECUR)
-            ));
+            return Merge(
+                For(times, i => 
+                    new Moves.Basic.Shoot1(
+                        new ProjectileLightning(lightningSelf.entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.maxTime)
+                            .Start(self.transform.position)
+                            .Target(lightningSelf.initialTarget)
+                            .AngleOffset(lightningSelf.angleOffset - 45f + Random.Range(0, 90f))
+                            .MaxTime(Random.Range(0.05f, 0.15f))
+                            .Speed(BossCore.Speed.LIGHTNING)
+                            .OnDestroyTimeout(LIGHTNING_RECUR)
+                    )
+                )
+            );
         };
     }
 }

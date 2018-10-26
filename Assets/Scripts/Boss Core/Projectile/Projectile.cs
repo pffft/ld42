@@ -87,9 +87,9 @@ namespace Projectiles
         {
             this.entity = entity;
 
-            this.preStart = ProxyVector3.BOSS_POSITION;
+            this.preStart = AI.AISequence.BOSS_POSITION;
             this.start = Vector3.zero;
-            this.preTarget = ProxyVector3.PLAYER_POSITION;
+            this.preTarget = AI.AISequence.DELAYED_PLAYER_POSITION;
             this.target = Vector3.zero;
             this.angleOffset = 0f;
 

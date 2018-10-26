@@ -38,6 +38,7 @@ namespace World
 
 		private float maxArea;
 
+        private const float DEFAULT_ARENA_SCALE = 50f;
         private static float ARENA_SCALE = 50f;
 
 		private float CurrentArea
@@ -47,11 +48,11 @@ namespace World
 
         public float RadiusInWorldUnits 
         {
-            get { return transform.localScale.x * ARENA_SCALE; }
+            get { return transform.localScale.x * DEFAULT_ARENA_SCALE; }
             set
 			{
                 ARENA_SCALE = value;
-                maxArea = ARENA_SCALE * ARENA_SCALE / 50f / 50f * Mathf.PI;
+                maxArea = ARENA_SCALE * ARENA_SCALE / DEFAULT_ARENA_SCALE / DEFAULT_ARENA_SCALE * Mathf.PI;
                 StartCoroutine(ChangeArenaSize(GameManager.Player.GetComponent<Entity>().HealthPerc * maxArea));
 			}
         }
@@ -80,6 +81,7 @@ namespace World
 			//drop the player if they're outside the arena
 			if (Vector3.Distance (transform.position, GameManager.Player.transform.position) > RadiusInWorldUnits)
 			{
+                Debug.Log("Player distance is greater than " + RadiusInWorldUnits);
 				//swap out a dummy and blow it up
 				GameManager.Player.gameObject.SetActive (false);
 				GameObject dummyPlayer = Instantiate(

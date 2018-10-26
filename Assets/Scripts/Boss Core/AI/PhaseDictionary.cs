@@ -4,11 +4,6 @@ using UnityEngine;
 
 using UnityEngine.Profiling;
 
-using static AI.AISequence;
-
-using System.Reflection;
-using System.Linq;
-
 namespace AI
 {
     public partial class AIPhase
@@ -89,7 +84,8 @@ namespace AI
                 //.AddScriptedSequence(0, new Moves.Test.Test().Times(75))
                 //.AddSequence(10, AISequence.Pause(100f))
                 //.AddSequence(10, new Moves.Test.SpinReverse().Wait(2f));
-                .AddSequence(10, new Moves.Test.Random_Leading())
+                //.AddSequence(10, new Moves.Test.Random_Leading())
+                //.AddSequence(10, new Moves.Test.Sniper_Final());
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()

@@ -58,6 +58,7 @@ namespace Projectiles
                     .Start(self.transform.position)
                     .MaxTime(self.data.maxTime)
                     .Size(self.data.size)
+                    .Speed(Speed.LIGHTNING)
             );
 
         public static ProjectileCallback REVERSE = (self) =>

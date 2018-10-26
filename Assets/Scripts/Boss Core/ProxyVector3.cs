@@ -8,15 +8,6 @@ namespace BossCore
     {
         private Vector3 offset;
 
-        public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
-        public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position + World.Arena.CENTER; });
-        public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>
-        {
-            float angle = Random.value * 360;
-            float distance = Random.Range(0, GameManager.Arena.RadiusInWorldUnits);
-            return distance * (Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward) + World.Arena.CENTER;
-        });
-
         public ProxyVector3(ProxiedValueGet get) : base(get) { }
 
         public override Vector3 GetValue()

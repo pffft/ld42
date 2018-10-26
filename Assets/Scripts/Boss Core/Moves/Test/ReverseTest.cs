@@ -31,7 +31,7 @@ namespace Moves.Test
             }),
             new PlayerLock(false)
             */
-            For(count, i => 
+            ForConcurrent(count, i => 
                 new Shoot1(
                     new ProjectileCurving(187, false)
                     .Start(PLAYER_POSITION + Quaternion.AngleAxis(i * (360f / count), Vector3.up) * (10 * Vector3.forward))

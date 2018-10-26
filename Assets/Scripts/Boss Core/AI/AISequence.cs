@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using BossCore;
 using UnityEngine;
 
 namespace AI
@@ -34,9 +35,19 @@ namespace AI
             }
         }
 
-        protected static BossCore.ProxyVector3 PLAYER_POSITION = BossCore.ProxyVector3.PLAYER_POSITION;
-        protected static BossCore.ProxyVector3 BOSS_POSITION = BossCore.ProxyVector3.BOSS_POSITION;
-        protected static BossCore.ProxyVector3 RANDOM_IN_ARENA = BossCore.ProxyVector3.RANDOM_IN_ARENA;
+        // TODO put these in a publically accessable location. Possibly in world or game manager.
+        public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
+        public static ProxyVector3 DELAYED_PLAYER_POSITION = new ProxyVector3(() =>
+        {
+            return BossController.isPlayerLocked ? BossController.playerLockPosition : GameManager.Player.transform.position + World.Arena.CENTER;
+        });
+        public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position; });
+        public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>
+        {
+            float angle = Random.value * 360;
+            float distance = Random.Range(0, GameManager.Arena.RadiusInWorldUnits);
+            return distance * (Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward) + World.Arena.CENTER;
+        });
 
         // A list of events to execute.
         public AIEvent[] events;
@@ -409,6 +420,9 @@ namespace AI
             return new AISequence(this, seq);
         }
 
+        /*
+         * Picks a random sequence from the provided list.
+         */
         public static AISequence Either(params AISequence[] sequences)
         {
             return new AISequence(() =>
@@ -440,6 +454,13 @@ namespace AI
             return For(start, end, 1, body);
         }
 
+        /*
+         * Iterates over the given boundaries, and passes the step value to the ForBody
+         * provided in the last parameter. Useful for replacing delegates with basic
+         * for loops inside of them. The events returned by this function happen as
+         * separate events; if the ForBody's AISequence has a delay, this will appear
+         * between all the events produced.
+         */
         public static AISequence For(float start, float end, float step, ForBody body)
         {
             Debug.Log("For called!");
@@ -471,8 +492,33 @@ namespace AI
                     sequences[count++] = body(i);
                 }
             }
-            return Merge(sequences);
+            return new AISequence(sequences);
         }
+
+        public static AISequence ForConcurrent(float count, ForBody body)
+        {
+            return ForConcurrent(0, count, 1, body);
+        }
+
+        public static AISequence ForConcurrent(float start, float end, ForBody body)
+        {
+            return ForConcurrent(start, end, 1, body);
+        }
+
+        /*
+         * Does the same as "For", but all the events generated happen in one frame.
+         * Useful for generating sequences with multiple projectiles appearing at once.
+         * 
+         * This means a wait returned by ForBody will happen at the end, rather than
+         * between each sequence.
+         */
+        public static AISequence ForConcurrent(float start, float end, float step, ForBody body)
+        {
+            return Merge(For(start, end, step, body).GetChildren());
+        }
+
+
+
 
         #endregion
     }

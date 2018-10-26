@@ -69,11 +69,11 @@ public class BossController : MonoBehaviour
 
         phases = new List<AIPhase>();
 
-        //phases.Add(AIPhase.PHASE_TUTORIAL_1);
+        phases.Add(AIPhase.PHASE_TUTORIAL_1);
         //phases.Add(AIPhase.PHASE_TUTORIAL_2);
         //phases.Add(AIPhase.PHASE_TUTORIAL_3);
         //phases.Add(AIPhase.PHASE1);
-        phases.Add(AIPhase.PHASE_TEST);
+        //phases.Add(AIPhase.PHASE_TEST);
         //phases.Add(AIPhase.PHASE_UNIT_TEST);
 
         StartCoroutine(ExecuteQueue());
@@ -172,6 +172,11 @@ public class BossController : MonoBehaviour
         {
             for (int i = 0; i < sequence.events.Length; i++)
             {
+                while (paused)
+                {
+                    yield return new WaitForSecondsRealtime(0.05f);
+                }
+
                 sequence.events[i].action?.Invoke();
                 // TODO reduce the wait time if the above invocation takes too long 
                 yield return new WaitForSecondsRealtime(sequence.events[i].duration);
