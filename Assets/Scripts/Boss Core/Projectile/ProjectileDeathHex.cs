@@ -11,6 +11,8 @@ namespace Projectiles
         public ProjectileDeathHex() : this(BossController.self) { }
 
         public ProjectileDeathHex(Entity self) : base(self) {
+            MaxTime = 1f;
+            Damage = 25f;
             OnDestroyTimeout = CallbackDictionary.SPAWN_6_CURVING;
         }
 

@@ -15,7 +15,7 @@ namespace Projectiles {
         // Some cached GameObject values for increased performance.
         private Transform trans;
         private MeshRenderer rend;
-        private bool shouldUpdate = true;
+        public bool shouldUpdate = true;
 
         // Time is updated in the component rather than the Projectile for increased performance
         public float currentTime;
@@ -127,15 +127,18 @@ namespace Projectiles {
             Profiler.EndSample();
 
             Profiler.BeginSample("Movement");
-            trans.position += (Time.deltaTime * data.Velocity);
-            Profiler.EndSample();
-
-            Profiler.BeginSample("Bounds check");
-            if (trans.position.sqrMagnitude > 5625f)
+            if (data.Speed != BossCore.Speed.FROZEN)
             {
-                BossController.ExecuteAsync(data.OnDestroyOutOfBounds(this));
-                Cleanup();
+                trans.position += (Time.deltaTime * data.Velocity);
+                Profiler.EndSample();
 
+                Profiler.BeginSample("Bounds check");
+                if (trans.position.sqrMagnitude > 5625f)
+                {
+                    BossController.ExecuteAsync(data.OnDestroyOutOfBounds(this));
+                    Cleanup();
+
+                }
             }
             Profiler.EndSample();
 

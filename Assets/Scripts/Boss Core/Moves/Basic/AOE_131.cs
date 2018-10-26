@@ -9,7 +9,7 @@ using Moves.Basic;
 using Projectiles;
 using static BossController;
 
-namespace Moves.User 
+namespace Moves.Basic 
 {
 	public class AOE_131 : AISequence 
 	{

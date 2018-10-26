@@ -60,8 +60,7 @@ namespace Moves.Test
                     new ShootArc(150, -22.5f, -22.5f - 60f, new Projectile { Size = Size.MEDIUM, Speed = Speed.VERY_FAST })
                 ),
                 new ShootArc(100, -60, 60, new Projectile { Speed = Speed.VERY_FAST, Size = Size.SMALL }).Wait(0.1f).Times(5)
-            ),
-            new Pause(0.6f)
+            ).Wait(0.6f).Times(7)
         )
         {
             Description = "Fires a quick barrage of random wave-based attacks.";

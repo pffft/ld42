@@ -82,22 +82,6 @@ namespace Projectiles
             return MemberwiseClone() as Projectile;
         }
 
-        /*
-        /// <summary>
-        /// Same as Clone(), but all callbacks are set to default. Useful for preventing
-        /// recursive behavior (by clearing the future callbacks).
-        /// </summary>
-        /// <returns>The clone, but without callbacks.</returns>
-        public Projectile CloneWithoutCallbacks()
-        {
-            Projectile clone = Clone();
-            clone.OnDestroyTimeout = CallbackDictionary.NOTHING;
-            clone.OnDestroyOutOfBounds = CallbackDictionary.NOTHING;
-            clone.OnDestroyCollision = CallbackDictionary.NOTHING;
-            return clone;
-        }
-        */
-
         /// <summary>
         /// Generates a new GameObject with a ProjectileComponent that references this
         /// data object.
@@ -151,7 +135,6 @@ namespace Projectiles
             return "Projectile"
                 + " with speed " + Speed
                 + ", size " + Size;
-                //+ ((type != Type.BASIC) ? ", and type " + type.ToString() : "");
         }
     }
 }

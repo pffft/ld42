@@ -43,7 +43,7 @@ namespace Projectiles
                 if (component.currentTime > count / numSpawners)
                 {
                     count++;
-                    new Projectile(Entity)
+                    ProjectileComponent newComp = new Projectile(Entity)
                     {
                         Start = component.transform.position,
                         MaxTime = MaxTime - component.currentTime,

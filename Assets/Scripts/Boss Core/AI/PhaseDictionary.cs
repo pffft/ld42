@@ -64,28 +64,25 @@ namespace AI
         //;
 
         /*
-         * TODO: Make this automatically check the "Moves" namespace and instantiate/load
-         * all the classes within it (except Move and IMoveDictionary). Make it throw warnings
-         * if a Move is declared in a class but never initialized (null), and if a Move is
-         * initialized before it's loaded through Load().
-         * 
          * TODO: Add some form of progress indicator to this.
+         * TODO: Make this load in Phases dynamically (like moves are)
          */
         public static void Load() {
             AISequence.ShouldAllowInstantiation = true;
 
             PHASE_TEST = new AIPhase()
                 //.AddSequence(10, Moves.Basic.PINCER)
-                //.AddSequence(10, new Moves.Test.Lightning_Arena().Times(2))
-                //.AddSequence(10, new Moves.Test.Quick_Waves())
-                //.AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
-                //.AddSequence(10, new Moves.Test.Double_Laser_Sweep())
-                //.AddSequence(10, new Moves.Test.Pincer_Sweep())
+                .AddSequence(10, new Moves.Test.Lightning_Arena().Times(2))
+                .AddSequence(10, new Moves.Test.Quick_Waves())
+                .AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
+                .AddSequence(10, new Moves.Test.Double_Laser_Sweep())
+                .AddSequence(10, new Moves.Test.Pincer_Sweep())
                 //.AddScriptedSequence(0, new Moves.Test.Test().Times(75))
                 //.AddSequence(10, AISequence.Pause(100f))
-                //.AddSequence(10, new Moves.Test.SpinReverse().Wait(2f));
+                .AddSequence(10, new Moves.Test.SpinReverse().Wait(2f))
                 .AddSequence(10, new Moves.Test.Random_Leading())
-                //.AddSequence(10, new Moves.Test.Sniper_Final());
+                .AddSequence(10, new Moves.Test.Sniper_Final())
+                .AddSequence(10, new Moves.Basic.Shoot_Death_Hex())
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()
@@ -112,8 +109,7 @@ namespace AI
 
             PHASE_TUTORIAL_3 = new AIPhase()
                 .SetMaxHealth(20)
-                //.AddSequence(10, SHOOT3_WAVE3.Wait(1f))
-                //.AddSequence(10, Moves.Basic.AOE_131_MEDIUM_LONG.Wait(0.5f))
+                .AddSequence(10, new Moves.Basic.AOE_131())
                 .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(90))
                 .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(120))
                 .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(360))

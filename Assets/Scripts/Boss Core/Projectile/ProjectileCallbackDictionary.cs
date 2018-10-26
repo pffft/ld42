@@ -23,7 +23,7 @@ namespace Projectiles
             );
 
         public static ProjectileCallback SPAWN_6_CURVING = self =>
-            For(6, i => new Shoot1(
+            ForConcurrent(6, i => new Shoot1(
                 new ProjectileCurving(self.data.Entity, (float)self.data.Speed * 2f, true)
                 {
                     Start = self.transform.position,
@@ -34,7 +34,7 @@ namespace Projectiles
             ));
 
         public static ProjectileCallback SPAWN_6 = self =>
-            For(6, i => new Shoot1(
+            ForConcurrent(6, i => new Shoot1(
                 new ProjectileCurving(self.data.Entity, 0f, true)
                 {
                     Start = self.transform.position,

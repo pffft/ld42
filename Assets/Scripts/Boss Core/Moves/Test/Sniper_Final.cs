@@ -41,7 +41,7 @@ namespace Moves.Test
                 ).Times(2),
                 new Shoot1(new Projectile { Speed = Speed.SNAIL, Size = Size.HUGE, MaxTime = 1f, OnDestroyTimeout = CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER }).Wait(2.5f),
                 new Shoot1(new Projectile { Speed = Speed.SNAIL, Size = Size.HUGE, MaxTime = 1f, OnDestroyTimeout = CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER }).Wait(2.5f)
-            ).Times(3)
+            )
         )
         { }
     }
