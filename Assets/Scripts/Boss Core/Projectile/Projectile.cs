@@ -46,7 +46,7 @@ namespace Projectiles
 
         #region Constructors
 
-        public Projectile() : this(BossController.self) { }
+        public Projectile() : this(GameManager.Boss.self) { }
 
         public Projectile(Entity entity)
         {

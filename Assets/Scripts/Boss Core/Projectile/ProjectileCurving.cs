@@ -17,7 +17,7 @@ namespace Projectiles
         private readonly bool leavesTrail;
 
         public ProjectileCurving(float curveAmount, bool leavesTrail)
-            : this(BossController.self, curveAmount, leavesTrail)
+            : this(GameManager.Boss.self, curveAmount, leavesTrail)
         { }
 
         public ProjectileCurving(Entity self, float curveAmount, bool leavesTrail)

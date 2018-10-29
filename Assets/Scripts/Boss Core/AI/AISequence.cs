@@ -39,7 +39,7 @@ namespace AI
         public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
         public static ProxyVector3 DELAYED_PLAYER_POSITION = new ProxyVector3(() =>
         {
-            return BossController.isPlayerLocked ? BossController.playerLockPosition : GameManager.Player.transform.position + World.Arena.CENTER;
+            return GameManager.Boss.isPlayerLocked ? GameManager.Boss.playerLockPosition : GameManager.Player.transform.position + World.Arena.CENTER;
         });
         public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position; });
         public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>

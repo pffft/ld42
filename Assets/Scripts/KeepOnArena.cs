@@ -22,6 +22,10 @@ public class KeepOnArena : MonoBehaviour {
                 float randomDegrees = Random.Range(0f, 359f);
                 float randomWidth = Random.Range(5f, GameManager.Arena.RadiusInWorldUnits);
                 transform.position = (Quaternion.AngleAxis(randomDegrees, Vector3.up) * (randomWidth * Vector3.forward)) + Vector3.up * 10f;
+
+                if (GetComponent<Rigidbody>() != null) {
+                    GetComponent<Rigidbody>().velocity = Vector3.zero;
+                }
             }
         }
 	}

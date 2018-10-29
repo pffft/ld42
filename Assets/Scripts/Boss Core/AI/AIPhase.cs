@@ -9,11 +9,26 @@ namespace AI
 {
     public partial class AIPhase
     {
-        // What's the amount of health we have this phase?
+        /// <summary>
+        /// What's the amount of health we have this phase?
+        /// </summary>
+        /// <value>The max health.</value>
         public int MaxHealth { get; set; } = 100;
 
-        // How big is the arena this phase?
+        /// <summary>
+        /// How big is the arena this phase?
+        /// </summary>
+        /// <value>The max arena radius.</value>
         public float MaxArenaRadius { get; set; } = 50f;
+
+        /// <summary>
+        /// If this value is true, we adjust the probability weights of the moves to be
+        /// closer to the global difficulty parameter. This parameter is based on how
+        /// aggressive the player is + how much damage they've taken recently (indicating
+        /// their proficiency at this difficulty). 
+        /// </summary>
+        /// <value><c>true</c> if dynamic difficulty; otherwise, <c>false</c>.</value>
+        public bool DynamicDifficulty { get; set; } = false;
 
         private List<AIPhaseComponent> phaseSequences;
         private List<AIPhaseScriptedComponent> scriptedSequences;

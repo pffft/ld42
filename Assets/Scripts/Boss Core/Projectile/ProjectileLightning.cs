@@ -16,7 +16,7 @@ namespace Projectiles
         private int count;
         private readonly int numSpawners = 30;
 
-        public ProjectileLightning(int level=0) : this(BossController.self, level) { }
+        public ProjectileLightning(int level=0) : this(GameManager.Boss.self, level) { }
 
         public ProjectileLightning(Entity self, int level) : this(self, level, 1f) { }
 

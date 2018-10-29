@@ -133,7 +133,7 @@ namespace AOEs
 
         #endregion
 
-        public AOE() : this(BossController.self) { }
+        public AOE() : this(GameManager.Boss.self) { }
 
         public AOE(Entity self)
         {

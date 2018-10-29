@@ -12,9 +12,9 @@ namespace Moves.Basic
             {
                 if (enableLock)
                 {
-                    playerLockPosition = GameManager.Player.transform.position;
+                    GameManager.Boss.playerLockPosition = GameManager.Player.transform.position;
                 }
-                isPlayerLocked = enableLock;
+                GameManager.Boss.isPlayerLocked = enableLock;
             }
         )
         {

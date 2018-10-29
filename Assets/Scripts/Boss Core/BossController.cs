@@ -20,43 +20,31 @@ public class BossController : MonoBehaviour
 {
     // Toggles insane mode. This just makes everything a living hell.
     // Specifically, every waiting period is reduced and movement speed is buffed.
-    public static bool insaneMode;
+    public bool insaneMode;
 
     [SerializeField]
     public bool DebugMode = true;
 
     // The Entity representing this faction. Assigned to projectiles we create.
-    public static CombatCore.Entity self;
-    public static string BOSS_NAME = "Boss";
+    public CombatCore.Entity self;
 
     // Used for the "PlayerLock" move. Keeps track of the current player position
     // for events and sequences that need a slightly out of date version.
-    public static Vector3 playerLockPosition;
-    public static bool isPlayerLocked;
+    public Vector3 playerLockPosition; // Should only be accessed via DelayedPlayerPosition.
+    public bool isPlayerLocked; // Should only be set via PlayerLock() AISequence.
 
     // Phase iteration logic
-    private static List<AIPhase> phases;
-    private static AIPhase currentPhase;
-    private static int phaseIndex = -1;
+    private AIRoutine routine;
 
     // Event queue variables. How we schedule our attacks.
-    private static Queue<AISequence> queuedSequences;
-    private static Queue<AIEvent> events;
-    private static bool paused;
-    private static bool running;
+    private Queue<AISequence> queuedSequences;
+    private bool paused;
+    private bool running = true;
 
-    private void Awake()
+    void Awake()
     {
-        //eventQueue = new EventQueue();
-        //eventQueue = GameManager.EventQueue;
-
-        queuedSequences = new Queue<AISequence>();
-        events = new Queue<AIEvent>();
-        paused = false;
-        running = true;
-
         self = GetComponent<CombatCore.Entity>();
-        self.name = BOSS_NAME;
+        queuedSequences = new Queue<AISequence>();
     }
 
     // Use this for initialization
@@ -66,16 +54,26 @@ public class BossController : MonoBehaviour
         AIPhase.Load();
         Profiler.EndSample();
 
+        AIRoutine mainRoutine = new AIRoutine
+        {
+            Phases = {
+                new Phases.Phase_Tutorial_1(),
+                new Phases.Phase_Tutorial_2(),
+                new Phases.Phase_Tutorial_3()
+            }
+        };
 
-        phases = new List<AIPhase>();
+        AIRoutine testRoutine = new AIRoutine
+        {
+            Phases = {
+                new Phases.Phase_Test()
+            }
+        };
 
-        //phases.Add(AIPhase.PHASE_TUTORIAL_1);
-        //phases.Add(AIPhase.PHASE_TUTORIAL_2);
-        //phases.Add(AIPhase.PHASE_TUTORIAL_3);
-        //phases.Add(AIPhase.PHASE1);
-        phases.Add(AIPhase.PHASE_TEST);
-        //phases.Add(AIPhase.PHASE_UNIT_TEST);
+        routine = mainRoutine;
+        //routine = testRoutine;
 
+        // Kick off the execution engine
         StartCoroutine(ExecuteQueue());
         NextPhase();
     }
@@ -83,15 +81,13 @@ public class BossController : MonoBehaviour
     /*
      * Transitions to the next phase by loading in the next set of moves.
      */
-    public static void NextPhase() {
-        phaseIndex++;
-        if (phaseIndex > phases.Count) {
-            Debug.LogError("You win!");
-		}
+    public void NextPhase() {
+        queuedSequences.Clear();
 
-        currentPhase = phases[phaseIndex];
-        self.healthMax = currentPhase.maxHealth;
-        GameManager.Arena.RadiusInWorldUnits = currentPhase.maxArenaRadius;
+        routine.NextPhase();
+
+        self.healthMax = routine.CurrentPhase.MaxHealth;
+        GameManager.Arena.RadiusInWorldUnits = routine.CurrentPhase.MaxArenaRadius;
 
         // Heal up to the new max health.
         CombatCore.Entity.HealEntity(self, float.PositiveInfinity);
@@ -101,7 +97,21 @@ public class BossController : MonoBehaviour
         Add(new AISequence(() => { self.SetInvincible(false); }));
     }
 
-    public static void Add(AISequence sequence)
+    public void ResetBoss()
+    {
+        // Flush the execution engine
+        StopCoroutine("Dash");
+        StopCoroutine("Glare");
+        StopCoroutine("Execute");
+        StopCoroutine("ExecuteAsync");
+        queuedSequences.Clear();
+
+        // Reset the routine and restart it
+        routine.Reset();
+        NextPhase();
+    }
+
+    public void Add(AISequence sequence)
     {
         if (GameManager.Boss.DebugMode)
         {
@@ -145,7 +155,7 @@ public class BossController : MonoBehaviour
         // If the queue ran out of events, pull the next AISequence in the phase
         if (queuedSequences.Count == 0)
         {
-            Add(currentPhase.GetNext());
+            Add(routine.CurrentPhase.GetNext());
         }
     }
 
@@ -168,7 +178,7 @@ public class BossController : MonoBehaviour
     }
 
     // event queue
-    private static IEnumerator Execute(AISequence sequence)
+    private IEnumerator Execute(AISequence sequence)
     {
         if (sequence.events != null)
         {
@@ -194,7 +204,7 @@ public class BossController : MonoBehaviour
         }
     }
 
-    public static void ExecuteAsync(AISequence sequence)
+    public void ExecuteAsync(AISequence sequence)
     {
         GameManager.Boss.StartCoroutine(Execute(sequence));
     }
@@ -205,7 +215,7 @@ public class BossController : MonoBehaviour
      * This happens separately from the event queue, and will pause any future
      * events until after this dash is completed.
      */
-    public static IEnumerator Dash(Vector3 targetPosition)
+    public IEnumerator Dash(Vector3 targetPosition)
     {
         paused = true;
 
@@ -238,7 +248,7 @@ public class BossController : MonoBehaviour
      * Should be used when launching an attack at the player to let them know
      * about the boundless depths of white-hot furi that the boss has for them.
      */
-    public static void Glare()
+    public void Glare()
     {
         Quaternion lookRotation = Quaternion.LookRotation(GameManager.Player.transform.position - GameManager.Boss.transform.position);
         GameManager.Boss.transform.rotation = lookRotation;

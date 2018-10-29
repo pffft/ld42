@@ -10,7 +10,7 @@ namespace Moves.Basic
         (
             () =>
             {
-                Glare();
+                GameManager.Boss.Glare();
 
                 Projectile newStruc = skeleton != null ? skeleton.Clone() : new Projectile();
                 newStruc.Create();

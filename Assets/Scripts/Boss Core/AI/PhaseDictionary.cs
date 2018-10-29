@@ -9,34 +9,6 @@ namespace AI
     public partial class AIPhase
     {
 
-        //public static AIPhase PHASE_TEST = new AIPhase()
-        //.AddSequence(10, HOMING_STRAFE_WAVE_SHOOT)
-        //   ;
-        public static AIPhase PHASE_TEST;
-
-        /*
-         * Teaches the player basic movement and throwing.
-         * 
-         * Should consist of moves that are easy to dodge by running or dashing,
-         * and have plenty of time in between to throw a shield.
-         * 
-         * Should probably disable shield blocking for this phase.
-         */
-        public static AIPhase PHASE_TUTORIAL_1;
-
-        /*
-         * Teaches the player that the shield exists.
-         * 
-         * Should consist of both dashing and blocking attacks, with plenty
-         * of time to throw shield between.
-         */
-        public static AIPhase PHASE_TUTORIAL_2;
-
-        /*
-         * Introduces AOEs (and how shield interacts with them).
-         */
-        public static AIPhase PHASE_TUTORIAL_3;
-
         public static AIPhase PHASE1;
 
         public static AIPhase PHASE_UNIT_TEST;
@@ -65,56 +37,11 @@ namespace AI
 
         /*
          * TODO: Add some form of progress indicator to this.
-         * TODO: Make this load in Phases dynamically (like moves are)
          */
         public static void Load() {
             AISequence.ShouldAllowInstantiation = true;
 
-            PHASE_TEST = new AIPhase()
-                //.AddSequence(10, Moves.Basic.PINCER)
-                .AddSequence(10, new Moves.Test.Lightning_Arena().Times(2))
-                .AddSequence(10, new Moves.Test.Quick_Waves())
-                .AddSequence(10, new Moves.Test.Double_Laser_Sweep_AOE())
-                .AddSequence(10, new Moves.Test.Double_Laser_Sweep())
-                .AddSequence(10, new Moves.Test.Pincer_Sweep())
-                //.AddScriptedSequence(0, new Moves.Test.Test().Times(75))
-                //.AddSequence(10, AISequence.Pause(100f))
-                .AddSequence(10, new Moves.Test.SpinReverse().Wait(2f))
-                .AddSequence(10, new Moves.Test.Random_Leading())
-                .AddSequence(10, new Moves.Test.Sniper_Final())
-                .AddSequence(10, new Moves.Basic.Shoot_Death_Hex())
-                ;
-
-            PHASE_TUTORIAL_1 = new AIPhase()
-                //.SetMaxHealth(20)
-                //.SetMaxArenaRadius(0.75f * 50f)
-                .AddSequence(10, new Moves.Basic.Sweep().Wait(1f))
-                .AddSequence(10, new Moves.Basic.Sweep(reverse: true).Wait(1f))
-                .AddSequence(10, new Moves.Basic.Sweep_Back_And_Forth().Wait(1f))
-                .AddSequence(10, new Moves.Basic.Sweep_Both().Wait(1f))
-                .AddSequence(10, new Moves.Tutorial1.Shoot_1_Several())
-                .AddSequence(10, new Moves.Tutorial1.Shoot_3_Several())
-                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(70))
-                .AddSequence(4, new Moves.Tutorial1.Shoot_Arc(120))
-                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(150))
-                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(70, true))
-                .AddSequence(4, new Moves.Tutorial1.Shoot_Arc(120, true))
-                .AddSequence(3, new Moves.Tutorial1.Shoot_Arc(150, true))
-                ;
-
-            PHASE_TUTORIAL_2 = new AIPhase()
-                //.SetMaxHealth(20)
-                .AddSequence(10, new Moves.Tutorial2.Force_Block())
-                ;
-
-            PHASE_TUTORIAL_3 = new AIPhase()
-                //.SetMaxHealth(20)
-                .AddSequence(10, new Moves.Basic.AOE_131())
-                .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(90))
-                .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(120))
-                .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(360))
-                ;
-
+            /*
             PHASE1 = new AIPhase()
                 //.AddSequence(10, SHOOT3_WAVE3)
                 .AddSequence(10, new Moves.Basic.Shoot_2_Waves())
@@ -152,6 +79,7 @@ namespace AI
                 .AddScriptedSequence(3, new Moves.Basic.Shoot1(new Projectiles.ProjectileHoming()).Wait(1f))
                 .AddScriptedSequence(4, new Moves.Basic.Shoot1(new Projectiles.ProjectileLightning()).Wait(1f));
             ;
+            */
         }
 
     }

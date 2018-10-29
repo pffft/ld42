@@ -12,7 +12,7 @@ namespace Moves.Basic
             () =>
             {
                 //long start = System.DateTime.Now.Ticks;
-                Glare();
+                GameManager.Boss.Glare();
 
                 // Ensure that "from" is always less than "to".
                 if (to < from)
