@@ -12,12 +12,12 @@ namespace Moves.Basic
         (
             () =>
             {
-                self.movespeed.LockTo(speed);
+                GameManager.Boss.self.movespeed.LockTo(speed);
 
                 Vector3 oldPosVector = GameManager.Boss.transform.position - center;
                 Quaternion rot = Quaternion.AngleAxis(degrees, clockwise ? Vector3.up : Vector3.down);
 
-                GameManager.Boss.StartCoroutine(Dash((rot * oldPosVector) + center));
+                GameManager.Boss.StartCoroutine(GameManager.Boss.Dash((rot * oldPosVector) + center));
             }
         )
         {}

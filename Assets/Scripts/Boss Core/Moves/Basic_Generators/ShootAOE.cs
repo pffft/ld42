@@ -11,8 +11,8 @@ namespace Moves.Basic
         public ShootAOE(AOE skeleton = null) : base
         (
             () => 
-            { 
-                Glare();
+            {
+                GameManager.Boss.Glare();
                 skeleton = skeleton != null ? skeleton.Clone() : new AOE();
                 skeleton.Create(); 
             }

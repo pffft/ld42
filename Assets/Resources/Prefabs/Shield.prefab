@@ -11,6 +11,23 @@ Prefab:
   m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1507530396552222}
   m_IsPrefabAsset: 1
+--- !u!1 &1168528406709094
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4860285585461024}
+  - component: {fileID: 135034493210033750}
+  - component: {fileID: 114185634914605470}
+  m_Layer: 15
+  m_Name: BossCollisionTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1507530396552222
 GameObject:
   m_ObjectHideFlags: 0
@@ -24,6 +41,8 @@ GameObject:
   - component: {fileID: 54870832810018796}
   - component: {fileID: 64894460222652124}
   - component: {fileID: 114517361295349430}
+  - component: {fileID: 114353084420896766}
+  - component: {fileID: 114821543164598386}
   m_Layer: 13
   m_Name: Shield
   m_TagString: Untagged
@@ -40,10 +59,24 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4860285585461024}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!4 &4860285585461024
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1168528406709094}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4835478478862716}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23303720274358774
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -97,7 +130,7 @@ Rigidbody:
   m_Drag: 1
   m_AngularDrag: 0.25
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -115,6 +148,28 @@ MeshCollider:
   m_CookingOptions: 14
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 91730964b14ca404bb67f5ff48b75c91, type: 3}
+--- !u!114 &114185634914605470
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1168528406709094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5aa3fd8e627444c69b97187b32a0291, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114353084420896766
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1507530396552222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ead5bed827a7c40198a19b7ac5172c78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114517361295349430
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -126,3 +181,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0705ae61cf8e6400da45dd37c18f65d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shouldReset: 0
+--- !u!114 &114821543164598386
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1507530396552222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70dae659e9d6bae4db41c2b2fc0b7d77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faction: 1
+  health: 0
+  healthMax: 0
+  shields: 0
+  shieldsMax: 0
+  shieldRegen: 0
+  shieldDelayMax: 0
+  movespeed:
+    baseValue: 0
+--- !u!135 &135034493210033750
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1168528406709094}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0.2}

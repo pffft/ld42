@@ -1,6 +1,4 @@
 ﻿using AI;
-using Projectiles;
-using static BossController;
 using UnityEngine;
 
 namespace Moves.Basic
@@ -11,11 +9,11 @@ namespace Moves.Basic
         (
             () =>
             {
-                self.movespeed.LockTo(speed);
+                GameManager.Boss.self.movespeed.LockTo(speed);
                 if (target.HasValue)
                 {
-                    GameManager.Boss.StartCoroutine(Dash(target.Value));
-                    Glare();
+                    GameManager.Boss.StartCoroutine(GameManager.Boss.Dash(target.Value));
+                    GameManager.Boss.Glare();
                     return;
                 }
 
@@ -54,9 +52,9 @@ namespace Moves.Basic
                 } while (rawPosition.magnitude > 50f);
 
                 rawPosition.y = 1.31f;
-                GameManager.Boss.StartCoroutine(Dash(rawPosition));
+                GameManager.Boss.StartCoroutine(GameManager.Boss.Dash(rawPosition));
 
-                Glare();
+                GameManager.Boss.Glare();
             }
         )
         {

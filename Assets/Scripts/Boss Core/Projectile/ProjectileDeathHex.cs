@@ -8,7 +8,7 @@ namespace Projectiles
     public class ProjectileDeathHex : Projectile
     {
 
-        public ProjectileDeathHex() : this(BossController.self) { }
+        public ProjectileDeathHex() : this(GameManager.Boss.self) { }
 
         public ProjectileDeathHex(Entity self) : base(self) {
             MaxTime = 1f;

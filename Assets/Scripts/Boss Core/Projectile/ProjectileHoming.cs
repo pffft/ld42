@@ -20,7 +20,7 @@ namespace Projectiles
         // Was this projectile once close to the player?
         private bool wasClose;
 
-        public ProjectileHoming() : this(BossController.self) { }
+        public ProjectileHoming() : this(GameManager.Boss.self) { }
 
         public ProjectileHoming(Entity self) : base(self) { }
 

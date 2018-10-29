@@ -11,7 +11,7 @@ namespace Moves.Basic
         (
             () =>
             {
-                Glare();
+                GameManager.Boss.Glare();
 
                 for (int i = 0; i < 3; i++)
                 {
