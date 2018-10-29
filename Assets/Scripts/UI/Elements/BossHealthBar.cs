@@ -16,6 +16,7 @@ public class BossHealthBar : MonoBehaviour
 		{
 			if (value != numberOfPhases)
 			{
+				//these bitches old af, YEET
 				numberOfPhases = value;
 				for (int i = 0; i < transform.childCount; i++)
 				{
