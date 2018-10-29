@@ -10,10 +10,10 @@ namespace AI
     public partial class AIPhase
     {
         // What's the amount of health we have this phase?
-        public int maxHealth = 100;
+        public int MaxHealth { get; set; } = 100;
 
         // How big is the arena this phase?
-        public float maxArenaRadius = 50f;
+        public float MaxArenaRadius { get; set; } = 50f;
 
         private List<AIPhaseComponent> phaseSequences;
         private List<AIPhaseScriptedComponent> scriptedSequences;
@@ -27,16 +27,6 @@ namespace AI
             phaseSequences = new List<AIPhaseComponent>();
             scriptedSequences = new List<AIPhaseScriptedComponent>();
             repeatingScriptedSequences = new List<AIPhaseScriptedComponent>();
-        }
-
-        public AIPhase SetMaxHealth(int health) {
-            this.maxHealth = health;
-            return this;
-        }
-
-        public AIPhase SetMaxArenaRadius(float width) {
-            this.maxArenaRadius = width;
-            return this;
         }
 
         public AIPhase AddSequence(int weight, AISequence sequence) {
