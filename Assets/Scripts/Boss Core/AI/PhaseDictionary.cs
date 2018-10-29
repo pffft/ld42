@@ -86,8 +86,8 @@ namespace AI
                 ;
 
             PHASE_TUTORIAL_1 = new AIPhase()
-                .SetMaxHealth(20)
-                .SetMaxArenaRadius(0.75f * 50f)
+                //.SetMaxHealth(20)
+                //.SetMaxArenaRadius(0.75f * 50f)
                 .AddSequence(10, new Moves.Basic.Sweep().Wait(1f))
                 .AddSequence(10, new Moves.Basic.Sweep(reverse: true).Wait(1f))
                 .AddSequence(10, new Moves.Basic.Sweep_Back_And_Forth().Wait(1f))
@@ -103,12 +103,12 @@ namespace AI
                 ;
 
             PHASE_TUTORIAL_2 = new AIPhase()
-                .SetMaxHealth(20)
+                //.SetMaxHealth(20)
                 .AddSequence(10, new Moves.Tutorial2.Force_Block())
                 ;
 
             PHASE_TUTORIAL_3 = new AIPhase()
-                .SetMaxHealth(20)
+                //.SetMaxHealth(20)
                 .AddSequence(10, new Moves.Basic.AOE_131())
                 .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(90))
                 .AddSequence(10, new Moves.Tutorial3.Shoot_AOE(120))
