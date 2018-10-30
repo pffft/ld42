@@ -20,10 +20,14 @@ public class BossController : MonoBehaviour
 {
     // Toggles insane mode. This just makes everything a living hell.
     // Specifically, every waiting period is reduced and movement speed is buffed.
-    public bool insaneMode;
+    [SerializeField]
+    private bool insaneMode;
 
     [SerializeField]
-    public bool DebugMode = true;
+    private bool DebugMode = true;
+
+    [SerializeField]
+    private bool Chill = false;
 
     // The Entity representing this faction. Assigned to projectiles we create.
     public CombatCore.Entity self;
@@ -149,8 +153,9 @@ public class BossController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Every frame, prompt the queue for then next event.
-        //GameManager.EventQueue.Update();
+        if (Chill) {
+            return;
+        }
 
         // If the queue ran out of events, pull the next AISequence in the phase
         if (queuedSequences.Count == 0)
