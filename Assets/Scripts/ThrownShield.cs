@@ -92,6 +92,7 @@ public class ThrownShield : MonoBehaviour {
         {
             Quaternion rot = Quaternion.AngleAxis(-Mathf.Sign(idealRotation) * homingScale * feathering, Vector3.up);
             body.velocity = rot * body.velocity;
+            body.velocity = new Vector3(body.velocity.x, 0, body.velocity.z);
             curDivergence += homingScale;
         }
         //Debug.Log("Current velocity magnitude: " + body.velocity.magnitude);

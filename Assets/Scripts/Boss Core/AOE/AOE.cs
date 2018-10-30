@@ -14,9 +14,11 @@ namespace AOEs
 
         // This is a hack. It works, but the compiler will give a warning about hiding
         // the outer method. There's probably a better way, but this gives nice syntax.
-
-        //public class RegionObj {
-        //    public RegionObj On(float from, float to) {
+//        public class RegionObj {
+//#pragma warning disable RECS0146 // Member hides static member from outer class
+//            public RegionObj On(float from, float to)
+//            {
+//#pragma warning restore RECS0146 // Member hides static member from outer class
         //        // Do the actual math here
         //        return new RegionObj();
         //    }

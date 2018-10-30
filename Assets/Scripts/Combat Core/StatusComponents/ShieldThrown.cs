@@ -23,7 +23,7 @@ namespace CombatCore.StatusComponents
             {
                 GameManager.ThrownShield = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Shield"));
                 GameManager.ThrownShield.name = "Thrown Shield";
-                GameManager.ThrownShield.transform.position = subject.transform.position;
+                GameManager.ThrownShield.transform.position = subject.transform.position + World.Arena.CENTER;
                 //GameManager.ThrownShield.transform.parent = homingProj.transform;
                 GameManager.ThrownShield.GetComponent<KeepOnArena>().shouldReset = false;
             }
