@@ -6,10 +6,11 @@ using UnityEngine;
 public class KeepOnArena : MonoBehaviour {
 
     public bool shouldReset = false;
+    private Rigidbody body;
 
 	// Use this for initialization
 	void Start () {
-		
+        this.body = GetComponent<Rigidbody>();
 	}
 	
 	// Update is called once per frame
@@ -23,8 +24,13 @@ public class KeepOnArena : MonoBehaviour {
                 float randomWidth = Random.Range(5f, GameManager.Arena.RadiusInWorldUnits);
                 transform.position = (Quaternion.AngleAxis(randomDegrees, Vector3.up) * (randomWidth * Vector3.forward)) + Vector3.up * 10f;
 
-                if (GetComponent<Rigidbody>() != null) {
-                    GetComponent<Rigidbody>().velocity = Vector3.zero;
+                if (body != null)
+                {
+                    Debug.Log("YEET");
+                    body.velocity = Vector3.zero;
+                    body.drag = 0f;
+                    //body.AddForce(100f * new Vector3(0f, -1f, 0f), ForceMode.Impulse);
+                    body.AddForceAtPosition(100f * Vector3.down, new Vector3(Random.value, 0f, Random.value));
                 }
             }
         }
