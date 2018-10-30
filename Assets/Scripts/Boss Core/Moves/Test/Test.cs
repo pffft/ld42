@@ -38,7 +38,6 @@ namespace Moves.Test
             new ShootArc(500, 0, 360, new Projectile { MaxTime = 2f }).Wait(0.05f)
         )
         {
-
         }
     }
 }

@@ -16,7 +16,7 @@ public class HUD : MonoBehaviour
 	private Image shieldIndicator = null;
 
 	[SerializeField]
-	private Image shieldPointer;
+	private Image shieldPointer = null;
 
 	[SerializeField]
 	private Color[] shieldIndicatorColors = new Color[2];
