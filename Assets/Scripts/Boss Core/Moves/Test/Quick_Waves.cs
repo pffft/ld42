@@ -7,7 +7,6 @@ using Moves.Basic;
 using Projectiles;
 using AOEs;
 using BossCore;
-using static BossController;
 
 namespace Moves.Test
 {
