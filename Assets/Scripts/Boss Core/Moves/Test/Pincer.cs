@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using System.Collections.Generic;
 using AI;
+using BossCore;
 using Moves.Basic;
 using Projectiles;
-using AOEs;
-using BossCore;
-using static BossController;
+using UnityEngine;
 
 namespace Moves.Test
 {
@@ -17,7 +13,6 @@ namespace Moves.Test
         (
             () => {
                 //Debug.Log("Pincer sees player at: " + GameManager.Player.transform.position);
-                Debug.Log("Pincer called");
                 List<AISequence> sequences = new List<AISequence>();
 
                 float curveAmount =
@@ -37,7 +32,6 @@ namespace Moves.Test
 
         )
         {
-            Debug.Log("Pincer created");
             Description = "Shoots two projectiles with an offset of +/-" + offset + " degrees with speed " + speed;
         }
     }
