@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using System.Collections.Generic;
 using AI;
+using BossCore;
 using Moves.Basic;
 using Projectiles;
-using AOEs;
-using BossCore;
-using static BossController;
+using UnityEngine;
 
 namespace Moves.Test
 {
@@ -19,7 +15,7 @@ namespace Moves.Test
                 //Debug.Log("Pincer sees player at: " + GameManager.Player.transform.position);
                 Debug.Log("Pincer called");
                 List<AISequence> sequences = new List<AISequence>();
-
+            ¸
                 float curveAmount =
                             -4f * // base
                             (float)speed * // turning radius is tighter when we go faster
