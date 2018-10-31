@@ -74,8 +74,8 @@ public class BossController : MonoBehaviour
             }
         };
 
-        routine = mainRoutine;
-        //routine = testRoutine;
+        //routine = mainRoutine;
+        routine = testRoutine;
 
         // Kick off the execution engine
         StartCoroutine(ExecuteQueue());
