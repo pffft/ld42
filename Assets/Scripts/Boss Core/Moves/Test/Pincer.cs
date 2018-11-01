@@ -13,9 +13,8 @@ namespace Moves.Test
         (
             () => {
                 //Debug.Log("Pincer sees player at: " + GameManager.Player.transform.position);
-                Debug.Log("Pincer called");
                 List<AISequence> sequences = new List<AISequence>();
-            ¸
+
                 float curveAmount =
                             -4f * // base
                             (float)speed * // turning radius is tighter when we go faster
@@ -33,7 +32,6 @@ namespace Moves.Test
 
         )
         {
-            Debug.Log("Pincer created");
             Description = "Shoots two projectiles with an offset of +/-" + offset + " degrees with speed " + speed;
         }
     }
