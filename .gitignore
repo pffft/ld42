@@ -69,4 +69,5 @@ crashlytics-build.properties
 
 # Remove DS_Store
 **/.DS_Store
+ProjectSettings/ProjectVersion.txt
 
