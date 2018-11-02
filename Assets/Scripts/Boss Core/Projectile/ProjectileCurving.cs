@@ -17,11 +17,6 @@ namespace Projectiles
         private readonly bool leavesTrail;
 
         public ProjectileCurving(float curveAmount, bool leavesTrail)
-            : this(GameManager.Boss.self, curveAmount, leavesTrail)
-        { }
-
-        public ProjectileCurving(Entity self, float curveAmount, bool leavesTrail)
-            : base(self)
         {
             this.curveAmount = curveAmount;
             this.leavesTrail = leavesTrail;
@@ -43,7 +38,7 @@ namespace Projectiles
                 if (component.currentTime > count / numSpawners)
                 {
                     count++;
-                    ProjectileComponent newComp = new Projectile(Entity)
+                    new Projectile
                     {
                         Start = component.transform.position,
                         MaxTime = MaxTime - component.currentTime,

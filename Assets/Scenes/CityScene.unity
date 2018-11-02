@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43856063, g: 0.48666787, b: 0.56694144, a: 1}
+  m_IndirectSpecularColor: {r: 0.438561, g: 0.4866684, b: 0.5669422, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -294,6 +294,16 @@ Prefab:
       propertyPath: Chill
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: self
+      value: 
+      objectReference: {fileID: 1409814815}
+    - target: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
+        type: 2}
+      propertyPath: insaneMode
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 2}
   m_IsPrefabAsset: 0
@@ -422,6 +432,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa51ae998d63f48eba266589ae521d17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1409814815 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114615383473035938, guid: f22ec206bc95d4d40953aa691a44ebd2,
+    type: 2}
+  m_PrefabInternal: {fileID: 822479260}
+  m_Script: {fileID: 11500000, guid: 70dae659e9d6bae4db41c2b2fc0b7d77, type: 3}
 --- !u!1001 &1507567307
 Prefab:
   m_ObjectHideFlags: 0

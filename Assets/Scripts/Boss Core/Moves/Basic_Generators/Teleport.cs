@@ -5,11 +5,18 @@ namespace Moves.Basic
 {
     public class Teleport : AISequence
     {
+        // A reference to the BossController's entity. Assigned when teleport is called.
+        private static CombatCore.Entity self = null;
+
         public Teleport(Vector3? target = null, int speed = 25) : base
         (
             () =>
             {
-                GameManager.Boss.self.movespeed.LockTo(speed);
+                if (self == null) {
+                    self = GameManager.Boss.GetComponent<CombatCore.Entity>();
+                }
+                self.movespeed.LockTo(speed);
+
                 if (target.HasValue)
                 {
                     GameManager.Boss.StartCoroutine(GameManager.Boss.Dash(target.Value));

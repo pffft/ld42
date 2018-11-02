@@ -20,16 +20,12 @@ namespace Projectiles
         // Was this projectile once close to the player?
         private bool wasClose;
 
-        public ProjectileHoming() : this(GameManager.Boss.self) { }
-
-        public ProjectileHoming(Entity self) : base(self) { }
-
         public override void CustomCreate(ProjectileComponent component)
         {
-            targetObject = component.data.Entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player.gameObject : GameManager.Boss.gameObject;
+            targetObject = GameManager.Player.gameObject; // TODO maybe make me a customizable parameter?
             wasClose = false;
             curDivergence = 0f;
-            homingScale = (float)component.data.Speed / 7f;
+            homingScale = (float)component.data.Speed / 7f; // maybe make this one customizable too
         }
 
         public override Material CustomMaterial() {

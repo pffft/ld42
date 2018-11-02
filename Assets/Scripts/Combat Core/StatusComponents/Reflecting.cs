@@ -23,6 +23,7 @@ namespace CombatCore.StatusComponents
 
 		public override void OnRevert(Entity subject)
 		{
+            /*
             for (int i = -hitsAbsorbed / 2; i <= hitsAbsorbed / 2; i++)
             {
                 //Projectile.spawnBasic(subject, subject.transform.position, subject.transform.forward, 2f, i * 30f, Speed.VERY_FAST);
@@ -34,6 +35,7 @@ namespace CombatCore.StatusComponents
                       AngleOffset = (i * 30f)
                 }.Create();
             }
+            */
 
 			subject.SetRooted (false);
 			subject.SetInvincible (false);

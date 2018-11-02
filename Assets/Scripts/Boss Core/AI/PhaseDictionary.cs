@@ -39,7 +39,7 @@ namespace AI
          * TODO: Add some form of progress indicator to this.
          */
         public static void Load() {
-            AISequence.ShouldAllowInstantiation = true;
+            //AISequence.ShouldAllowInstantiation = true;
 
             /*
             PHASE1 = new AIPhase()

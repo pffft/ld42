@@ -15,8 +15,6 @@ namespace Projectiles
 
     public class Projectile
     {
-        public Entity Entity { get; set; }
-
         public virtual ProxyVector3 Start { get; set; } = AI.AISequence.BOSS_POSITION;
         public virtual ProxyVector3 Target { get; set; } = AI.AISequence.DELAYED_PLAYER_POSITION;
         public virtual float AngleOffset { get; set; } = 0f;
@@ -43,17 +41,6 @@ namespace Projectiles
          * Called when the object hits the player
          */
         public ProjectileCallback OnDestroyCollision { get; set; } = CallbackDictionary.NOTHING;
-
-        #region Constructors
-
-        public Projectile() : this(GameManager.Boss.self) { }
-
-        public Projectile(Entity entity)
-        {
-            Entity = entity;
-        }
-
-        #endregion
 
         /// <summary>
         /// This method is called at the end of every Update() call. When overridden,

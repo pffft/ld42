@@ -41,9 +41,6 @@ namespace AOEs
         // Every AOE has the same material, for now. We cache it here.
         public static Material AOE_MATERIAL;
 
-        // Mostly so we know what side we're on.
-        public Entity Entity { get; set; }
-
         // internal. Tracks what triangles are on or off in the mesh
         public bool[] Regions { get; protected set; } = new bool[NUM_SECTIONS];
 
@@ -135,12 +132,8 @@ namespace AOEs
 
         #endregion
 
-        public AOE() : this(GameManager.Boss.self) { }
-
-        public AOE(Entity self)
+        public AOE()
         {
-            this.Entity = self;
-
             for (int i = 0; i < Regions.Length; i++)
             {
                 Regions[i] = false;
@@ -219,7 +212,7 @@ namespace AOEs
         {
             // Set up the gameobject
             GameObject obj = new GameObject();
-            obj.transform.position = Entity.transform.position;
+            obj.transform.position = Start.GetValue(); // TODO move this into initialization of AOEComponent
             obj.layer = LayerMask.NameToLayer("AOE");
             obj.name = "AOE";
             obj.SetActive(false); // hack so we can assign variables on init
