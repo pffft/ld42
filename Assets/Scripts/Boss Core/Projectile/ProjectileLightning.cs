@@ -16,11 +16,11 @@ namespace Projectiles
         private int count;
         private readonly int numSpawners = 30;
 
-        public ProjectileLightning(int level=0) : this(GameManager.Boss.self, level) { }
+        public ProjectileLightning() : this(0, 1f) { }
 
-        public ProjectileLightning(Entity self, int level) : this(self, level, 1f) { }
+        private ProjectileLightning(int level) : this(level, 1f) { }
 
-        private ProjectileLightning(Entity self, int level, float initialMaxTime) : base(self) 
+        private ProjectileLightning(int level, float initialMaxTime)
         {
             this.level = level;
             this.initialMaxTime = initialMaxTime;
@@ -105,7 +105,7 @@ namespace Projectiles
             return Merge(
                 For(times, i => 
                     new Moves.Basic.Shoot1(
-                        new ProjectileLightning(lightningSelf.Entity, lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.MaxTime)
+                        new ProjectileLightning(lightningSelf.level + 1, lightningSelf.initialMaxTime - lightningSelf.MaxTime)
                         {
                             Start = self.transform.position,
                             Target = lightningSelf.initialTarget,

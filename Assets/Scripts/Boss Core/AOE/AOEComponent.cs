@@ -116,7 +116,7 @@ namespace AOEs
         {
             GameObject otherObject = other.gameObject;
             Entity otherEntity = otherObject.GetComponent<Entity>();
-            if (otherEntity != null && !otherEntity.IsInvincible() && otherEntity.GetFaction() != data.Entity.GetFaction())
+            if (otherEntity != null && !otherEntity.IsInvincible() && otherEntity.GetFaction() != Entity.Faction.enemy)
             {
                 // Position relative to us; not absolute
                 Vector3 playerPositionFlat = new Vector3(other.transform.position.x - transform.position.x, 0f, other.transform.position.z - transform.position.z);
@@ -149,7 +149,8 @@ namespace AOEs
 
                 if (data.Regions[section])
                 {
-                    Entity.DamageEntity(otherEntity, data.Entity, data.Damage);
+                    // Note: we pass in a null entity; callbacks might break
+                    Entity.DamageEntity(otherEntity, null, data.Damage);
                 }
             }
         }

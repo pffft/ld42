@@ -6,7 +6,7 @@ namespace AI
 {
     public class AIRoutine 
     {
-        public List<AIPhase> Phases { get; private set; }
+        public List<AIPhase> Phases { get; protected set; }
         public AIPhase CurrentPhase
         {
             get
@@ -18,6 +18,7 @@ namespace AI
 
         public AIRoutine() {
             Phases = new List<AIPhase>();
+            //AISequence.ShouldAllowInstantiation = true;
         }
 
         public AIPhase NextPhase() {

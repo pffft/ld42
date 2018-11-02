@@ -14,7 +14,7 @@ namespace Projectiles
 
         public static ProjectileCallback FREEZE = self =>
             new Shoot1(
-                new Projectile(self.data.Entity)
+                new Projectile
                 {
                     Start = self.transform.position,
                     MaxTime = 5f,
@@ -24,7 +24,7 @@ namespace Projectiles
 
         public static ProjectileCallback SPAWN_6_CURVING = self =>
             ForConcurrent(6, i => new Shoot1(
-                new ProjectileCurving(self.data.Entity, (float)self.data.Speed * 2f, true)
+                new ProjectileCurving((float)self.data.Speed * 2f, true)
                 {
                     Start = self.transform.position,
                     Target = self.data.Velocity,
@@ -35,7 +35,7 @@ namespace Projectiles
 
         public static ProjectileCallback SPAWN_6 = self =>
             ForConcurrent(6, i => new Shoot1(
-                new ProjectileCurving(self.data.Entity, 0f, true)
+                new ProjectileCurving(0f, true)
                 {
                     Start = self.transform.position,
                     Target = self.data.Velocity,
@@ -46,11 +46,11 @@ namespace Projectiles
 
         // Spawns a wave at the death position.
         public static ProjectileCallback SPAWN_WAVE = self =>
-            new ShootAOE(new AOEs.AOE(self.data.Entity) { Start = self.transform.position }.On(0, 360f));
+            new ShootAOE(new AOEs.AOE { Start = self.transform.position }.On(0, 360f));
         
         public static ProjectileCallback SPAWN_1_TOWARDS_PLAYER = self =>
             new Shoot1(
-                new Projectile(self.data.Entity)
+                new Projectile
                 {
                     Start = self.transform.position,
                     MaxTime = self.data.MaxTime,
@@ -60,7 +60,7 @@ namespace Projectiles
 
         public static ProjectileCallback SPAWN_1_HOMING_TOWARDS_PLAYER = self =>
             new Shoot1(
-                new ProjectileHoming(self.data.Entity)
+                new ProjectileHoming
                 {
                     Start = self.transform.position,
                     MaxTime = self.data.MaxTime,
@@ -71,7 +71,7 @@ namespace Projectiles
 
         public static ProjectileCallback REVERSE = (self) =>
             new Shoot1(
-                new Projectile(self.data.Entity)
+                new Projectile
                 {
                     Start = self.transform.position,
                     Target = self.data.Start,
@@ -92,7 +92,7 @@ namespace Projectiles
             Speed nextSpeed = speeds[System.Array.IndexOf(speeds, currentSpeed) + 1];
 
             return new Shoot1(
-                new Projectile(self.data.Entity)
+                new Projectile
                 {
                     Start = self.transform.position,
                     Target = self.data.Start,

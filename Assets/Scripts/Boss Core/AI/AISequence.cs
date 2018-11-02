@@ -24,8 +24,12 @@ namespace AI
         /// Should we allow new AISequences to be generated? This is false by default; when
         /// we are ready to load in the sequence dictionaries, we set this to true. This will
         /// catch floating AISequence declarations at runtime.
+        /// 
+        /// TODO: Make a better way to toggle this value. Currently this is true when loading in routines/phases,
+        /// and when generating projectile/AOE callbacks. This means the logic for setting it to false is somewhat complex.
+        /// Is it really so bad to let people put AISequences wherever they want?
         /// </summary>
-        public static bool ShouldAllowInstantiation = false;
+        public static bool ShouldAllowInstantiation = true;
 
         private static void CheckAllowInstantiation()
         {
@@ -37,10 +41,14 @@ namespace AI
 
         // TODO put these in a publically accessable location. Possibly in world or game manager.
         public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
-        public static ProxyVector3 DELAYED_PLAYER_POSITION = new ProxyVector3(() =>
-        {
-            return GameManager.Boss.isPlayerLocked ? GameManager.Boss.playerLockPosition : GameManager.Player.transform.position + World.Arena.CENTER;
-        });
+
+        /// <summary>
+        /// Grabs the delayed player position. If the "PlayerLock" move is locked on, then
+        /// this will return the player position at the time the move was run. Otherwise, this
+        /// returns the same value as PLAYER_POSITION.
+        /// <see cref="Moves.Basic.PlayerLock"/>
+        /// </summary>
+        public static ProxyVector3 DELAYED_PLAYER_POSITION = Moves.Basic.PlayerLock._delayed_player_position;
         public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position; });
         public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>
         {
