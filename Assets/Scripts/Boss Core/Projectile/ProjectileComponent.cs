@@ -12,6 +12,9 @@ namespace Projectiles {
         // The data representing this component's specific appearance and behavior.
         public Projectile data;
 
+        public Vector3 Start;
+        public Vector3 Target;
+
         // Some cached GameObject values for increased performance.
         private Transform trans;
         private MeshRenderer rend;
@@ -42,8 +45,8 @@ namespace Projectiles {
         {
             // Resolve the proxy variables for start and target
             // This also "locks" them so they don't keep updating.
-            data.Start = data.Start.GetValue();
-            data.Target = data.Target.GetValue();
+            Start = data.Start.GetValue();
+            Target = data.Target.GetValue();
 
             // Sets size (and assigns default material, if none set)
             gameObject.transform.localScale = SizeToScale(data.Size) * Vector3.one;
@@ -77,8 +80,8 @@ namespace Projectiles {
             // Computes the starting position, rotation, and velocity.
 
             // Remove any height from the start and target vectors
-            Vector3 topDownSpawn = new Vector3(data.Start.x, 0, data.Start.z);
-            Vector3 topDownTarget = new Vector3(data.Target.x, 0, data.Target.z);
+            Vector3 topDownSpawn = new Vector3(Start.x, 0, Start.z);
+            Vector3 topDownTarget = new Vector3(Target.x, 0, Target.z);
 
             // Add in rotation offset from the angleOffset parameter
             Quaternion offset = Quaternion.AngleAxis(data.AngleOffset, Vector3.up);
@@ -87,7 +90,7 @@ namespace Projectiles {
             // TODO update this to be rotation around the up axis to fix 180 degree bug
             Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
 
-            this.gameObject.transform.position = (Vector3)data.Start;
+            this.gameObject.transform.position = (Vector3)Start;
             this.gameObject.transform.rotation = rotation;
             //this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
             this.data.Velocity = rotation * (Vector3.forward * (float)data.Speed);

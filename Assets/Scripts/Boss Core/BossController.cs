@@ -37,7 +37,9 @@ public class BossController : MonoBehaviour
         Tutorial,
         //Main,
         Test,
+        TestLatest,
         //UnitTest
+        Unsorted,
     }
     [SerializeField]
     private _Routine Routine = _Routine.Tutorial;
@@ -59,6 +61,8 @@ public class BossController : MonoBehaviour
         //AIPhase.Load();
         Profiler.EndSample();
 
+        
+
         //AISequence.ShouldAllowInstantiation = true;
         switch (Routine) {
             case _Routine.Tutorial:
@@ -66,6 +70,12 @@ public class BossController : MonoBehaviour
                 break;
             case _Routine.Test:
                 routine = new Routines.Test();
+                break;
+            case _Routine.TestLatest:
+                routine = new Routines.TestLatest();
+                break;
+            case _Routine.Unsorted:
+                routine = new Routines.Unsorted();
                 break;
         }
         //AISequence.ShouldAllowInstantiation = false;
@@ -78,8 +88,12 @@ public class BossController : MonoBehaviour
     /*
      * Transitions to the next phase by loading in the next set of moves.
      */
-    public void NextPhase() {
+    public void NextPhase()
+    {
+        Debug.Log("Next phase");
         queuedSequences.Clear();
+        StopAllCoroutines();
+        StartCoroutine(ExecuteQueue());
 
         routine.NextPhase();
 
@@ -96,21 +110,17 @@ public class BossController : MonoBehaviour
             Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
             Add(new AISequence(() => { self.SetInvincible(false); }));
         }
+        Debug.Log("Queue length: " + queuedSequences.Count);
     }
 
     public void ResetBoss()
     {
         // Flush the execution engine
-        // TODO: this might need more work to flush current attack.
         running = false;
-        StopCoroutine("Dash");
-        StopCoroutine("Glare");
-        StopCoroutine("Execute");
-        StopCoroutine("ExecuteQueue");
-        StopCoroutine("ExecuteAsync");
+        StopAllCoroutines();
         queuedSequences.Clear();
 
-        // Reset the routine and restart it
+        // Reset the routine and restart it from the first phase
         routine.Reset();
 
         // Restart the execution engine
@@ -123,6 +133,7 @@ public class BossController : MonoBehaviour
     private void Add(AISequence sequence)
     {
         // Debug mode provides additional information when executing an event.
+        // TODO: possibly move this into a static analysis done when loading in an AIPhase/AIRoutine.
         if (GameManager.Boss.DebugMode)
         {
             if (sequence == null)
@@ -131,22 +142,51 @@ public class BossController : MonoBehaviour
                 return;
             }
 
-            // Generate warning if there's a named sequence without a description.
+            // "glue" AISequences are special: AISequences followed by "Then" or "Wait" 
+            // won't have descriptions, but can be identified by being direct instances
+            // of the "AISequence" class (vs. subclasses for every other move).
             //
-            // Note that "glue" AISequences are allowed; those that don't subclass AISequence 
-            // don't need to provide a description. This includes subclassed AISequences that
-            // have additional Wait()s or Then()s called.
-            if (sequence.Description == null && !sequence.Name.Equals("AISequence"))
+            // These guys don't need to have a valid difficulty or description.
+            bool isGlueSequence = sequence.Name.Equals("AISequence");
+
+            // Warn about unnamed sequences. By default, this shouldn't be called; the standard name is valid.
+            if (sequence.Name == null) 
+            {
+                Debug.LogWarning("Found AISequence without a name. Description: " + sequence.Description ?? "not provided.");
+            }
+
+            // Warn if there's a named sequence without a description.
+            //
+            if (sequence.Description == null && !isGlueSequence)
             {
                 Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
             }
 
-            // Generate warning if there's a sequence with too high a difficulty.
-            if (sequence.Difficulty >= 8f)
+            // Warn about default descriptions.
+            if (sequence.Description != null && sequence.Description.Equals("Your description here")) 
             {
-                Debug.LogWarning("Found AISequence \"" + sequence.Name + "\" with very high difficulty: " + sequence.Difficulty + ". ");
+                Debug.LogWarning("Found AISequence with default description. Name: " + sequence.Name);
             }
 
+            // Warn if there's a sequence with too high a difficulty.
+            if (sequence.Difficulty >= 8f)
+            {
+                Debug.LogWarning("Found AISequence with very high difficulty (" + sequence.Difficulty + "). Name: " + sequence.Name);
+            }
+
+            // Warn about default difficulty (-1). Glue sequences can ignore this.
+            if (Mathf.Abs(sequence.Difficulty - -1) < 0.01f && !isGlueSequence) 
+            {
+                Debug.LogWarning("Found AISequence with default difficulty (-1). Name: " + sequence.Name);
+            }
+
+            // Warn about invalid difficulty (<= 0). Glue sequences can ignore this.
+            if (sequence.Difficulty <= 0f && !isGlueSequence) 
+            {
+                Debug.LogWarning("Found AISequence with invalid difficulty (<= 0). Name: " + sequence.Name);
+            }
+
+            // If we (finally) get to the end and still have a valid sequence, then we print out what it does.
             Debug.Log("Added AISequence" +
                       (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") +
                       "to queue. Here's what it says it'll do: \"" +

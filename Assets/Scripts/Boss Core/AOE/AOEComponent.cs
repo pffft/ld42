@@ -11,16 +11,19 @@ namespace AOEs
         // A reference containing the data we'll be using.
         public AOE data;
 
+        private Vector3 Start;
+        private Vector3 Target;
+
         // Initialize values to the latest ones- start and target, if null, should
         // be set to the live boss/player positions.
         public void Awake()
         {
-            data.Start = data.Start.GetValue();
-            data.Target = data.Target.GetValue();
+            Start = data.Start.GetValue();
+            Target = data.Target.GetValue();
 
             // Remove any height from the start and target vectors
-            Vector3 topDownSpawn = new Vector3(data.Start.x, 0, data.Start.z);
-            Vector3 topDownTarget = new Vector3(data.Target.x, 0, data.Target.z);
+            Vector3 topDownSpawn = new Vector3(Start.x, 0, Start.z);
+            Vector3 topDownTarget = new Vector3(Target.x, 0, Target.z);
 
             float degrees = Vector3.Angle(Vector3.forward, topDownTarget - topDownSpawn);
             if (topDownTarget.x < topDownSpawn.x)

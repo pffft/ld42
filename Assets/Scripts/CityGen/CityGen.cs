@@ -14,6 +14,9 @@ public class CityGen : MonoBehaviour {
     public float scale = 1f;
     private Vector3 offset = new Vector3(50, 0, 50);
 
+    public int Depth = 28;
+    public int MaxWidth = 8;
+
 	// Use this for initialization
 	void Start () {
         arenaObjPrefab = Resources.Load<GameObject>("Models/City_Roundabout_Arena");
@@ -27,16 +30,16 @@ public class CityGen : MonoBehaviour {
         initialTransforms.Add(arenaBlock.transform);
         //GameObject.Instantiate(blockPrefab, Vector3.zero, Quaternion.identity);
 
-        for (int depth = -1; depth < 28; depth++)
+        for (int depth = -1; depth < Depth; depth++)
         {
-            float maxWidth = Mathf.Max(8, scale * depth);
+            float maxWidth = Mathf.Max(MaxWidth, scale * depth);
             for (int width = (int)(-maxWidth); width <= maxWidth; width++)
             {
                 if ((width == -1 || width == 0) && (depth == -1 || depth == 0))
                 {
                     continue;
                 }
-                GameObject newObj = GameObject.Instantiate(blockPrefab, offset + new Vector3(100f * width, 0f, 100f * depth), Quaternion.AngleAxis(Random.Range(0, 3) * 90f, Vector3.up));
+                GameObject newObj = GameObject.Instantiate(blockPrefab, offset + new Vector3(200f * width, 0f, 200f * depth), Quaternion.AngleAxis(Random.Range(0, 3) * 90f, Vector3.up));
                 initialTransforms.Add(newObj.transform);
             }
         }
@@ -44,7 +47,7 @@ public class CityGen : MonoBehaviour {
         MoveDown();
 	}
 
-    private Vector3 finalOffset = new Vector3(0, -250, 0);
+    private Vector3 finalOffset = new Vector3(0, -1000, 0);
     bool shouldMove = true;
     private float currTime = 0f;
     private float maxTime = 5f;

@@ -53,7 +53,11 @@ namespace World
 			{
                 ARENA_SCALE = value;
                 maxArea = ARENA_SCALE * ARENA_SCALE / DEFAULT_ARENA_SCALE / DEFAULT_ARENA_SCALE * Mathf.PI;
-                StartCoroutine(ChangeArenaSize(GameManager.Player.GetComponent<Entity>().HealthPerc * maxArea));
+                if (GameManager.Player.GetComponent<Entity>())
+                {
+                    StartCoroutine(ChangeArenaSize(GameManager.Player.GetComponent<Entity>().HealthPerc * maxArea));
+                }
+
 			}
         }
 
@@ -63,14 +67,23 @@ namespace World
 			transform.localScale = Vector3.one * maxRadius;
 			maxArea = Mathf.PI * maxRadius * maxRadius;
 
-            if(GameManager.Player != null)
-                GameManager.Player.GetComponent<Entity>().tookDamage += OnPlayerDamageTaken;
+            if (GameManager.Player != null)
+            {
+                if (GameManager.Player.GetComponent<Entity>() != null)
+                {
+                    GameManager.Player.GetComponent<Entity>().tookDamage += OnPlayerDamageTaken;
+                }
+            }
 		}
 
 		public void OnDestroy()
 		{
-			if (GameManager.Player != null)
-                GameManager.Player.GetComponent<Entity>().tookDamage -= OnPlayerDamageTaken;
+            if (GameManager.Player != null)
+            {
+                if (GameManager.Player.GetComponent<Entity>() != null) {
+                    GameManager.Player.GetComponent<Entity>().tookDamage -= OnPlayerDamageTaken;
+                }
+            }
 		}
 
 		public void Update()
