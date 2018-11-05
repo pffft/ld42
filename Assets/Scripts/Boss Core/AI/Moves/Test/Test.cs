@@ -15,20 +15,8 @@ namespace Moves.Test
     {
         public Test() : base
         (
-            //Pause(1f),
-            For(10, i =>
-                Merge(
-                    new Shoot1(new Projectile { AngleOffset = 15 + (6 * i) }).Wait(0.05f),
-                    new Shoot1(new Projectile { AngleOffset = -15 - (6 * i) }).Wait(0.05f)
-                )
-            ),
-            For(10, i =>
-                Merge(
-                    new Shoot1(new Projectile { AngleOffset = 75 - (6 * i) }).Wait(0.05f),
-                    new Shoot1(new Projectile { AngleOffset = -75 + (6 * i) }).Wait(0.05f)
-                )
-            ),
-            new ShootAOE(new AOE { FixedWidth = 3f }.On(-60, 60))
+            //new Shoot1(new Projectile { Target = LEADING_PLAYER_POSITION, Speed = Speed.VERY_FAST }).Wait(0.5f)
+            new Shoot1(new ProjectileHoming(difficulty: 1) { Speed = Speed.VERY_FAST }).Wait(0.1f)
         )
         {
         }

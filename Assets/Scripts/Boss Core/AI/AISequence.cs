@@ -49,6 +49,32 @@ namespace AI
         /// <see cref="Moves.Basic.PlayerLock"/>
         /// </summary>
         public static ProxyVector3 DELAYED_PLAYER_POSITION = Moves.Basic.PlayerLock._delayed_player_position;
+
+        // Experimental. Leads ahead of the player based on their current velocity and distance from boss.
+        // This is quite realtime, but can be jittery as a result.
+        public static ProxyVector3 LEADING_PLAYER_POSITION = new ProxyVector3(() => {
+            float distance = (GameManager.Boss.transform.position - GameManager.Player.transform.position).magnitude;
+            //Vector3 offset = (distance / 2f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized);
+            Vector3 offset = 1f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized;
+
+            return PLAYER_POSITION.GetValue() + offset;
+        });
+
+        // Smooths the value of LEADING_PLAYER_POSITION using two samples over time.
+        // This is less "realtime", but provides a smoother tracking.
+        private static Vector3 last_lead = Vector3.zero;
+        private static Vector3 curr_lead = Vector3.zero;
+        public static ProxyVector3 SMOOTHED_LEADING_PLAYER_POSITION = new ProxyVector3(() =>
+        {
+            Vector3 raw_value = LEADING_PLAYER_POSITION.GetValue();
+
+            last_lead = curr_lead;
+            curr_lead = raw_value;
+
+            return (last_lead + curr_lead) / 2.0f;
+
+        });
+
         public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position; });
         public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>
         {

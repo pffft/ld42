@@ -12,8 +12,8 @@ namespace Projectiles {
         // The data representing this component's specific appearance and behavior.
         public Projectile data;
 
-        private Vector3 Start;
-        private Vector3 Target;
+        public Vector3 Start;
+        public Vector3 Target;
 
         // Some cached GameObject values for increased performance.
         private Transform trans;

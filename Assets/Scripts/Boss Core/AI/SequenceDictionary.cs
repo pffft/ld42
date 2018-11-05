@@ -51,43 +51,6 @@ namespace AI
         //    LINE_CIRCLE_STRAFE_60.Times(6)
         //);
 
-        //public static AISequence FOUR_WAY_SWEEP_WITH_HOMING = new AISequence(6, () =>
-        //{
-        //    List<AISequence> sequences = new List<AISequence>();
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        for (int j = 0; j < 7; j++)
-        //        {
-        //            sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * 6f).Size(Size.MEDIUM)).Wait(0.1f));
-        //        }
-        //        sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
-        //        for (int j = 7; j < 15; j++)
-        //        {
-        //            sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * 6f).Size(Size.MEDIUM)).Wait(0.1f));
-        //        }
-        //        sequences.Add(AOE_360);
-        //    }
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        for (int j = 0; j < 5; j++)
-        //        {
-        //            sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f).Size(Size.MEDIUM)).Wait(0.1f));
-        //        }
-        //        sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
-        //        for (int j = 5; j < 10; j++)
-        //        {
-        //            sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f).Size(Size.MEDIUM)).Wait(0.1f));
-        //        }
-        //        sequences.Add(Shoot1(New(self).Size(Size.LARGE).Homing()));
-        //        for (int j = 10; j < 15; j++)
-        //        {
-        //            sequences.Add(ShootArc(4, skeleton: New(self).Target(Vector3.forward).AngleOffset(j * -6f).Size(Size.MEDIUM)).Wait(0.1f));
-        //        }
-        //        sequences.Add(AOE_360);
-        //    }
-        //    return sequences.ToArray();
-        //});
-
         //public static AISequence SWEEP_BACK_AND_FORTH_MEDIUM = new AISequence(
         //    5.5f,
         //    Teleport().Wait(0.25f),

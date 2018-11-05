@@ -17,7 +17,7 @@ namespace Moves.Unsorted
             ForConcurrent(6, i => 
                 new Shoot1(
                     new ProjectileCurving((float)Speed.MEDIUM * (clockwise ? 1 : -1) * 2f, true) { 
-                        MaxTime = 5f, AngleOffset = offset + ((clockwise ? 1 : -1) * i * 60f)
+                        MaxTime = 3f, AngleOffset = offset + ((clockwise ? 1 : -1) * i * 60f)
                     }
                 )
             )

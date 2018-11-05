@@ -20,6 +20,15 @@ namespace Projectiles
         // Was this projectile once close to the player?
         private bool wasClose;
 
+        private int difficulty;
+
+        public ProjectileHoming(int difficulty=0) {
+            this.difficulty = difficulty;
+            if (difficulty == 1) {
+                Target = AI.AISequence.SMOOTHED_LEADING_PLAYER_POSITION;
+            }
+        }
+
         public override void CustomCreate(ProjectileComponent component)
         {
             targetObject = GameManager.Player.gameObject; // TODO maybe make me a customizable parameter?
@@ -33,10 +42,17 @@ namespace Projectiles
         }
         
         public override void CustomUpdate(ProjectileComponent component) {
-            Vector3 idealVelocity = ((float)Speed) * (targetObject.transform.position - component.transform.position).normalized;
+            switch (difficulty) {
+                case 0: HomingLevel0(component); break;
+                case 1: HomingLevel0(component); break;
+            }
+        }
+
+        private void HomingLevel0(ProjectileComponent component) {
+            Vector3 idealVelocity = ((float)Speed) * (Target.GetValue() - component.transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, Velocity, Vector3.up);
 
-            float distance = Vector3.Distance(targetObject.transform.position, component.transform.position);
+            float distance = Vector3.Distance(Target.GetValue(), component.transform.position);
 
             if (!wasClose && distance < 10f)
             {
