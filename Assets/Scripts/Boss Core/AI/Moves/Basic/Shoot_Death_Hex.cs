@@ -13,9 +13,9 @@ namespace Moves.Basic
 {
 	public class Shoot_Death_Hex : AISequence 
 	{
-		public Shoot_Death_Hex() : base
+		public Shoot_Death_Hex(float maxTime = 1f) : base
 		(
-            new Shoot1(new ProjectileDeathHex()).Wait(1f)
+            new Shoot1(new ProjectileDeathHex() { MaxTime = maxTime }).Wait(1f)
 		)
 		{
 			Description = "Shoots a high-damage projectile that splits into 6 curving projectiles with trails.";

@@ -8,6 +8,7 @@ using BossCore;
 using Moves.Basic;
 using Projectiles;
 
+// TODO unfinished
 namespace Moves.Test 
 {
 	public class Horseshoe_AOE : AISequence 

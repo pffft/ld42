@@ -18,15 +18,6 @@ namespace AI
     public partial class AISequence
     {
 
-        //public static Move DASH_TEST = new Move(
-        //    8f,
-        //    "DASH_TEST",
-        //    "Aggressively tests dashing.",
-        //    new AISequence(() => {
-        //        return ShootAOE(AOE.New(self).Start(GameManager.Player.transform.position).On(0, 360f).Speed(Speed.FAST).FixedWidth(2f)).Wait(0.75f);
-        //    })
-        //);
-
         //#region Building Block Sequences
 
         //public static AISequence LINE_CIRCLE_STRAFE_60 = new AISequence(
@@ -43,61 +34,6 @@ namespace AI
 
         //#region Full Moveset Sequences
 
-        ///*
-        // * 40 basic bullets, with a 360 wave at the start, middle, and end.
-        // */
-        //public static Move SHOOT3_WAVE3 = new Move(
-        //    3, 
-        //    "SHOOT3_WAVE3",
-        //    "40 basic bullets, with a 360 wave at the start, middle, and end.",
-        //    new AISequence(
-        //        Teleport().Wait(0.5f),
-        //        AOE_360,
-        //        Shoot3().Wait(0.1f).Times(20),
-        //        AOE_360,
-        //        Shoot3().Wait(0.1f).Times(20),
-        //        AOE_360.Wait(0.5f)
-        //    )
-        //);
-
-        //public static Move HEX_CURVE_INTRO = new Move(
-        //    4,
-        //    "HEX_CURVE_INTRO",
-        //    "Introduces the player to the hex curve attack",
-        //    new AISequence(
-        //        ShootHexCurve(true),
-        //        AOE_360.Wait(2.5f),
-        //        ShootHexCurve(false),
-        //        AOE_360.Wait(2.5f),
-        //        ShootHexCurve(true),
-        //        AOE_360,
-        //        ShootHexCurve(false).Wait(1f),
-        //        AOE_360.Wait(1f),
-        //        AOE_360.Wait(1.5f),
-        //        Teleport().Wait(0.5f)
-        //    )
-        //);
-
-        //public static AISequence BIG_HOMING_STRAFE = new AISequence(
-        //    CameraMove(false, new Vector3(0, 17.5f, -35f)).Wait(1f),
-        //    Teleport(NORTH_FAR).Wait(1f),
-        //    ShootHomingStrafe(strafeAmount: 65).Times(10),
-        //    Teleport(NORTH_FAR).Wait(1f),
-        //    ShootHomingStrafe(strafeAmount: 15).Times(15),
-        //    CameraMove(true).Wait(2f)
-        //);
-
-        //public static AISequence DOUBLE_HEX_CURVE = new AISequence(
-        //    Teleport(CENTER).Wait(1.5f),
-        //    PlayerLock(true),
-        //    ShootHexCurve(true),
-        //    AOE_360.Wait(0.5f),
-        //    ShootHexCurve(true, New(self).AngleOffset(30f)).Wait(0.5f),
-        //    AOE_360.Wait(1f),
-        //    AOE_360.Wait(1f),
-        //    PlayerLock(false)
-        //);
-
         //public static AISequence HOMING_STRAFE_WAVE_SHOOT = new Move(
         //    5.5f,
         //    "HOMING_STRAFE_WAVE_SHOOT",
@@ -107,73 +43,6 @@ namespace AI
         //        ShootHomingStrafe(strafeAmount: 15).Wait(0.01f).Times(15).Wait(0.3f), // This is hard; adding wait is reasonable
         //        SHOOT_2_WAVES.Times(2)
         //    )
-        //);
-
-        ///*
-        // * A really intricate pattern. 6 projectiles that explode into 6 more projectiles,
-        // * repeated twice to forme a lattice. Safe spot is a midpoint between any two of
-        // * the first projectiles, near the far edge of the arena.
-        // * 
-        // * ** This might have changed due to the way ShootDeathHex was implemented.
-        // */
-        //public static AISequence DEATH_HEX = new AISequence(
-        //    9, 
-        //    Teleport(CENTER).Wait(0.5f),
-        //    ShootDeathHex(2f).Wait(1f),
-        //    ShootDeathHex(1f).Wait(2f),
-        //    ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(1f),
-        //    ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(1f),
-        //    ShootArc(skeleton: New(self).MaxTime(0.25f)).Wait(0.75f)
-        //);
-
-        ///*
-        // * Fires six slow circles around the arena in a circular pattern.
-        // * Then repeats twice, with lines appearing on the left and right sides.
-        // */
-        //public static AISequence WAVE_CIRCLE = new AISequence(5, 
-        //    Teleport(WEST_MED),
-        //    SLOW_WAVE_CIRCLE.Times(6),
-        //    SLOW_WAVE_CIRCLE.Times(3),
-        //    ShootLine(50, 75f, Vector3.left, Speed.MEDIUM_SLOW),
-        //    SLOW_WAVE_CIRCLE.Times(3),
-        //    ShootLine(50, 75f, Vector3.right, Speed.MEDIUM_SLOW),
-        //    SLOW_WAVE_CIRCLE.Times(3),
-        //    ShootLine(50, 75f, Vector3.left, Speed.MEDIUM_SLOW),
-        //    SLOW_WAVE_CIRCLE.Times(3),
-        //    ShootLine(50, 75f, Vector3.right, Speed.MEDIUM_SLOW)
-        //);
-
-        //public static AISequence JUMP_ROPE_FAST = new AISequence(
-        //    4, 
-        //    CameraMove(false, new Vector3(0, 17.5f, -35)).Wait(1f),
-        //    Teleport(WEST_FAR, 35),
-        //    ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
-        //    Teleport(EAST_FAR, 35),
-        //    ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
-        //    Teleport(WEST_FAR, 35),
-        //    ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
-        //    Teleport(EAST_FAR, 35),
-        //    ShootLine(50, 100f, speed: Speed.SNIPE).Times(2),
-        //    CameraMove(true)
-        //);
-
-        //public static AISequence DOUBLE_HEX_CURVE_HARD = new AISequence(
-        //    10, 
-        //    Teleport(CENTER).Wait(1f),
-        //    ShootHexCurve(true, New(self).AngleOffset(0f)).Wait(0.5f),
-        //    ShootHexCurve(true, New(self).AngleOffset(30f)),
-        //    SHOOT3_WAVE3,
-        //    Teleport(CENTER),
-        //    ShootHexCurve(false, New(self).AngleOffset(0f)),
-        //    ShootHexCurve(false, New(self).AngleOffset(30f)),
-        //    // This homing might be too hard; especially with this amount of 360s.
-        //    Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(10),
-        //    AOE_360,
-        //    Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
-        //    AOE_360,
-        //    Shoot3(New(self).Size(Size.MEDIUM).Homing()).Wait(0.1f).Times(5),
-        //    AOE_360.Wait(0.5f),
-        //    AOE_360.Wait(0.5f)
         //);
 
         //public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5f, 
