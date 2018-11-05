@@ -14,6 +14,7 @@ namespace Moves.Unsorted
     {
         public Four_Way_Sweep_With_Homing() : base
         (
+            // TODO refactor me to use standard notation
             () => {
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = 0; i < 4; i++)

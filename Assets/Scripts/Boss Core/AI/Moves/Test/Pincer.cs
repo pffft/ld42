@@ -11,6 +11,8 @@ namespace Moves.Test
     {
         public Pincer(float offset=0f, Speed speed=Speed.SNIPE) : base
         (
+            // TODO add variable storage or something to simplify this down.
+            // Maybe an instance variable?
             () => {
                 //Debug.Log("Pincer sees player at: " + GameManager.Player.transform.position);
                 List<AISequence> sequences = new List<AISequence>();
