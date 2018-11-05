@@ -30,6 +30,7 @@ public class BossController : MonoBehaviour
     private Queue<AISequence> queuedSequences;
     private bool paused;
     private bool running = true;
+    private bool shouldCancelCurrent = false;
 
     #region Debugging code that should be refactored soon™
     // Debug code. Used to set the routine from the inspector rather than changing code.
@@ -78,8 +79,12 @@ public class BossController : MonoBehaviour
     /*
      * Transitions to the next phase by loading in the next set of moves.
      */
-    public void NextPhase() {
+    public void NextPhase()
+    {
+        Debug.Log("Next phase");
         queuedSequences.Clear();
+        StopAllCoroutines();
+        StartCoroutine(ExecuteQueue());
 
         routine.NextPhase();
 
@@ -96,6 +101,7 @@ public class BossController : MonoBehaviour
             Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
             Add(new AISequence(() => { self.SetInvincible(false); }));
         }
+        Debug.Log("Queue length: " + queuedSequences.Count);
     }
 
     public void ResetBoss()
@@ -103,11 +109,7 @@ public class BossController : MonoBehaviour
         // Flush the execution engine
         // TODO: this might need more work to flush current attack.
         running = false;
-        StopCoroutine("Dash");
-        StopCoroutine("Glare");
-        StopCoroutine("Execute");
-        StopCoroutine("ExecuteQueue");
-        StopCoroutine("ExecuteAsync");
+        StopAllCoroutines();
         queuedSequences.Clear();
 
         // Reset the routine and restart it
@@ -204,6 +206,12 @@ public class BossController : MonoBehaviour
     /// <param name="sequence">The sequence to be executed.</param>
     private IEnumerator Execute(AISequence sequence)
     {
+        Debug.Log("Executing " + sequence.Name);
+        if (shouldCancelCurrent)
+        {
+            yield return null;
+        }
+
         if (sequence.events != null)
         {
             for (int i = 0; i < sequence.events.Length; i++)

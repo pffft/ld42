@@ -15,7 +15,9 @@ namespace Moves.Tutorial2
         public Force_Block() : base
         (
             new Teleport().Wait(0.25f),
+            new PlayerLock(true),
             new ShootArc(100, -90, 90, new Projectile { Size = Size.TINY }).Wait(0.1f).Times(10),
+            new PlayerLock(false),
             new Pause(4f)
         )
         {

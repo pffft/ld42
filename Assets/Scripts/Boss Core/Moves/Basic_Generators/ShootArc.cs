@@ -28,6 +28,7 @@ namespace Moves.Basic
                 {
                     Projectile newStruc = clone.Clone();
                     newStruc.AngleOffset = newStruc.AngleOffset + i;
+                UnityEngine.Debug.Log("Target: " + newStruc.Target.GetValue());
                     newStruc.Create();
                 }
                 //long time = System.DateTime.Now.Ticks - start;
