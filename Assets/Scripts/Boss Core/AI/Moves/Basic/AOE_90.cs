@@ -8,15 +8,13 @@ using static BossController;
 
 namespace Moves.Basic
 {
-    public class AOE_90 : AISequence
+    public class AOE_90 : Move
     {
-        public AOE_90() : base
-        (
-            new ShootAOE(new AOE { FixedWidth = 3f }.On(-45, 45))
-        ) 
+        public AOE_90()
         {
             Description = "Shoots a 90 degree wide AOE at the player.";
             Difficulty = 1f;
+            Sequence = new ShootAOE(new AOE { FixedWidth = 3f }.On(-45, 45));
         }
     }
 }

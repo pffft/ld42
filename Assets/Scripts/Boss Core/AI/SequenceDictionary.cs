@@ -34,95 +34,10 @@ namespace AI
 
         //#region Full Moveset Sequences
 
-        //public static AISequence HOMING_STRAFE_WAVE_SHOOT = new Move(
-        //    5.5f,
-        //    "HOMING_STRAFE_WAVE_SHOOT",
-        //    "Does a homing strafe, followed by two shoot_2_waves.",
-        //    new AISequence(
-        //        Teleport().Wait(0.2f),
-        //        ShootHomingStrafe(strafeAmount: 15).Wait(0.01f).Times(15).Wait(0.3f), // This is hard; adding wait is reasonable
-        //        SHOOT_2_WAVES.Times(2)
-        //    )
-        //);
-
         //public static AISequence JUMP_ROPE_SLOW_CIRCLES = new AISequence(5.5f, 
         //    Teleport(WEST_FAR),
         //    LINE_STRAFE_60.Times(6),
         //    LINE_CIRCLE_STRAFE_60.Times(6)
-        //);
-
-        //public static AISequence WAVE_REVERSE_TARGET = new AISequence(
-        //    5,
-        //    new AISequence(() =>
-        //    {
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            Projectile
-        //                .New(self)
-        //                .Speed(Speed.FAST)
-        //                .Size(Size.MEDIUM)
-        //                .MaxTime(1f)
-        //                .AngleOffset(i * (360f / 50f))
-        //                .OnDestroyTimeout(CallbackDictionary.SPAWN_1_TOWARDS_PLAYER)
-        //                .Create();
-        //        }
-        //    }).Wait(2f)
-        //);
-
-        //public static AISequence WAVE_REVERSE_TARGET_HOMING = new AISequence(
-        //    7,
-        //    new AISequence(() =>
-        //    {
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            Projectile
-        //                .New(self)
-        //                .Speed(Speed.FAST)
-        //                .Size(Size.MEDIUM)
-        //                .MaxTime(1f)
-        //                .AngleOffset(i * (360f / 50f))
-        //                .Homing()
-        //                .OnDestroyTimeout(CallbackDictionary.SPAWN_1_HOMING_TOWARDS_PLAYER)
-        //                .Create();
-        //        }
-        //    }).Wait(2f)
-        //);
-
-
-        //public static AISequence WAVE_REVERSE = new AISequence(
-        //    4,
-        //    new AISequence(() =>
-        //    {
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            Projectile
-        //                .New(self)
-        //                .Speed(Speed.FAST)
-        //                .Size(Size.MEDIUM)
-        //                .MaxTime(1.5f)
-        //                .AngleOffset(i * (360f / 50f))
-        //                .OnDestroyTimeout(CallbackDictionary.REVERSE)
-        //                .Create();
-        //        }
-        //    })
-        //);
-
-        //public static AISequence WAVE_REVERSE_FASTER = new AISequence(
-        //    4,
-        //    new AISequence(() =>
-        //    {
-        //        for (int i = 0; i < 50; i++)
-        //        {
-        //            Projectile
-        //                .New(self)
-        //                .Speed(Speed.FAST)
-        //                .Size(Size.MEDIUM)
-        //                .MaxTime(1.5f)
-        //                .AngleOffset(i * (360f / 50f))
-        //                .OnDestroyTimeout(CallbackDictionary.REVERSE_FASTER)
-        //                .Create();
-        //        }
-        //    })
         //);
 
         //public static AISequence CIRCLE_IN_OUT = new AISequence(
@@ -147,15 +62,6 @@ namespace AI
         //    4f,
         //    Teleport().Wait(0.25f),
         //    ShootArc(4, -45f, 45f, New(self).Size(Size.LARGE).Speed(Speed.MEDIUM_SLOW).MaxTime(1f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(2f)
-        //);
-
-        //public static AISequence SHOOT_4_WAVES_BEHIND = new AISequence(
-        //    5.5f,
-        //    Teleport(CENTER).Wait(0.5f),
-        //    Shoot1(New(self).Size(Size.LARGE).Speed(Speed.MEDIUM_SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(220f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(0.5f),
-        //    Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(200f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(0.5f),
-        //    Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(160f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(0.5f),
-        //    Shoot1(New(self).Size(Size.LARGE).Speed(Speed.SLOW).MaxTime(2f).Target(SOUTH_FAR).AngleOffset(140f).OnDestroyTimeout(CallbackDictionary.SPAWN_WAVE)).Wait(5f)
         //);
 
         //// Testing if we can modify AOE attacks at runtime (the answer is a mind-numbing yes!)

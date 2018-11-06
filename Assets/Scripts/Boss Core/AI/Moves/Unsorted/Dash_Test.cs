@@ -10,7 +10,7 @@ using Projectiles;
 
 namespace Moves.Unsorted 
 {
-	public class Dash_Test : AISequence 
+	public class Dash_Test : Move 
 	{
 		public Dash_Test() : base
 		(

@@ -11,23 +11,12 @@ using static BossController;
 
 namespace Moves.Test
 {
-    public class Pincer_Sweep : AISequence
+    public class Pincer_Sweep : Move
     {
-        public Pincer_Sweep() : base
-        (
-            /*
-            () => {
-                List<AISequence> sequences = new List<AISequence>();
-                for (int i = 150; i >= 0; i -= 5) {
-                    sequences.Add(new Pincer(i).Wait(0.05f));
-                }
-                return sequences.ToArray();
-            }
-            */
-            For(150, 0, -5, i => new Pincer(i).Wait(0.05f))
-        )
+        public Pincer_Sweep()
         {
             Description = "Sweeps pincer projectiles from +150 to +0 degrees";
+            Sequence = For(150, 0, -5, i => new Pincer(i).Wait(0.05f));
         }
     }
 }

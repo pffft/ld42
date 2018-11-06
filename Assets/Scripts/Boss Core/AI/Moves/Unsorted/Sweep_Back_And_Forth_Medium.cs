@@ -10,7 +10,7 @@ using Projectiles;
 
 namespace Moves.Unsorted
 {
-    public class Sweep_Back_And_Forth_Medium : AISequence
+    public class Sweep_Back_And_Forth_Medium : Move
     {
         public Sweep_Back_And_Forth_Medium() : base
         (

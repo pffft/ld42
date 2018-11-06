@@ -11,8 +11,8 @@ using static World.Arena;
 
 namespace Moves.Unsorted 
 {
-	public class Double_Hex_Curve : AISequence 
-	{
+	public class Double_Hex_Curve : Move
+    {
 		public Double_Hex_Curve() : base
         (
             new Teleport(CENTER).Wait(1.5f),

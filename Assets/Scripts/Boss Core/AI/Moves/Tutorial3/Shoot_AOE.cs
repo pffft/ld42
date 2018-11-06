@@ -9,18 +9,18 @@ using Moves.Basic;
 
 namespace Moves.Tutorial3
 {
-    public class Shoot_AOE : AISequence
+    public class Shoot_AOE : Move
     {
 
-        public Shoot_AOE(int width) : base
-        (
-            new Teleport().Wait(0.25f),
-            new ShootAOE(new AOE { FixedWidth = 3f }.On(-width / 2, width / 2)),
-            new Pause(0.5f)
-        )
+        public Shoot_AOE(int width)
         {
             Description = "Shoots an AOE " + width + " degrees wide at the player.";
             Difficulty = 1.5f;
+            Sequence = new AISequence(
+                new Teleport().Wait(0.25f),
+                new ShootAOE(new AOE { FixedWidth = 3f }.On(-width / 2, width / 2)),
+                new Pause(0.5f)
+            );
         }
     }
 }

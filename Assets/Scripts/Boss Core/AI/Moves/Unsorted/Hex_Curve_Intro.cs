@@ -10,8 +10,8 @@ using Projectiles;
 
 namespace Moves.Unsorted 
 {
-	public class Hex_Curve_Intro : AISequence 
-	{
+	public class Hex_Curve_Intro : Move
+    {
         public Hex_Curve_Intro() : base
         (
             new Shoot_Hex_Curve(true),

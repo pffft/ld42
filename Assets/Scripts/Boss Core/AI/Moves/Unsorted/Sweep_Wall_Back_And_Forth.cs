@@ -11,8 +11,8 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Sweep_Wall_Back_And_Forth : AISequence 
-	{
+	public class Sweep_Wall_Back_And_Forth : Move
+    {
 		public Sweep_Wall_Back_And_Forth() : base
 		(
             new PlayerLock(true),

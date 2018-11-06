@@ -18,7 +18,7 @@ namespace Moves.Unsorted
      * 
      * ** This might have changed due to the way ShootDeathHex was implemented.
      */
-    public class Death_Hex : AISequence 
+    public class Death_Hex : Move 
 	{
 		public Death_Hex() : base
         (

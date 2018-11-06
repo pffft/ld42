@@ -10,12 +10,16 @@ using Projectiles;
 
 namespace Moves.Unsorted
 {
-    public class Four_Way_Sweep_With_Homing : AISequence
+    public class Four_Way_Sweep_With_Homing : Move
     {
-        public Four_Way_Sweep_With_Homing() : base
-        (
+        public Four_Way_Sweep_With_Homing()
+        {
+            Description = "Shoots a 4-directional sweep with homing projectiles in between.";
+            Difficulty = 6f;
+
             // TODO refactor me to use standard notation
-            () => {
+            Sequence = new AISequence(() =>
+            {
                 List<AISequence> sequences = new List<AISequence>();
                 for (int i = 0; i < 4; i++)
                 {
@@ -23,7 +27,7 @@ namespace Moves.Unsorted
                     {
                         sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * 6f, Size = Size.MEDIUM }).Wait(0.1f));
                     }
-                    sequences.Add(new Shoot1(new ProjectileHoming { Size = Size.LARGE}));
+                    sequences.Add(new Shoot1(new ProjectileHoming { Size = Size.LARGE }));
                     for (int j = 7; j < 15; j++)
                     {
                         sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * 6f, Size = Size.MEDIUM }).Wait(0.1f));
@@ -49,11 +53,7 @@ namespace Moves.Unsorted
                     sequences.Add(new AOE_360());
                 }
                 return sequences.ToArray();
-            }
-        )
-        {
-            Description = "Shoots a 4-directional sweep with homing projectiles in between.";
-            Difficulty = 6f;
+            });
         }
     }
 }
