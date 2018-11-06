@@ -11,10 +11,13 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Sweep_Wall : AISequence 
-	{
-		public Sweep_Wall(bool clockwise=true) : base
-		(() =>
+	public class Sweep_Wall : Move
+    {
+		public Sweep_Wall(bool clockwise=true)
+        {
+            Description = "Shoots a sweeping wall " + (clockwise ? "clockwise" : "counterclockwise") + ".";
+			Difficulty = 5f;
+            Sequence = new AISequence(() =>
             {
                 List<AISequence> sequences = new List<AISequence>();
 
@@ -28,11 +31,7 @@ namespace Moves.Unsorted
                     sequences.Add(new ShootWall(angleOffset: angle).Wait(0.1f));
                 }
                 return sequences.ToArray();
-            }
-        )
-        {
-            Description = "Shoots a sweeping wall " + (clockwise ? "clockwise" : "counterclockwise") + ".";
-			Difficulty = 5f; 
+            });
 		}
 	}
 }

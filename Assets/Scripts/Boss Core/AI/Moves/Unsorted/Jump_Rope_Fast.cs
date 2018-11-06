@@ -12,8 +12,8 @@ using static World.Arena;
 
 namespace Moves.Unsorted 
 {
-	public class Jump_Rope_Fast : AISequence 
-	{
+	public class Jump_Rope_Fast : Move
+    {
 		public Jump_Rope_Fast() : base
         (
             new MoveCamera(false, new Vector3(0, 17.5f, -35)).Wait(1f),

@@ -11,8 +11,8 @@ using static World.Arena;
 
 namespace Moves.Unsorted
 {
-	public class Wave_Circle : AISequence 
-	{
+	public class Wave_Circle : Move
+    {
 
         private class Slow_Wave_Circle : AISequence {
             public Slow_Wave_Circle() : base 

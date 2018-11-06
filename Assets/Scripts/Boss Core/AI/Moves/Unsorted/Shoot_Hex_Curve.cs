@@ -10,7 +10,7 @@ using Projectiles;
 
 namespace Moves.Unsorted
 {
-    public class Shoot_Hex_Curve : AISequence
+    public class Shoot_Hex_Curve : Move
     {
         public Shoot_Hex_Curve(bool clockwise=true, float offset=0f) : base
         (

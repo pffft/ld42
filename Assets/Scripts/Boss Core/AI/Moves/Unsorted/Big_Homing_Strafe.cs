@@ -11,7 +11,7 @@ using Projectiles;
 
 namespace Moves.User 
 {
-	public class Big_Homing_Strafe : AISequence 
+	public class Big_Homing_Strafe : Move 
 	{
 		public Big_Homing_Strafe() : base
         (

@@ -11,14 +11,11 @@ using static BossController;
 
 namespace Moves.Test
 {
-    public class Test : AISequence
+    public class Test : Move
     {
-        public Test() : base
-        (
-            //new Shoot1(new Projectile { Target = LEADING_PLAYER_POSITION, Speed = Speed.VERY_FAST }).Wait(0.5f)
-            new Shoot1(new ProjectileHoming(difficulty: 1) { Speed = Speed.VERY_FAST }).Wait(0.1f)
-        )
+        public Test()
         {
+            Sequence = new Shoot1(new ProjectileHoming(difficulty: 1) { Speed = Speed.VERY_FAST }).Wait(0.1f);
         }
     }
 }

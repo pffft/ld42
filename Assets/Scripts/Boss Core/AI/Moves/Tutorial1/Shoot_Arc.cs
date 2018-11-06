@@ -7,17 +7,17 @@ using Moves.Basic;
 
 namespace Moves.Tutorial1
 {
-    public class Shoot_Arc : AISequence
+    public class Shoot_Arc : Move
     {
-        public Shoot_Arc(int width=70, bool dense=false) : base
-        (
-            new Teleport().Wait(0.25f),
-            new ShootArc(dense ? 100 : 50, -width / 2, width / 2),
-            new Pause(1.5f)
-        )
+        public Shoot_Arc(int width=70, bool dense=false)
         {
             Description = "Shoots a" + (dense ? " dense" : "n") + " arc, " + width + " degrees wide, at the player.";
             Difficulty = 2f;
+            Sequence = new AISequence(
+                new Teleport().Wait(0.25f),
+                new ShootArc(dense ? 100 : 50, -width / 2, width / 2),
+                new Pause(1.5f)
+            );
         }
     }
 }

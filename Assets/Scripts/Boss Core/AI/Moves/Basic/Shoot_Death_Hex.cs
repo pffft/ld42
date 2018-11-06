@@ -11,15 +11,14 @@ using static BossController;
 
 namespace Moves.Basic 
 {
-	public class Shoot_Death_Hex : AISequence 
+	public class Shoot_Death_Hex : Move 
 	{
-		public Shoot_Death_Hex(float maxTime = 1f) : base
-		(
-            new Shoot1(new ProjectileDeathHex() { MaxTime = maxTime }).Wait(1f)
-		)
+		public Shoot_Death_Hex(float maxTime = 1f)
 		{
 			Description = "Shoots a high-damage projectile that splits into 6 curving projectiles with trails.";
-			Difficulty = 4f; 
-		}
+			Difficulty = 4f;
+            Sequence = new Shoot1(new ProjectileDeathHex() { MaxTime = maxTime }).Wait(1f);
+
+        }
 	}
 }

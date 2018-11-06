@@ -11,8 +11,8 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Shoot3_Wave3 : AISequence 
-	{
+	public class Shoot3_Wave3 : Move
+    {
 		public Shoot3_Wave3() : base
 		(
             new Teleport().Wait(0.5f),

@@ -20,24 +20,8 @@ namespace AI
         /// </summary>
         public static bool ShouldTryExpandFunctions = false;
 
-        /// <summary>
-        /// Should we allow new AISequences to be generated? This is false by default; when
-        /// we are ready to load in the sequence dictionaries, we set this to true. This will
-        /// catch floating AISequence declarations at runtime.
-        /// 
-        /// TODO: Make a better way to toggle this value. Currently this is true when loading in routines/phases,
-        /// and when generating projectile/AOE callbacks. This means the logic for setting it to false is somewhat complex.
-        /// Is it really so bad to let people put AISequences wherever they want?
-        /// </summary>
-        public static bool ShouldAllowInstantiation = true;
-
-        private static void CheckAllowInstantiation()
-        {
-            if (!ShouldAllowInstantiation)
-            {
-                throw new System.Exception("Free-floating AISequence generated outside of Load().");
-            }
-        }
+        // TODO remove this later by making all constructors that set it protected.
+        public bool _isDirty = false;
 
         // TODO put these in a publically accessable location. Possibly in world or game manager.
         public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
@@ -169,8 +153,10 @@ namespace AI
         #region Constructors
 
         // Used internally as a shortcut.
+        // TODO make private; currently Moves.Basic.Pause() uses this
+        [System.Obsolete]
         protected AISequence(AIEvent[] events) {
-            CheckAllowInstantiation();
+            _isDirty = true;
             this.events = events; 
             this.children = null;
 
@@ -180,10 +166,12 @@ namespace AI
         /*
          * Creates a new singleton AISequence from the given Action.
          * This has no delay after its event.
+         * TODO make protected
          */
+        [System.Obsolete]
         public AISequence(AIEvent.Action a)
         {
-            CheckAllowInstantiation();
+            _isDirty = true;
             this.events = new AIEvent[] { new AIEvent(0f, a) };
             this.children = null;
 
@@ -191,24 +179,14 @@ namespace AI
         }
 
         /*
-         * Takes an arbitrary length list of AISequences and combines them into an AISequence.
-         */
-        public AISequence(params AISequence[] sequences)
-        {
-            CheckAllowInstantiation();
-            this.events = null;
-            this.children = sequences;
-
-            this.GetChildren = () => { return children; };
-        }
-
-        /*
          * Keeps track of a function that can "explode" into a list of AISequences.
          * When this is added to the event queue, this function is called.
+         * TODO make protected
          */
+        [System.Obsolete]
         public AISequence(GenerateSequences genFunction)
         {
-            CheckAllowInstantiation();
+            _isDirty = true;
             this.events = null;
             this.children = null;
 
@@ -219,15 +197,28 @@ namespace AI
         /*
          * Keeps track of a function that can "explode" into a single AISequence.
          * When this is added to the event queue, this function is called.
+         * TODO make protected
          */
+        [System.Obsolete]
         public AISequence(GenerateSequence genFunction)
         {
-            CheckAllowInstantiation();
+            _isDirty = true;
             this.events = null;
             this.children = null;
 
             this.GetChildren = () => new AISequence[] { genFunction() };
             this.Description = ShouldTryExpandFunctions ? null : "A sequence was generated from a function.";
+        }
+
+        /*
+         * Takes an arbitrary length list of AISequences and combines them into an AISequence.
+         */
+        public AISequence(params AISequence[] sequences)
+        {
+            this.events = null;
+            this.children = sequences;
+
+            this.GetChildren = () => { return children; };
         }
 
         #endregion
@@ -405,6 +396,7 @@ namespace AI
 
         /*
          * Returns this AISequence repeated "times" number of times.
+         * TODO make a ProxyInt
          */
         public AISequence Times(int times)
         {
@@ -413,16 +405,19 @@ namespace AI
                 Debug.LogError("Cannot repeat sequence 0 or fewer times");
                 times = 1;
             }
-            if (times == 1) {
+            if (times == 1)
+            {
                 return this;
             }
 
             AISequence[] newSequences = new AISequence[times];
-            for (int i = 0; i < times; i++) {
+            for (int i = 0; i < times; i++)
+            {
                 newSequences[i] = this;
             }
-            return new AISequence(newSequences) { 
-                Description = times + " times: " 
+            return new AISequence(newSequences)
+            {
+                Description = times + " times: "
             };
         }
 
