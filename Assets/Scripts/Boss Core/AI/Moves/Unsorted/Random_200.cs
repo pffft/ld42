@@ -17,37 +17,26 @@ namespace Moves.Unsorted
 		{
 			Description = "Spawns 200 random projectiles.";
 			Difficulty = 8f;
-            Sequence = new AISequence(() =>
-            {
-                List<AISequence> sequences = new List<AISequence>();
-                for (int j = 0; j < 200; j++)
-                {
-                    switch (Random.Range(0, 3))
-                    {
-                        case 0:
-                            sequences.Add(Merge(
+
+            Sequence = new AISequence(
+                For(200, i => Either(
+                    Merge(
                         new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.SMALL, Speed = Speed.FAST }),
                         new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.SMALL, Speed = Speed.FAST }),
                         new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.TINY, Speed = Speed.FAST })
-                    )); break;
-                        case 1:
-                            sequences.Add(Merge(
+                    ),
+                    Merge(
                         new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.MEDIUM, Speed = Speed.MEDIUM }),
                         new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.MEDIUM, Speed = Speed.MEDIUM })
-                    )); break;
-                        case 2:
-                            sequences.Add(
-                                new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.LARGE, Speed = Speed.SLOW })
-                            );
-                            break;
-                    }
-                    if (j % 20 == 0)
-                    {
-                        sequences.Add(new Shoot1(ProjectileHoming.DEFAULT));
-                    }
-                    if (j % 40 == 0)
-                    {
-                        sequences.Add(new Shoot1(
+                    ),
+                    new Shoot1(new Projectile { AngleOffset = Random.Range(0, 360f), Size = Size.LARGE, Speed = Speed.SLOW }),
+                    If(
+                        (int)i % 20 == 0, 
+                        new Shoot1(ProjectileHoming.DEFAULT)
+                    ),
+                    If(
+                        (int)i % 40 == 0,
+                        new Shoot1(
                             new Projectile
                             {
                                 Size = Size.MEDIUM,
@@ -56,12 +45,11 @@ namespace Moves.Unsorted
                                 MaxTime = 0.5f,
                                 OnDestroyTimeout = CallbackDictionary.SPAWN_WAVE
                             }
-                        ));
-                    }
-                    sequences.Add(Pause(0.05f));
-                }
-                return sequences.ToArray();
-            });
+                        )
+                    ),
+                    new Pause(0.05f)
+                ))
+            );
 		}
     }
 }

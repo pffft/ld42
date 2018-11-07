@@ -4,7 +4,7 @@ using static BossController;
 
 namespace Moves.Basic
 {
-    public class Shoot3 : AISequence
+    public class Shoot3 : InternalMove
     {
 
         public Shoot3(Projectile skeleton = null) : base

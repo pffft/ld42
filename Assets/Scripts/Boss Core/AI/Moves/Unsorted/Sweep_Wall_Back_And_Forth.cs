@@ -13,16 +13,16 @@ namespace Moves.Unsorted
 {
 	public class Sweep_Wall_Back_And_Forth : Move
     {
-		public Sweep_Wall_Back_And_Forth() : base
-		(
-            new PlayerLock(true),
-            new Sweep_Wall(true),
-            new Sweep_Wall(false),
-            new PlayerLock(false)
-		)
+        public Sweep_Wall_Back_And_Forth()
 		{
 			Description = "Sweeps a wall clockwise, then counterclockwise.";
-			Difficulty = 6f; 
+			Difficulty = 6f;
+            Sequence = new AISequence(
+                new PlayerLock(true),
+                new Sweep_Wall(true),
+                new Sweep_Wall(false),
+                new PlayerLock(false)
+            );
 		}
 	}
 }

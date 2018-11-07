@@ -5,23 +5,13 @@ using UnityEngine;
 
 namespace AI
 {
-    /*
-     * Some delegates used to generate a sequence of events that need more dynamic
-     * information. This allows for for loops over sequences and events.
-     */
-    public delegate AISequence[] GenerateSequences();
-    public delegate AISequence GenerateSequence();
-
-    public partial class AISequence
+    public class AISequence
     {
         /// <summary>
         /// When calling ToString on AISequences, should we try to expand sequence generator
         /// functions into their base AISequences, or simply say there was a function there?
         /// </summary>
         public static bool ShouldTryExpandFunctions = false;
-
-        // TODO remove this later by making all constructors that set it protected.
-        public bool _isDirty = false;
 
         // TODO put these in a publically accessable location. Possibly in world or game manager.
         public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
@@ -36,7 +26,8 @@ namespace AI
 
         // Experimental. Leads ahead of the player based on their current velocity and distance from boss.
         // This is quite realtime, but can be jittery as a result.
-        public static ProxyVector3 LEADING_PLAYER_POSITION = new ProxyVector3(() => {
+        public static ProxyVector3 LEADING_PLAYER_POSITION = new ProxyVector3(() =>
+        {
             float distance = (GameManager.Boss.transform.position - GameManager.Player.transform.position).magnitude;
             //Vector3 offset = (distance / 2f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized);
             Vector3 offset = 1f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized;
@@ -67,12 +58,18 @@ namespace AI
             return distance * (Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward) + World.Arena.CENTER;
         });
 
-        // A list of events to execute.
-        public AIEvent[] events;
-        private AISequence[] children;
+        // A list of events to execute. This is the data, or leaf, of the recursive structure.
+        public AIEvent[] Events
+        {
+            get; protected set;
+        }
 
+        // The AISequence children. This represents an intermediate node in the recursion.
         public delegate AISequence[] AISequenceGenerator();
-        public AISequenceGenerator GetChildren;
+        public AISequenceGenerator Children
+        {
+            get; protected set;
+        }
 
         /*
          * A relative difficulty parameter. 
@@ -119,16 +116,19 @@ namespace AI
             get; protected set;
         }
 
-        public override string ToString() {
-            if (Description != null) {
+        public override string ToString()
+        {
+            if (Description != null)
+            {
                 return Description;
             }
 
             string fullDesc = null;
-            AISequence[] sequences = GetChildren();
+            AISequence[] sequences = Children();
             if (sequences != null)
             {
-                if (sequences.Length > 0) {
+                if (sequences.Length > 0)
+                {
                     fullDesc += sequences[0];
                 }
 
@@ -142,7 +142,7 @@ namespace AI
                 // collapse into something easier to read. For now, ShouldTryExpandFunctions is false so
                 // we don't have a million sequences printing out.
             }
-            else if (events != null)
+            else if (Events != null)
             {
                 fullDesc += "Some events executed, and that's all we know.";
             }
@@ -152,78 +152,30 @@ namespace AI
 
         #region Constructors
 
-        // Used internally as a shortcut.
-        // TODO make private; currently Moves.Basic.Pause() uses this
-        [System.Obsolete]
-        protected AISequence(AIEvent[] events) {
-            _isDirty = true;
-            this.events = events; 
-            this.children = null;
-
-            this.GetChildren = () => { return children; };
-        }
-
-        /*
-         * Creates a new singleton AISequence from the given Action.
-         * This has no delay after its event.
-         * TODO make protected
-         */
-        [System.Obsolete]
-        public AISequence(AIEvent.Action a)
+        // Used internally within AISequence.
+        private AISequence(AIEvent[] events)
         {
-            _isDirty = true;
-            this.events = new AIEvent[] { new AIEvent(0f, a) };
-            this.children = null;
+            this.Events = events;
+            //this.Children = null;
 
-            this.GetChildren = () => { return children; };
+            this.Children = () => { return null; };
         }
 
-        /*
-         * Keeps track of a function that can "explode" into a list of AISequences.
-         * When this is added to the event queue, this function is called.
-         * TODO make protected
-         */
-        [System.Obsolete]
-        public AISequence(GenerateSequences genFunction)
-        {
-            _isDirty = true;
-            this.events = null;
-            this.children = null;
-
-            this.GetChildren = () => genFunction();
-            this.Description = ShouldTryExpandFunctions ? null : "Some sequences were generated from a function.";
-        }
-
-        /*
-         * Keeps track of a function that can "explode" into a single AISequence.
-         * When this is added to the event queue, this function is called.
-         * TODO make protected
-         */
-        [System.Obsolete]
-        public AISequence(GenerateSequence genFunction)
-        {
-            _isDirty = true;
-            this.events = null;
-            this.children = null;
-
-            this.GetChildren = () => new AISequence[] { genFunction() };
-            this.Description = ShouldTryExpandFunctions ? null : "A sequence was generated from a function.";
-        }
-
-        /*
-         * Takes an arbitrary length list of AISequences and combines them into an AISequence.
-         */
+        /// <summary>
+        /// Takes an arbitrary length list of AISequences and combines them into an AISequence.
+        /// </summary>
+        /// <param name="sequences">A variable length list of sequences.</param>
         public AISequence(params AISequence[] sequences)
         {
-            this.events = null;
-            this.children = sequences;
+            this.Events = null;
+            //this.Children = sequences;
 
-            this.GetChildren = () => { return children; };
+            this.Children = () => { return sequences; };
         }
 
         #endregion
 
-        #region Somewhat internal tools for AISequences
+        #region Internal tools for AISequences
 
         private static AIEvent BasicMerge(params AIEvent[] events)
         {
@@ -274,30 +226,36 @@ namespace AI
          * array of AIEvents. This will execute any generation functions every time 
          * it is called, and so the exact list returned may vary between method calls.
          */
-        public AIEvent[] Flatten() {
+        private AIEvent[] Flatten()
+        {
             return FlattenRecur(this);
         }
 
-        private AIEvent[] FlattenRecur(AISequence sequence) {
+        private AIEvent[] FlattenRecur(AISequence sequence)
+        {
 
-            AISequence[] seqChildren = sequence.GetChildren();
-            if (seqChildren != null) {
+            AISequence[] seqChildren = sequence.Children();
+            if (seqChildren != null)
+            {
                 List<AIEvent> childrenEvents = new List<AIEvent>();
-                for (int i = 0; i < seqChildren.Length; i++) {
+                for (int i = 0; i < seqChildren.Length; i++)
+                {
                     childrenEvents.AddRange(FlattenRecur(seqChildren[i]));
                 }
                 return childrenEvents.ToArray();
             }
 
-            if (sequence.events == null) {
+            if (sequence.Events == null)
+            {
                 Debug.LogError("Failed to flatten AISequence: \"" + sequence + "\". Children and Events are both null.");
             }
-            return sequence.events; // If null, will crash AddRange above
+            return sequence.Events; // If null, will crash AddRange above
         }
 
         #endregion
 
         #region Tools to construct AISequences
+
 
         /*
          * Merges the given array of AISequences, and executes all of them concurrently.
@@ -306,8 +264,21 @@ namespace AI
          * or stitching various "ShootArc" methods.
          * 
          * On a more complex scale, two separate sets of tasks can be executed in parallel.
+         * 
+         * Note: This returns a new AISequence because "MergeCoerce" flattens the sequences passed in.
+         * This fixes random values, and so breaks a lot of the sequences. Making the MergeCoerce call
+         * take place in a delegate means it'll resample "sequences" every time.
          */
         public static AISequence Merge(params AISequence[] sequences)
+        {
+            return new AISequence
+            {
+                Children = () => new AISequence[] { MergeCoerce(sequences) }
+            };
+        }
+
+        // Merges the given array of AISequences and executes all of them concurrently.
+        private static AISequence MergeCoerce(params AISequence[] sequences)
         {
             int[] indicies = new int[sequences.Length];
             float[] startTimes = new float[sequences.Length];
@@ -384,8 +355,9 @@ namespace AI
             mergedDesc += sequences[sequences.Length - 1];
             mergedDesc += ").";
 
-            return new AISequence(finalEventsList.ToArray()) { 
-                Description = mergedDesc 
+            return new AISequence(finalEventsList.ToArray())
+            {
+                Description = mergedDesc
             };
         }
 
@@ -396,7 +368,6 @@ namespace AI
 
         /*
          * Returns this AISequence repeated "times" number of times.
-         * TODO make a ProxyInt
          */
         public AISequence Times(int times)
         {
@@ -436,8 +407,9 @@ namespace AI
          */
         public static AISequence Pause(float duration)
         {
-            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) }) { 
-                Description = "Wait for " + duration + " seconds." 
+            return new AISequence(new AIEvent[] { new AIEvent(duration, () => { }) })
+            {
+                Description = "Wait for " + duration + " seconds."
             };
         }
 
@@ -454,10 +426,12 @@ namespace AI
          */
         public static AISequence Either(params AISequence[] sequences)
         {
-            return new AISequence(() =>
+            return new AISequence
             {
-                return sequences[(int)(Random.value * sequences.Length)];
-            });
+                Events = null,
+                Children = () => new AISequence[] { sequences[(int)(Random.value * sequences.Length)] },
+                Description = "A sequence was chosen randomly from a list."
+            };
         }
 
         // A delegate that captures an iterator in a for loop
@@ -492,7 +466,6 @@ namespace AI
          */
         public static AISequence For(float start, float end, float step, ForBody body)
         {
-            Debug.Log("For called!");
             if (Mathf.Approximately(step, 0))
             {
                 Debug.LogError("Found for loop with step size 0.");
@@ -543,12 +516,104 @@ namespace AI
          */
         public static AISequence ForConcurrent(float start, float end, float step, ForBody body)
         {
-            return Merge(For(start, end, step, body).GetChildren());
+            return Merge(For(start, end, step, body).Children());
         }
 
+        public static AISequence If(bool condition, AISequence then)
+        {
+            return condition ? then : Pause(0f);
+        }
 
+        public static AISequence If(bool condition, AISequence then, AISequence _else)
+        {
+            return condition ? then : _else;
+        }
 
+        // TODO this isn't pretty but it works.
+        // I tried using ProxyVariables but then everything needs to use them. Is there a better way
+        // to get randomness in the moves?
+        public static AISequence GenerateRandom(ForBody body)
+        {
+            return new AISequence()
+            {
+                Children = () => new AISequence[] { body(Random.value) }
+            };
+        }
 
         #endregion
+
+        /// <summary>
+        /// Guards against invalid AISequences. Prints via Debug.Log/Error if there are any
+        /// problems with the AISequence. If this returns true, it may still have warnings; if
+        /// this returns false, it will print errors.
+        /// </summary>
+        public static bool IsValid(AISequence sequence) 
+        {
+            if (sequence == null)
+            {
+                Debug.LogError("Null AISequence added to queue.");
+                return false;
+            }
+
+            // Guard against basic attempts to break the game. A user cannot define InternalMoves.
+            if (!(sequence is Move))
+            {
+                if (sequence is InternalMove)
+                {
+                    if (!InternalMove.IsValid(sequence as InternalMove))
+                    {
+                        Debug.LogError("Found InternalMove that was not recognized. Refusing to execute. Name: " + sequence.Name);
+                        return false;
+                    } // else ok
+                }
+            }
+
+            // "glue" AISequences are special: AISequences followed by "Then" or "Wait" 
+            // won't have descriptions, but can be identified by being direct instances
+            // of the "AISequence" class (vs. subclasses for every other move).
+            //
+            // These guys don't need to have a valid difficulty or description.
+            //bool isGlueSequence = sequence.Name.Equals("AISequence");
+            bool isGlueSequence = sequence.GetType() == typeof(AISequence) || sequence is InternalMove;
+
+            // Warn about unnamed sequences. By default, this shouldn't be called; the standard name is valid.
+            if (sequence.Name == null)
+            {
+                Debug.LogWarning("Found AISequence without a name. Description: " + sequence.Description ?? "not provided.");
+            }
+
+            // Warn if there's a named sequence without a description.
+            //
+            if (sequence.Description == null && !isGlueSequence)
+            {
+                Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
+            }
+
+            // Warn about default descriptions.
+            if (sequence.Description != null && sequence.Description.Equals("Your description here"))
+            {
+                Debug.LogWarning("Found AISequence with default description. Name: " + sequence.Name);
+            }
+
+            // Warn if there's a sequence with too high a difficulty.
+            if (sequence.Difficulty >= 8f)
+            {
+                Debug.LogWarning("Found AISequence with very high difficulty (" + sequence.Difficulty + "). Name: " + sequence.Name);
+            }
+
+            // Warn about default difficulty (-1). Glue sequences can ignore this.
+            if (Mathf.Abs(sequence.Difficulty - -1) < 0.01f && !isGlueSequence)
+            {
+                Debug.LogWarning("Found AISequence with default difficulty (-1). Name: " + sequence.Name);
+            }
+
+            // Warn about invalid difficulty (<= 0). Glue sequences can ignore this.
+            if (sequence.Difficulty <= 0f && !isGlueSequence)
+            {
+                Debug.LogWarning("Found AISequence with invalid difficulty (<= 0). Name: " + sequence.Name);
+            }
+
+            return true;
+        }
     }
 }

@@ -6,7 +6,7 @@ using static BossController;
 
 namespace Moves.Basic
 {
-    public class ShootAOE : AISequence
+    public class ShootAOE : InternalMove
     {
         public ShootAOE(AOE skeleton = null) : base
         (

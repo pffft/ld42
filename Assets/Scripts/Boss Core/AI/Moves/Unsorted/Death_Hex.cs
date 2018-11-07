@@ -20,18 +20,18 @@ namespace Moves.Unsorted
      */
     public class Death_Hex : Move 
 	{
-		public Death_Hex() : base
-        (
-            new Teleport(CENTER).Wait(0.5f),
-            new Shoot_Death_Hex(2f).Wait(1f),
-            new Shoot_Death_Hex(1f).Wait(2f),
-            new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(1f),
-            new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(1f),
-            new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(0.75f)
-        )
+        public Death_Hex()
         {
             Description = "Fires 6 projectiles that explode into 6 more projectiles, repeated twice to form a lattice.";
-            Difficulty = 9f; 
+            Difficulty = 9f;
+            Sequence = new AISequence(
+                new Teleport(CENTER).Wait(0.5f),
+                new Shoot_Death_Hex(2f).Wait(1f),
+                new Shoot_Death_Hex(1f).Wait(2f),
+                new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(1f),
+                new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(1f),
+                new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(0.75f)
+            );
 		}
 	}
 }

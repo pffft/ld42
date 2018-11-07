@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Moves.Basic
 {
-    public class Strafe : AISequence
+    public class Strafe : InternalMove
     {
         // A reference to the BossController's entity. Assigned when teleport is called.
         private static CombatCore.Entity self = null;

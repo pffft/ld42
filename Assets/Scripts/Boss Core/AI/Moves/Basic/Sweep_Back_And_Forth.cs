@@ -18,20 +18,9 @@ namespace Moves.Basic
             Sequence = new AISequence(
                 new Teleport().Wait(0.25f),
                 new PlayerLock(true),
-                new AISequence(() =>
-                {
-                    List<AISequence> sequences = new List<AISequence>();
-                    for (int i = -30; i < 90; i += 5)
-                    {
-                        sequences.Add(new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f));
-                    }
-                    sequences.Add(Pause(0.25f));
-                    for (int i = 30; i > -90; i -= 5)
-                    {
-                        sequences.Add(new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f));
-                    }
-                    return sequences.ToArray();
-                }),
+                For(-30, 90, 5, i => new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f)),
+                new Pause(0.25f),
+                For(30, -90, -5, i => new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f)),
                 new PlayerLock(false),
                 new Pause(0.5f)
             );

@@ -18,18 +18,12 @@ namespace Moves.Basic
             Sequence = new AISequence(
                 new Teleport().Wait(0.25f),
                 new PlayerLock(true),
-                new AISequence(() =>
-                {
-
-                    List<AISequence> sequences = new List<AISequence>();
-                    for (int i = 0; i < 120; i += 5)
-                    {
-                        sequences.Add(new Shoot1(new Projectile { AngleOffset = i - 60 }));
-                        sequences.Add(new Shoot1(new Projectile { AngleOffset = 60 - i }));
-                        sequences.Add(new Pause(0.05f));
-                    }
-                    return sequences.ToArray();
-                }),
+                For(0, 120, 5, 
+                    i => Merge(
+                        new Shoot1(new Projectile { AngleOffset = i - 60 }),
+                        new Shoot1(new Projectile { AngleOffset = 60 - i })
+                    ).Wait(0.05f)
+                ),
                 new PlayerLock(false),
                 new Pause(0.5f)
             );

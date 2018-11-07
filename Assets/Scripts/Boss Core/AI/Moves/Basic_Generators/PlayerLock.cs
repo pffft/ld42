@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Moves.Basic
 {
-    public class PlayerLock : AISequence
+    public class PlayerLock : InternalMove
     {
         // Used for the "PlayerLock" move. Keeps track of the current player position
         // for events and sequences that need a slightly out of date version.

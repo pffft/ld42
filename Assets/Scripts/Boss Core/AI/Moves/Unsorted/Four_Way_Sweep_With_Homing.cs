@@ -17,43 +17,33 @@ namespace Moves.Unsorted
             Description = "Shoots a 4-directional sweep with homing projectiles in between.";
             Difficulty = 6f;
 
-            // TODO refactor me to use standard notation
-            Sequence = new AISequence(() =>
-            {
-                List<AISequence> sequences = new List<AISequence>();
-                for (int i = 0; i < 4; i++)
-                {
-                    for (int j = 0; j < 7; j++)
-                    {
-                        sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * 6f, Size = Size.MEDIUM }).Wait(0.1f));
-                    }
-                    sequences.Add(new Shoot1(new ProjectileHoming { Size = Size.LARGE }));
-                    for (int j = 7; j < 15; j++)
-                    {
-                        sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * 6f, Size = Size.MEDIUM }).Wait(0.1f));
-                    }
-                    sequences.Add(new AOE_360());
-                }
-                for (int i = 0; i < 4; i++)
-                {
-                    for (int j = 0; j < 5; j++)
-                    {
-                        sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * -6f, Size = Size.MEDIUM }).Wait(0.1f));
-                    }
-                    sequences.Add(new Shoot1(new ProjectileHoming { Size = Size.LARGE }));
-                    for (int j = 5; j < 10; j++)
-                    {
-                        sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * -6f, Size = Size.MEDIUM }).Wait(0.1f));
-                    }
-                    sequences.Add(new Shoot1(new ProjectileHoming { Size = Size.LARGE }));
-                    for (int j = 10; j < 15; j++)
-                    {
-                        sequences.Add(new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * -6f, Size = Size.MEDIUM }).Wait(0.1f));
-                    }
-                    sequences.Add(new AOE_360());
-                }
-                return sequences.ToArray();
-            });
+            Sequence = new AISequence(
+                For(4, i => new AISequence
+                (
+                    For(0, 7, j =>
+                        new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * 6f, Size = Size.MEDIUM }).Wait(0.1f)
+                    ),
+                    new Shoot1(new ProjectileHoming { Size = Size.LARGE }),
+                    For(8, 15, j =>
+                        new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * 6f, Size = Size.MEDIUM }).Wait(0.1f)
+                    ),
+                    new AOE_360()
+                )),
+                For(4, i => new AISequence(
+                    For(0, 5, j =>
+                        new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * -6f, Size = Size.MEDIUM }).Wait(0.1f)
+                    ),
+                    new Shoot1(new ProjectileHoming { Size = Size.LARGE }),
+                    For(5, 10, j =>
+                        new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * -6f, Size = Size.MEDIUM }).Wait(0.1f)
+                    ),
+                    new Shoot1(new ProjectileHoming { Size = Size.LARGE }),
+                    For(10, 15, j =>
+                        new ShootArc(4, 0, 360, new Projectile { Target = Vector3.forward, AngleOffset = j * -6f, Size = Size.MEDIUM }).Wait(0.1f)
+                    ),
+                    new AOE_360()
+                ))
+            );
         }
     }
 }

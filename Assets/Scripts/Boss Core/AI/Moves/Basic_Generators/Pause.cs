@@ -2,14 +2,18 @@
 
 namespace Moves.Basic
 {
-    public class Pause : AISequence
+    public class Pause : InternalMove
     {
+        /// <summary>
+        /// Creates a new AISequence that does nothing, but has a specified duration.
+        /// </summary>
+        /// <param name="duration">How long we should wait for.</param>
         public Pause(float duration) : base
         (
-            new AIEvent[] { new AIEvent(duration, () => { }) }
+            new AIEvent(duration, () => { })
         )
         {
-            Description = "Waiting for " + duration + " seconds.";
+            Description = "Wait for " + duration + " seconds.";
         }
     }
 }

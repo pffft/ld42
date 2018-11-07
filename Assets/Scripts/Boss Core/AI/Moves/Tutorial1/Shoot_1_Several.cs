@@ -14,12 +14,8 @@ namespace Moves.Tutorial1
             Description = "Shoots between 5 and 10 default projectiles at the player.";
             Difficulty = 2f;
             Sequence = new AISequence(
-                // TODO find a way to allow random values to any parameter.
                 new Teleport().Wait(0.5f),
-                new AISequence(() =>
-                {
-                    return new Shoot1().Wait(0.1f).Times(Random.Range(5, 10));
-                }),
+                GenerateRandom(ran => new Shoot1().Wait(0.1f).Times((int) (5 + (ran * 5)))),
                 new Pause(1.5f)
             );
         }

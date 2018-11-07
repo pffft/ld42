@@ -19,7 +19,7 @@ namespace Moves.Tutorial3
             Sequence = new AISequence(
                 new Teleport().Wait(0.25f),
                 new ShootAOE(new AOE { FixedWidth = 3f }.On(-width / 2, width / 2)),
-                new Pause(0.5f)
+                new Pause(1.5f)
             );
         }
     }

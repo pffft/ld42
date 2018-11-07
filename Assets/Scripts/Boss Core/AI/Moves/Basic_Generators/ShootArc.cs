@@ -4,7 +4,7 @@ using static BossController;
 
 namespace Moves.Basic
 {
-    public class ShootArc : AISequence
+    public class ShootArc : InternalMove
     {
 
         public ShootArc(int density = 50, float from = 0, float to = 360, Projectile skeleton = null) : base
