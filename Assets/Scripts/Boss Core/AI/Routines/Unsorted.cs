@@ -12,7 +12,7 @@ namespace Routines
         {
             Phases = new List<AIPhase>
             {
-                new AIPhase().AddSequence(10, new Moves.Unsorted.Double_Hex_Curve_Hard())
+                new Phases.Phase_Unsorted()
             };
         }
     }
