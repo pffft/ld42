@@ -15,6 +15,12 @@ namespace Projectiles
 
     public class Projectile
     {
+        // Experimental. Static Projectiles that are commonly used (note: there don't tend to be duplicate projectiles)
+        public static Projectile DEFAULT = new Projectile();
+        public static Projectile DEFAULT_LARGE_SLOW = new Projectile { Size = Size.LARGE, Speed = Speed.SLOW };
+        public static Projectile DEFAULT_MEDIUM_MEDIUM = new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM };
+        public static Projectile DEFAULT_SMALL_FAST = new Projectile { Size = Size.SMALL, Speed = Speed.FAST };
+
         public virtual ProxyVector3 Start { get; set; } = AI.AISequence.BOSS_POSITION;
         public virtual ProxyVector3 Target { get; set; } = AI.AISequence.DELAYED_PLAYER_POSITION;
         public virtual float AngleOffset { get; set; } = 0f;

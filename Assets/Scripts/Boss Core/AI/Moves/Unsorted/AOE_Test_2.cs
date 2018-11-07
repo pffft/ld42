@@ -37,6 +37,7 @@ namespace Moves.Unsorted
 
         public AOE_Test_2() {
             Sequence = new AISequence(
+                new Teleport(CENTER),
                 TELEGRAPH_CARDINAL,
 
                 new ShootAOE(

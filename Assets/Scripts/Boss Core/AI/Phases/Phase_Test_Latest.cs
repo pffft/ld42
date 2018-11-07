@@ -10,7 +10,7 @@ namespace Phases
     {
         public Phase_Test_Latest()
         {
-            AddSequence(10, new Moves.Tutorial1.Shoot_1_Several());
+            AddSequence(10, new Moves.Test.Test());
         }
     }
 }

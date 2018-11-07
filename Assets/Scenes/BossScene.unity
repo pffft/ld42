@@ -7661,7 +7661,7 @@ Prefab:
     - target: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
         type: 2}
       propertyPath: Chill
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
         type: 2}

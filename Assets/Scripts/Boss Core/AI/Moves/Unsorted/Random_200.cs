@@ -43,7 +43,7 @@ namespace Moves.Unsorted
                     }
                     if (j % 20 == 0)
                     {
-                        sequences.Add(new Shoot1(new ProjectileHoming { Size = Size.MEDIUM }));
+                        sequences.Add(new Shoot1(ProjectileHoming.DEFAULT));
                     }
                     if (j % 40 == 0)
                     {
