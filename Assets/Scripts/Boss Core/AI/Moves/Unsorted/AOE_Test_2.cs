@@ -48,6 +48,7 @@ namespace Moves.Unsorted
                     Target = Vector3.forward,
                     MaxTime = 2f,
                     // TODO add ability to change values in callbacks like before
+                    // (self) => ShootAOE(new AOE { Parent = self.data }) // add parent field to avoid copy constructor?
                     //OnDestroyTimeout = (self) => self.data.Clone().Freeze().RotationSpeed(20f).MaxTime(12.6f).Create(),
                     OnDestroyOutOfBounds = AOECallbackDictionary.DONT_DESTROY_OOB
                     }
