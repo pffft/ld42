@@ -18,7 +18,7 @@ namespace Moves.Unsorted
         {
             Description = "Fires a wave of projectiles that, on death, reverse direction.";
             Difficulty = 4f;
-            Sequence = For(
+            Sequence = ForConcurrent(
                 50,
                 i => new Shoot1
                 (
