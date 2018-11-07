@@ -24,7 +24,7 @@ namespace Phases
                         Debug.Log("Adding type: " + type);
                         AddSequence(10, System.Activator.CreateInstance(type) as AISequence);
                     }
-                    catch (System.Exception e)
+                    catch (System.Exception)
                     {
                         Debug.Log("Failed to add type: " + type);
                     }
