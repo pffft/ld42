@@ -28,6 +28,7 @@ namespace Moves.Test
                     OnDestroyTimeout =
                     self =>
                     {
+                        // TODO write a better API for this
                         AOE clone = self.data.Clone();
                         clone.MaxTime = 10f;
                         clone.Freeze();

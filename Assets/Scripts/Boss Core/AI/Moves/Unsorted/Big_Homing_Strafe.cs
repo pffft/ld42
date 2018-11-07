@@ -9,7 +9,7 @@ using Moves.Basic;
 using static World.Arena;
 using Projectiles;
 
-namespace Moves.User 
+namespace Moves.Unsorted 
 {
 	public class Big_Homing_Strafe : Move 
 	{

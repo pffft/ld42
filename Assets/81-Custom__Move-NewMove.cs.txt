@@ -7,19 +7,20 @@ using AOEs;
 using BossCore;
 using Moves.Basic;
 using Projectiles;
-using static BossController;
+
+using static World.Arena;
 
 namespace Moves.User 
 {
-	public class #SCRIPTNAME# : AISequence 
+	public class #SCRIPTNAME# : Move 
 	{
-		public #SCRIPTNAME#() : base
-		(
-			// Your AISequence here
-		)
+		public #SCRIPTNAME#()
 		{
 			Description = "Your description here";
-			Difficulty = 1f; 
+			Difficulty = -1f; 
+			Sequence = new AISequence(
+				// Your sequence here
+			);
 		}
 	}
 }
