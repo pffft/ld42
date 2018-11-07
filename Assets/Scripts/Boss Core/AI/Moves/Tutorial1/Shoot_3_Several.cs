@@ -15,11 +15,7 @@ namespace Moves.Tutorial1
             Difficulty = 3f;
             Sequence = new AISequence(
                 new Teleport().Wait(0.5f),
-                // TODO add some way to include random values here
-                new AISequence(() =>
-                {
-                    return new Shoot3().Wait(0.1f).Times(Random.Range(7, 12));
-                }),
+                GenerateRandom(ran => new Shoot3().Wait(0.1f).Times((int) (7 + (ran * 5)))),
                 new Pause(1.5f)
             );
         }

@@ -6,7 +6,7 @@ using BossCore;
 
 namespace Moves.Basic
 {
-    public class ShootLine : AISequence
+    public class ShootLine : InternalMove
     {
         public ShootLine(int amount = 50, float width = 75f, Vector3? target = null, Speed speed = Speed.MEDIUM, Size size = Size.MEDIUM) : base
         (

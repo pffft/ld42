@@ -14,23 +14,23 @@ namespace Moves.Unsorted
 {
 	public class Double_Hex_Curve_Hard : Move
     {
-		public Double_Hex_Curve_Hard() : base
-        (
-            new Teleport(CENTER).Wait(0.5f),
-            new Shoot_Hex_Curve(false, 0f),
-            new Shoot_Hex_Curve(false, 30f),
-            // This homing might be too hard; especially with this amount of 360s.
-            new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(10),
-            new AOE_360(),
-            new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(5),
-            new AOE_360(),
-            new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(5),
-            new AOE_360().Wait(0.5f),
-            new AOE_360().Wait(0.5f)
-        )
+		public Double_Hex_Curve_Hard()
         {
 			Description = "A harder variant of the double hex curve.";
-			Difficulty = 10f; 
+			Difficulty = 10f;
+            Sequence = new AISequence(
+                new Teleport(CENTER).Wait(0.5f),
+                new Shoot_Hex_Curve(false, 0f),
+                new Shoot_Hex_Curve(false, 30f),
+                // This homing might be too hard; especially with this amount of 360s.
+                new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(10),
+                new AOE_360(),
+                new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(5),
+                new AOE_360(),
+                new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(5),
+                new AOE_360().Wait(0.5f),
+                new AOE_360().Wait(0.5f)
+            );
 		}
 	}
 }

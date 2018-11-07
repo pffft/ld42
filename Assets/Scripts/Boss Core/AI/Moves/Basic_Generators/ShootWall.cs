@@ -6,7 +6,7 @@ using BossCore;
 
 namespace Moves.Basic
 {
-    public class ShootWall : AISequence
+    public class ShootWall : InternalMove
     {
         public ShootWall(float angleOffset) : base
         (

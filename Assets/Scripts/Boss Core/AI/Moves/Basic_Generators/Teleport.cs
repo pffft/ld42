@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Moves.Basic
 {
-    public class Teleport : AISequence
+    public class Teleport : InternalMove
     {
         // A reference to the BossController's entity. Assigned when teleport is called.
         private static CombatCore.Entity self = null;

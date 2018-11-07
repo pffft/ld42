@@ -6,6 +6,15 @@ namespace AI
 {
     public class Move : AISequence
     {
+        // Hide the parent's Children property so that no subclass can use it.
+        public new AISequenceGenerator Children {
+            get; private set;
+        }
+
+        public new AIEvent[] Events {
+            get; private set;
+        }
+
         private AISequence _sequence;
         public AISequence Sequence 
         { 
@@ -21,19 +30,7 @@ namespace AI
         }
 
         public Move() {
-            this.GetChildren = () => new AISequence[] { Sequence };
+            base.Children = () => new AISequence[] { Sequence };
         }
-
-        // TODO this is provided for backwards compatibility with the base(...)
-        // style of building moves. Later we should move away from it.
-        [System.Obsolete]
-        public Move(params AISequence[] sequences) : base(sequences) { 
-            Debug.LogWarning("Using the base(...) notation is deprecated! Name: " + Name); 
-        }
-
-        // Hide the AISequence constructors so that we get a compilation error for using them
-        private Move(AIEvent[] events) { }
-        private Move(GenerateSequence sequence) { }
-        private Move(GenerateSequences sequence) { }
     }
 }

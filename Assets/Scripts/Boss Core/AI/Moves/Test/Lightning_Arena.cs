@@ -18,17 +18,7 @@ namespace Moves.Test
             Difficulty = 5f;
             Sequence = new AISequence(
                 new Teleport(World.Arena.CENTER).Wait(0.25f),
-                new AISequence(() =>
-                {
-                    List<AISequence> sequences = new List<AISequence>();
-
-                    for (int i = 0; i < 1; i++)
-                    {
-                        sequences.Add(new Shoot1(
-                        new ProjectileLightning { AngleOffset = i * 90f }).Wait(0.1f));
-                    }
-                    return sequences.ToArray();
-                }),
+                For(4, i => new Shoot1(new ProjectileLightning { AngleOffset = i * 90f }).Wait(0.1f)),
                 Pause(1f)
             );
         }

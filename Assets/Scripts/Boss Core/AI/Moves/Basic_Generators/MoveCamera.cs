@@ -5,7 +5,7 @@ using static BossController;
 
 namespace Moves.Basic
 {
-    public class MoveCamera : AISequence
+    public class MoveCamera : InternalMove
     {
         public MoveCamera(bool isFollow = false, Vector3? targetPosition = null) : base
         (
