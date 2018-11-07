@@ -10,7 +10,7 @@ using Projectiles;
 using static BossController;
 using static World.Arena;
 
-namespace Moves.User 
+namespace Moves.Unsorted 
 {
 	public class Shoot_4_Waves_Behind : Move
     {

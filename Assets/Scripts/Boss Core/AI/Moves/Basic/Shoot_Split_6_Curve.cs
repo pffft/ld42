@@ -9,7 +9,7 @@ using Moves.Basic;
 using Projectiles;
 using static BossController;
 
-namespace Moves.User 
+namespace Moves.Unsorted 
 {
 	public class Shoot_Split_6_Curve : Move 
 	{
