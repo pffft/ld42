@@ -26,7 +26,6 @@ public class KeepOnArena : MonoBehaviour {
 
                 if (body != null)
                 {
-                    Debug.Log("YEET");
                     body.velocity = Vector3.zero;
                     body.drag = 0f;
                     //body.AddForce(100f * new Vector3(0f, -1f, 0f), ForceMode.Impulse);

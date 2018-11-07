@@ -25,16 +25,15 @@ namespace Moves.Test
             //Either(new Shoot1(Projectile.DEFAULT_LARGE_SLOW), new Shoot3(Projectile.DEFAULT_MEDIUM_MEDIUM));
             //InternalMove move = new InternalMove(() => { Debug.Log("Bad!"); });
 
-            //Sequence = new Shoot1(new Projectile
-            //{ 
-            //    MaxTime = 0f, 
-            //    OnDestroyTimeout = (self) => {
-            //        return new InternalMove(() => { Debug.Log("Bad!"); });
-            //    } 
-            //});
-
-            Sequence = new InternalMove();
-
+            Sequence = new Shoot1(new Projectile
+            { 
+                MaxTime = 0f, 
+                OnDestroyTimeout = (self) => {
+                    // Delegates allow for arbitrary code execution.
+                    Debug.Log("Bad!");
+                    return new AISequence();
+                } 
+            });
         }
     }
 }

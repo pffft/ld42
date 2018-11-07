@@ -12,10 +12,6 @@ public class BossController : MonoBehaviour
     [SerializeField]
     private bool insaneMode = false;
 
-    [Tooltip("If enabled, will print logging messages related to current attacks. Has a mild performance impact.")]
-    [SerializeField]
-    private bool DebugMode = true;
-
     [Tooltip("If enabled, the boss won't attack you or move at the start.")]
     [SerializeField]
     private bool Chill = false;
@@ -106,11 +102,10 @@ public class BossController : MonoBehaviour
         // Add i-frames for 3 seconds while we move to center & regain health.
         if (!Chill)
         {
-            self.SetInvincible(true);
+            Add(new Moves.Basic.Invincible(true));
             Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
-            Add(new AISequence(() => { self.SetInvincible(false); }));
+            Add(new Moves.Basic.Invincible(false));
         }
-        Debug.Log("Queue length: " + queuedSequences.Count);
     }
 
     public void ResetBoss()
@@ -132,68 +127,12 @@ public class BossController : MonoBehaviour
 
     private void Add(AISequence sequence)
     {
-        // Debug mode provides additional information when executing an event.
-        // TODO: possibly move this into a static analysis done when loading in an AIPhase/AIRoutine.
-        if (GameManager.Boss.DebugMode)
+        if (AISequence.IsValid(sequence))
         {
-            if (sequence == null)
-            {
-                Debug.LogError("Null AISequence added to queue.");
-                return;
-            }
-
-            // "glue" AISequences are special: AISequences followed by "Then" or "Wait" 
-            // won't have descriptions, but can be identified by being direct instances
-            // of the "AISequence" class (vs. subclasses for every other move).
-            //
-            // These guys don't need to have a valid difficulty or description.
-            bool isGlueSequence = sequence.Name.Equals("AISequence");
-
-            // Warn about unnamed sequences. By default, this shouldn't be called; the standard name is valid.
-            if (sequence.Name == null) 
-            {
-                Debug.LogWarning("Found AISequence without a name. Description: " + sequence.Description ?? "not provided.");
-            }
-
-            // Warn if there's a named sequence without a description.
-            //
-            if (sequence.Description == null && !isGlueSequence)
-            {
-                Debug.LogWarning("Found AISequence with a name, but without a description. Name: " + sequence.Name);
-            }
-
-            // Warn about default descriptions.
-            if (sequence.Description != null && sequence.Description.Equals("Your description here")) 
-            {
-                Debug.LogWarning("Found AISequence with default description. Name: " + sequence.Name);
-            }
-
-            // Warn if there's a sequence with too high a difficulty.
-            if (sequence.Difficulty >= 8f)
-            {
-                Debug.LogWarning("Found AISequence with very high difficulty (" + sequence.Difficulty + "). Name: " + sequence.Name);
-            }
-
-            // Warn about default difficulty (-1). Glue sequences can ignore this.
-            if (Mathf.Abs(sequence.Difficulty - -1) < 0.01f && !isGlueSequence) 
-            {
-                Debug.LogWarning("Found AISequence with default difficulty (-1). Name: " + sequence.Name);
-            }
-
-            // Warn about invalid difficulty (<= 0). Glue sequences can ignore this.
-            if (sequence.Difficulty <= 0f && !isGlueSequence) 
-            {
-                Debug.LogWarning("Found AISequence with invalid difficulty (<= 0). Name: " + sequence.Name);
-            }
-
-            // If we (finally) get to the end and still have a valid sequence, then we print out what it does.
-            Debug.Log("Added AISequence" +
-                      (sequence.Name.Equals("AISequence") ? " " : " \"" + sequence.Name + "\" ") +
-                      "to queue. Here's what it says it'll do: \"" +
-                      (sequence.Description ?? sequence.ToString()) + "\".");
+            queuedSequences.Enqueue(sequence);
+        } else {
+            Debug.LogError("Refusing to add invalid sequence: " + sequence.Name);
         }
-
-        queuedSequences.Enqueue(sequence);
     }
 
     void Update()
@@ -213,10 +152,6 @@ public class BossController : MonoBehaviour
     /// <summary>
     /// The main "thread" that executes the next event on the event queue.
     /// If there aren't any sequences, then we spin until there are some.
-    /// 
-    /// TODO: either here or in "Execute", have some way to interrupt the current
-    /// executing AISequence so the next phase can be started immediately. Also so
-    /// that if the player interrupts, we can do something about it.
     /// </summary>
     private IEnumerator ExecuteQueue()
     {
@@ -229,7 +164,12 @@ public class BossController : MonoBehaviour
             }
 
             AISequence nextSequence = queuedSequences.Peek();
-            yield return Execute(nextSequence);
+            if (AISequence.IsValid(nextSequence))
+            {
+                yield return Execute(nextSequence);
+            } else {
+                Debug.LogError("Refusing to execute invalid AISequence.");
+            }
             queuedSequences.Dequeue();
             //Profiler.EndSample();
         }
@@ -244,9 +184,9 @@ public class BossController : MonoBehaviour
     /// <param name="sequence">The sequence to be executed.</param>
     private IEnumerator Execute(AISequence sequence)
     {
-        if (sequence.events != null)
+        if (sequence.Events != null)
         {
-            for (int i = 0; i < sequence.events.Length; i++)
+            for (int i = 0; i < sequence.Events.Length; i++)
             {
                 // If the event queue is paused, then wait until it's unpaused.
                 while (paused)
@@ -254,14 +194,14 @@ public class BossController : MonoBehaviour
                     yield return new WaitForSecondsRealtime(0.05f);
                 }
 
-                sequence.events[i].action?.Invoke();
+                sequence.Events[i].action?.Invoke();
                 // TODO reduce the wait time if the above invocation takes too long 
-                yield return new WaitForSecondsRealtime(sequence.events[i].duration);
+                yield return new WaitForSecondsRealtime(sequence.Events[i].duration);
             }
         }
         else
         {
-            AISequence[] children = sequence.GetChildren();
+            AISequence[] children = sequence.Children();
             for (int i = 0; i < children.Length; i++)
             {
                 yield return Execute(children[i]);
@@ -276,7 +216,12 @@ public class BossController : MonoBehaviour
     /// <param name="sequence">The sequence to be executed immediately.</param>
     public void ExecuteAsync(AISequence sequence)
     {
-        GameManager.Boss.StartCoroutine(Execute(sequence));
+        if (AISequence.IsValid(sequence))
+        {
+            GameManager.Boss.StartCoroutine(Execute(sequence));
+        } else {
+            Debug.LogError("Refusing to execute invalid AISequence.");
+        }
     }
 
     /*
