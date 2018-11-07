@@ -8,6 +8,8 @@ namespace Projectiles
     public class ProjectileHoming : Projectile
     {
 
+        public static new ProjectileHoming DEFAULT = new ProjectileHoming { Size = Size.MEDIUM };
+
         private GameObject targetObject;
 
         private float curDivergence;

@@ -15,7 +15,7 @@ namespace Moves.Test
     {
         public Test()
         {
-            Sequence = new Shoot1(new ProjectileHoming(difficulty: 1) { Speed = Speed.VERY_FAST }).Wait(0.1f);
+            Sequence = new Shoot1(Projectile.DEFAULT_LARGE_SLOW).Wait(0.1f);
         }
     }
 }

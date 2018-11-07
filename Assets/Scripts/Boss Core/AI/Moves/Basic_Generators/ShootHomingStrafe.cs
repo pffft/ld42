@@ -9,7 +9,7 @@ namespace Moves.Basic
         public ShootHomingStrafe(bool clockwise = true, int strafeAmount = 5, int speed = 25) : base
         (
             new Strafe(clockwise, strafeAmount, speed),
-            new Shoot1(new ProjectileHoming { Size = Size.MEDIUM })
+            new Shoot1(ProjectileHoming.DEFAULT)
         )
         {
             Description = "Strafed " + strafeAmount + " degrees " + (clockwise ? "clockwise" : "counterclockwise") + " and shot a homing projectile.";

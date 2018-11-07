@@ -20,11 +20,11 @@ namespace Moves.Unsorted
             new Shoot_Hex_Curve(false, 0f),
             new Shoot_Hex_Curve(false, 30f),
             // This homing might be too hard; especially with this amount of 360s.
-            new Shoot3(new ProjectileHoming { Size = Size.MEDIUM }).Wait(0.1f).Times(10),
+            new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(10),
             new AOE_360(),
-            new Shoot3(new ProjectileHoming { Size = Size.MEDIUM }).Wait(0.1f).Times(5),
+            new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(5),
             new AOE_360(),
-            new Shoot3(new ProjectileHoming { Size = Size.MEDIUM }).Wait(0.1f).Times(5),
+            new Shoot3(ProjectileHoming.DEFAULT).Wait(0.1f).Times(5),
             new AOE_360().Wait(0.5f),
             new AOE_360().Wait(0.5f)
         )
