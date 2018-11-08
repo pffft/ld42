@@ -36,6 +36,8 @@ namespace Projectiles
         /*
          * Called after object is destroyed due to time limit.
          */
+        // TODO find a way to remove public-facing delegate here.
+        // Maybe make this an AISequence? But then how to pass the (self) reference?
         public ProjectileCallback OnDestroyTimeout { get; set; } = CallbackDictionary.NOTHING;
 
         /*
