@@ -77,12 +77,103 @@ This syntax is designed to express a flow of actions from top to bottom, with me
 
 ### Builder methods
 
-To make more complex `AISequence`s, there are quite a few methods that give additional functionality. These are described below.
+To make more complex `AISequence`s, there are quite a few methods that give additional functionality. You can call any of these using the format `[AISequence].Method`, where `[AISequence]` is any `AISequence`, and `Method` is any method below (which return `AISequence`s). The available methods are described below.
 
 #### Wait/Pause
+
+`Wait` allows you to specify a delay after any `AISequence`. The parameter specified is how many seconds you'd like to wait.
+
+Calling `Wait` is equivalent to `new Moves.Basic.Pause()`. For example:
+
+```C#
+Sequence = new AISequence(
+  new Teleport().Wait(0.5f)
+);
+```
+
+is the same as:
+
+```C#
+Sequence = new AISequence(
+  new Teleport(),
+  new Pause(0.5f)
+);
+```
+
+[Note that `Moves.Basic` is included by default, so `Moves.Basic.Pause` can be simplified to `Pause`].
+
+In cases where you just want to have a `Wait` call as the first thing in an `AISequence`, you can call the static method `Pause`. For example, say you want to wait for half a second before teleporting in your custom move. You want to call `[AISequence].Wait(0.5f)`, but `[AISequence]` doesn't exist. This is a situation where you want to use `Pause` instead:
+
+```C#
+Sequence = new AISequence(
+  Pause(0.5f),
+  new Teleport()
+);
+```
+
+The static method `Pause` is mostly useful for calls to `Merge`, which sometimes require explicit time alignments.
+
 #### Then
+
+If you want to be explicit about the structure of an `AISequence`, you can directly specify the next element to execute using `Then`. The following code explicitly uses the `Then` notation:
+
+```C#
+Sequence = new AISequence(
+  new Teleport().Then(Pause(0.5f)).Then(new Shoot1())
+);
+```
+
+and is equivalent to the following code:
+
+```C#
+Sequence = new AISequence(
+  new Teleport(),
+  new Pause(0.5f),
+  new Shoot1()
+);
+```
+
+`Then` is useful for calls to `Merge`, because it allows multiple sequential statements to be expressed on one line. 
+
+While you can define an entire `AISequence` using `Wait` and `Then`, this tends to be less readable because everything is treated as being a single line by most IDEs. As a result, it is recommended to avoid using `Then` unless it is specifically needed, which tends to only happen in `Merge` calls.
+
 #### Times
-#### For
+
+To repeat an `AISequence` call several times, you can use the `Times` method. The parameter specifies how many times you'd like to repeat the action. As a simple example, to shoot 3 default `Projectile`s at the player with 0.1 seconds in between, you can write:
+
+```C#
+Sequence = new AISequence(
+  new Shoot1().Wait(0.1f).Times(3)
+);
+```
+
+It's important to note that the order of `Wait` and `Times` matters. Methods will effect everything *before* them in the same `AISequence`; so in the example above, `Times` applies to the `AISequence` `new Shoot1().Wait(0.1f)` and NOT to the `AISequence` `Wait(0.1f)`. Thus, the sequence above will have a delay of 0.1 seconds between every `Projectile` firing.
+
+If you were to swap the order of `Wait` and `Times`, you'd fire three `Projectile`s with no delay (so they would all fire at once, and it would visually appear as one `Projectile`), and *then* wait for 0.1 seconds, which usually isn't what you want to do.
+
+A slightly more complex example to describe this behavior:
+
+```C#
+Sequence = new AISequence(
+  new Shoot1().Wait(0.1f).Times(10).Wait(0.5f)
+);
+```
+
+Here, we fire 10 `Projectile`s with a delay of 0.1 seconds between each shot, and after we finish firing all 10, we wait for half a second more.
+
+#### For/ForConcurrent
+
+Sometimes, you need even more complex behavior than what can be provided with just `Times`. One common example used frequently is firing a collection of similar `Projectile`s that vary in a couple of properties. Say you want to have a sweep of `Projectile`s; that is, fire a bunch of `Projectile`s of the same size and speed, but with an angle offset ranging from -30 to +30 degrees. You could write code like this:
+
+```C#
+Sequence = new AISequence(
+  new Shoot1(new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = -30f }).Wait(0.1f),
+  new Shoot1(new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = -29f }).Wait(0.1f),
+  ...
+  new Shoot1(new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset =  30f }).Wait(0.1f),
+);
+```
+
 #### If
 #### Either
 #### Merge
