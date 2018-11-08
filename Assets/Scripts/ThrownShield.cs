@@ -79,7 +79,6 @@ public class ThrownShield : MonoBehaviour {
 
         GameObject otherObject = other.gameObject;
         Entity otherEntity = otherObject.GetComponentInParent<Entity>();
-        Debug.Log(otherObject.name);
         if (otherEntity != null)
         {
             // Do damage if the target isn't invincible and not on our team

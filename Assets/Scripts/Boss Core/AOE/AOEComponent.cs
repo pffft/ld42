@@ -54,16 +54,14 @@ namespace AOEs
             data.CurrentTime += Time.deltaTime;
             if (data.CurrentTime > data.MaxTime)
             {
-                //Debug.Log("Time is over! " + data.currentTime + " max: " + data.maxTime);
                 data.OnDestroyTimeout(this);
                 Destroy(this.gameObject);
             }
 
             // Hit the arena walls
             // should be "innerscale"- what about AOE attacks without hole in center?
-            if (data.Scale > GameManager.Arena.RadiusInWorldUnits + data.Start.GetValue().magnitude)
+            if (data.Scale > GameManager.Arena.RadiusInWorldUnits + Start.magnitude)
             {
-                //Debug.Log("Ring hit arena. Returning.");
                 data.OnDestroyOutOfBounds(this);
                 if (data.shouldDestroyOnOutOfBounds)
                 {
@@ -71,10 +69,6 @@ namespace AOEs
                 }
             }
 
-            // Update the size of the AOE per its expansion rate.
-            // We divide by two because AOEs move based on radius, not diameter;
-            // this makes the speeds faster than for projectiles without this correction.
-            //Debug.Log("Speed: " + data.expansionSpeed);
             data.Scale += (float)data.OuterSpeed * Time.deltaTime;
             gameObject.transform.localScale = data.Scale * Vector3.one;
 
@@ -89,8 +83,6 @@ namespace AOEs
                 Mathf.Abs((float)data.OuterSpeed) > 0.01f &&
                 !Mathf.Approximately((float)data.OuterSpeed, (float)data.InnerSpeed))
             {
-                //Debug.Log("Separate inner AOE update");
-                //Debug.Log("Separate inner update");
                 float ideal = ((float)data.InnerSpeed / (float)data.OuterSpeed);
                 data.InnerScale = data.InnerScale - ((data.InnerScale - ideal) * Time.deltaTime);
 
@@ -101,15 +93,11 @@ namespace AOEs
             // If we have a fixed width to maintain, we must recompute.
             if (Mathf.Abs(data.FixedWidth) > 0.01f && Mathf.Abs(data.Scale) > 0.01f)
             {
-                //Debug.Log("Fixed width AOE update");
-                //Debug.Log("Fixed width update");
                 data.InnerScale = (data.Scale < data.FixedWidth) ? 0f : (data.Scale - data.FixedWidth) / data.Scale;
 
                 RecomputeMeshHole();
                 return;
             }
-
-            //Debug.Log("Normal AOE update");
         }
 
         /*
@@ -144,11 +132,8 @@ namespace AOEs
                 }
                 degrees -= data.InternalRotation;
                 degrees = Mathf.Repeat(degrees, 360f);
-                //Debug.Log(degrees);
-
 
                 int section = (int)(degrees / AOE.THETA_STEP);
-                //Debug.Log("In section " + section);
 
                 if (data.Regions[section])
                 {
@@ -202,7 +187,7 @@ namespace AOEs
             meshFilter.sharedMesh.vertices = vertices;
             meshFilter.sharedMesh.triangles = triangles;
             meshFilter.sharedMesh.RecalculateNormals();
-            transform.position = new Vector3(data.Start.x, AOE.HEIGHT, data.Start.z);
+            transform.position = new Vector3(Start.x, AOE.HEIGHT, Start.z);
         }
     }
 }

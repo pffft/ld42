@@ -41,6 +41,11 @@ namespace Projectiles {
             rend = GetComponent<MeshRenderer>();
         }
 
+        public void Poke() {
+            rend.enabled = true;
+            shouldUpdate = true;
+        }
+
         public void Initialize()
         {
             // Resolve the proxy variables for start and target

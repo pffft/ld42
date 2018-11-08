@@ -50,7 +50,7 @@ namespace World
         {
             get { return transform.localScale.x * DEFAULT_ARENA_SCALE; }
             set
-			{
+            {
                 ARENA_SCALE = value;
                 maxArea = ARENA_SCALE * ARENA_SCALE / DEFAULT_ARENA_SCALE / DEFAULT_ARENA_SCALE * Mathf.PI;
                 if (GameManager.Player.GetComponent<Entity>())
@@ -94,7 +94,6 @@ namespace World
 			//drop the player if they're outside the arena
 			if (Vector3.Distance (transform.position, GameManager.Player.transform.position) > RadiusInWorldUnits)
 			{
-                Debug.Log("Player distance is greater than " + RadiusInWorldUnits);
 				//swap out a dummy and blow it up
 				GameManager.Player.gameObject.SetActive (false);
 				GameObject dummyPlayer = Instantiate(
@@ -141,15 +140,19 @@ namespace World
 			StartCoroutine (ChangeArenaSize (maxArea * victim.HealthPerc));
 		}
 
-		private IEnumerator ChangeArenaSize(float targetArea)
-		{
-			while (Mathf.Abs(CurrentArea - targetArea) > threshold)
-			{
-                float newRadius = Mathf.Lerp (transform.localScale.x, (ARENA_SCALE / 50f) * Mathf.Sqrt (targetArea / Mathf.PI), Time.deltaTime * adjustSpeed);
-				transform.localScale = Vector3.one * newRadius;
+        private IEnumerator ChangeArenaSize(float targetArea)
+        {
+            float idealRadius = Mathf.Sqrt((ARENA_SCALE / DEFAULT_ARENA_SCALE) * Mathf.Sqrt(targetArea / Mathf.PI));
+            while (Mathf.Abs(CurrentArea - targetArea) > threshold)
+            {
+                float newRadius = Mathf.Lerp(transform.localScale.x, idealRadius, Time.deltaTime * adjustSpeed);
+                transform.localScale = Vector3.one * newRadius;
 
-				yield return null;
-			}
-		}
+                yield return null;
+            }
+
+            // Set to the ideal value
+            transform.localScale = Vector3.one * idealRadius;
+        }
 	}
 }
