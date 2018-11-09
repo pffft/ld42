@@ -200,7 +200,7 @@ for (float iterator = start; iterator < end; iterator += step) {
 }
 ```
 
-The second version (without a `step` parameter) substitutes in a `step` value of `1`. The third version (with only a `count` parameter) starts at `start = 0` and increments with a `step = 1`, and thus is very similar to the `Times` method (albeit more powerful).
+The second version (without a `step` parameter) substitutes in a `step` value of `1`, and so is equivalent to `For(start, end, 1, body)`. The third version (with only a `count` parameter) starts at `start = 0` and increments with a `step = 1`, and therefore is equivalent to `For(0, count, 1, body)`.
 
 The `ForBody` parameter is a method of type `(float => AISequence)`; that is, it takes a float representing the current value of the iterator, and returns an `AISequence`. As seen in the example, you can use the lambda notation to capture the iterator and use it freely in other `AISequences`; you also don't have to name the iterator variable `i`, and can any name that's useful (like `count` or `angle`). 
 
