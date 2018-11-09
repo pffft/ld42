@@ -10,8 +10,8 @@ namespace Moves.Basic
         private static Vector3 playerLockPosition;
         private static bool isPlayerLocked;
 
-        public static BossCore.ProxyVector3 _delayed_player_position = new BossCore.ProxyVector3(() => {
-            return isPlayerLocked ? playerLockPosition : PLAYER_POSITION.GetValue();
+        public static Constants.ProxyVector3 _delayed_player_position = new Constants.ProxyVector3(() => {
+            return isPlayerLocked ? playerLockPosition : Constants.Positions.PLAYER_POSITION.GetValue();
         });
 
         public PlayerLock(bool enableLock = true) : base

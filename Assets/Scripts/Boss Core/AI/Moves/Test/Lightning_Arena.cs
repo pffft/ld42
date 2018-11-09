@@ -5,7 +5,7 @@ using UnityEngine;
 
 using Projectiles;
 using static BossController;
-using BossCore;
+using Constants;
 using Moves.Basic;
 
 namespace Moves.Test
@@ -17,7 +17,7 @@ namespace Moves.Test
             Description = "Spawns lightning on the whole arena";
             Difficulty = 5f;
             Sequence = new AISequence(
-                new Teleport(World.Arena.CENTER).Wait(0.25f),
+                new Teleport(Constants.Positions.CENTER).Wait(0.25f),
                 For(4, i => new Shoot1(new ProjectileLightning { AngleOffset = i * 90f }).Wait(0.1f)),
                 Pause(1f)
             );

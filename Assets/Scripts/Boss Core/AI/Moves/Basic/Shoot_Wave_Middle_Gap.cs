@@ -1,6 +1,6 @@
 ﻿using AI;
 using Projectiles;
-using BossCore;
+using Constants;
 
 using static BossController;
 using static AI.AISequence;

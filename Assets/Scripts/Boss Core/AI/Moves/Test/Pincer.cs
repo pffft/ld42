@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using AI;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 using UnityEngine;
+
 
 namespace Moves.Test
 {

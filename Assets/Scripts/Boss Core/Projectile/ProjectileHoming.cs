@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileHoming : Projectile
+    public class ProjectileHoming : ProjectileData
     {
 
         public static new ProjectileHoming DEFAULT = new ProjectileHoming { Size = Size.MEDIUM };
@@ -29,11 +29,11 @@ namespace Projectiles
         public ProjectileHoming(int difficulty=0) {
             this.difficulty = difficulty;
             if (difficulty == 1) {
-                Target = AI.AISequence.SMOOTHED_LEADING_PLAYER_POSITION;
+                Target = Constants.Positions.SMOOTHED_LEADING_PLAYER_POSITION;
             }
         }
 
-        public override void CustomCreate(ProjectileComponent component)
+        public override void CustomCreate(Projectile component)
         {
             targetObject = GameManager.Player.gameObject; // TODO maybe make me a customizable parameter?
             wasClose = false;
@@ -45,14 +45,14 @@ namespace Projectiles
             return Resources.Load<Material>("Art/Materials/PurpleTransparent");
         }
         
-        public override void CustomUpdate(ProjectileComponent component) {
+        public override void CustomUpdate(Projectile component) {
             switch (difficulty) {
                 case 0: HomingLevel0(component); break;
                 case 1: HomingLevel0(component); break;
             }
         }
 
-        private void HomingLevel0(ProjectileComponent component) {
+        private void HomingLevel0(Projectile component) {
             Vector3 idealVelocity = ((float)Speed) * (Target.GetValue() - component.transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, Velocity, Vector3.up);
 

@@ -4,10 +4,10 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
-using static World.Arena;
+using static Constants.Positions;
 
 namespace Moves.Unsorted
 {
@@ -28,9 +28,9 @@ namespace Moves.Unsorted
                 new Teleport(CENTER).Wait(0.5f),
                 new Shoot_Death_Hex(2f).Wait(1f),
                 new Shoot_Death_Hex(1f).Wait(2f),
-                new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(1f),
-                new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(1f),
-                new ShootArc(50, 0, 360, new Projectile { MaxTime = 0.25f }).Wait(0.75f)
+                new ShootArc(50, 0, 360, new ProjectileData { MaxTime = 0.25f }).Wait(1f),
+                new ShootArc(50, 0, 360, new ProjectileData { MaxTime = 0.25f }).Wait(1f),
+                new ShootArc(50, 0, 360, new ProjectileData { MaxTime = 0.25f }).Wait(0.75f)
             );
 		}
 	}

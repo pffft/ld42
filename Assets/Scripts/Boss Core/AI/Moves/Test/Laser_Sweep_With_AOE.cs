@@ -6,7 +6,7 @@ using AI;
 using Moves.Basic;
 using Projectiles;
 using AOEs;
-using BossCore;
+using Constants;
 using static BossController;
 
 namespace Moves.Test
@@ -22,12 +22,12 @@ namespace Moves.Test
                 new PlayerLock(true),
                 Merge(
                     new Laser().Wait(1f),
-                    new Pause(1f).Then(new ShootAOE(new AOE { FixedWidth = 3f, OuterSpeed = Speed.FAST }.On(-60, 60)))
+                    new Pause(1f).Then(new ShootAOE(new AOEData { FixedWidth = 3f, OuterSpeed = Speed.FAST }.On(-60, 60)))
                 ),
                 new Pause(1f),
                 Merge(
                     new Laser(90, -90, 5, -90).Wait(1f),
-                    new Pause(1f).Then(new ShootAOE(new AOE { FixedWidth = 3f, OuterSpeed = Speed.FAST }.On(-60, 60)))
+                    new Pause(1f).Then(new ShootAOE(new AOEData { FixedWidth = 3f, OuterSpeed = Speed.FAST }.On(-60, 60)))
                 ),
                 new PlayerLock(false),
                 new Pause(1f)

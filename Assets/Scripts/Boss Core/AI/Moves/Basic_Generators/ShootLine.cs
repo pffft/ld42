@@ -1,8 +1,8 @@
 ﻿using AI;
 using Projectiles;
-using static BossController;
 using UnityEngine;
-using BossCore;
+
+using Constants;
 
 namespace Moves.Basic
 {
@@ -19,7 +19,7 @@ namespace Moves.Basic
                 for (int i = 0; i < amount; i++)
                 {
                     Vector3 spawn = GameManager.Boss.transform.position + ((i - (amount / 2f)) * (width / amount) * leftDirection);
-                    new Projectile()
+                    new ProjectileData()
                     {
                         Start = spawn,
                         Target = spawn + targetPos,

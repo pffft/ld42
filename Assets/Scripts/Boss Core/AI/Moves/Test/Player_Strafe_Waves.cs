@@ -14,7 +14,7 @@ namespace Moves.Test
 
         public Player_Strafe_Waves()
         {
-            Sequence = For(6, i => new Strafe(true, 60, 25, GameManager.Player.transform.position)).Then(new ShootAOE(new AOE().On(-60, 60))).Wait(0.75f);
+            Sequence = For(6, i => new Strafe(true, 60, 25, GameManager.Player.transform.position)).Then(new ShootAOE(new AOEData().On(-60, 60))).Wait(0.75f);
         }
     }
 }

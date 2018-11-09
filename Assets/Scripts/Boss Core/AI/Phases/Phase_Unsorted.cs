@@ -19,14 +19,28 @@ namespace Phases
             {
                 if (type.Namespace != null && type.Namespace.Equals("Moves.Unsorted"))
                 {
+                    if (System.Attribute.GetCustomAttribute(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute)) != null) 
+                    {
+                        Debug.Log("Skipping compiler type: " + type);
+                        continue;
+                    }
+
                     try
                     {
-                        Debug.Log("Adding type: " + type);
-                        AddSequence(10, System.Activator.CreateInstance(type) as AISequence);
+                        Debug.Log("Trying to add type: " + type);
+                        object rawObj = System.Activator.CreateInstance(type);
+                        Debug.Log("Instantiated type parent type: " + rawObj.GetType().BaseType);
+                        AISequence instantiatedSequence = (AISequence) rawObj;
+                        if (instantiatedSequence == null) 
+                        {
+                            Debug.LogError("Instantiation failure! Got back null.");
+                        }
+                        AddSequence(10, instantiatedSequence);
                     }
-                    catch (System.Exception)
+                    catch (System.Exception e)
                     {
-                        Debug.Log("Failed to add type: " + type);
+                        Debug.LogError("Failed to add type: " + type);
+                        Debug.LogError(e);
                     }
                 }
             }

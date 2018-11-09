@@ -4,7 +4,7 @@ using AI;
 using UnityEngine;
 
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Test;
 using Moves.Basic;
 using static BossController;
@@ -18,7 +18,7 @@ namespace Moves.Test
             Description = "Lightning with aoe";
             Difficulty = 6f;
             Sequence = new AISequence(
-                new ShootAOE(new AOE
+                new ShootAOE(new AOEData
                 {
                     AngleOffset = (-25),
                     RotationSpeed = (15f),
@@ -31,7 +31,7 @@ namespace Moves.Test
                      .On(270 - 22.5f, 270 + 22.5f)
                 ).Wait(1.5f),
                 new Lightning_Arena().Wait(0.5f),
-                new ShootAOE(new AOE
+                new ShootAOE(new AOEData
                 {
                     AngleOffset = (-25),
                     RotationSpeed = (15f),

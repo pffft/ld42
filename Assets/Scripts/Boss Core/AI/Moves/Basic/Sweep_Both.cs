@@ -20,8 +20,8 @@ namespace Moves.Basic
                 new PlayerLock(true),
                 For(0, 120, 5, 
                     i => Merge(
-                        new Shoot1(new Projectile { AngleOffset = i - 60 }),
-                        new Shoot1(new Projectile { AngleOffset = 60 - i })
+                        new Shoot1(new ProjectileData { AngleOffset = i - 60 }),
+                        new Shoot1(new ProjectileData { AngleOffset = 60 - i })
                     ).Wait(0.05f)
                 ),
                 new PlayerLock(false),

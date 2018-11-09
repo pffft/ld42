@@ -26,7 +26,6 @@ namespace Projectiles
 
         public void Update()
         {
-            /*
             if (count++ > 10) {
                 Profiler.BeginSample("Flushing hot cache");
                 count = 0;
@@ -38,7 +37,6 @@ namespace Projectiles
                 }
                 Profiler.EndSample();
             }
-            */
         }
 
         public static GameObject Checkout() {

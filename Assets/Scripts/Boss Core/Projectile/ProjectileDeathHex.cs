@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileDeathHex : Projectile
+    public class ProjectileDeathHex : ProjectileData
     {
         public ProjectileDeathHex() {
             MaxTime = 1f;

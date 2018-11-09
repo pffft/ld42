@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using BossCore;
+using Constants;
 using static AI.AISequence;
 using Moves.Basic;
 
@@ -16,7 +16,7 @@ namespace Projectiles
 
         public static ProjectileCallbackExpression FREEZE = self =>
             new Shoot1(
-                new Projectile
+                new ProjectileData
                 {
                     Start = self.transform.position,
                     MaxTime = 5f,
@@ -48,11 +48,11 @@ namespace Projectiles
 
         // Spawns a wave at the death position.
         public static ProjectileCallbackExpression SPAWN_WAVE = self =>
-            new ShootAOE(new AOEs.AOE { Start = self.transform.position }.On(0, 360f));
+            new ShootAOE(new AOEs.AOEData { Start = self.transform.position }.On(0, 360f));
         
         public static ProjectileCallbackExpression SPAWN_1_TOWARDS_PLAYER = self =>
             new Shoot1(
-                new Projectile
+                new ProjectileData
                 {
                     Start = self.transform.position,
                     MaxTime = self.data.MaxTime,
@@ -73,7 +73,7 @@ namespace Projectiles
 
         public static ProjectileCallbackExpression REVERSE = (self) =>
             new Shoot1(
-                new Projectile
+                new ProjectileData
                 {
                     Start = self.transform.position,
                     Target = self.data.Start,

@@ -4,7 +4,7 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 using static BossController;
@@ -20,9 +20,9 @@ namespace Moves.Basic
             Sequence = new AISequence(
                 new Teleport().Wait(0.5f),
                 new PlayerLock(true),
-                new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM, FixedWidth = 5 }.On(-60, 60)).Wait(0.19f),
-                new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM, FixedWidth = 20 }.On(-60, -40).On(-10, 10).On(40, 60)).Wait(0.76f),
-                new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM, FixedWidth = 5 }.On(-60, 60)).Wait(0.2f),
+                new ShootAOE(new AOEData { OuterSpeed = Speed.MEDIUM, FixedWidth = 5 }.On(-60, 60)).Wait(0.19f),
+                new ShootAOE(new AOEData { OuterSpeed = Speed.MEDIUM, FixedWidth = 20 }.On(-60, -40).On(-10, 10).On(40, 60)).Wait(0.76f),
+                new ShootAOE(new AOEData { OuterSpeed = Speed.MEDIUM, FixedWidth = 5 }.On(-60, 60)).Wait(0.2f),
                 new PlayerLock(false).Wait(1f)
             );
 		}

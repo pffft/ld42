@@ -27,6 +27,8 @@ public class BossController : MonoBehaviour
     private bool paused;
     private bool running = true;
 
+    private System.Diagnostics.Stopwatch stopWatch;
+
     #region Debugging code that should be refactored soon™
     // Debug code. Used to set the routine from the inspector rather than changing code.
     private enum _Routine {
@@ -48,6 +50,7 @@ public class BossController : MonoBehaviour
             self = GetComponent<CombatCore.Entity>();
         }
         queuedSequences = new Queue<AISequence>();
+        stopWatch = new System.Diagnostics.Stopwatch();
     }
 
     // Use this for initialization
@@ -103,7 +106,7 @@ public class BossController : MonoBehaviour
         if (!Chill)
         {
             Add(new Moves.Basic.Invincible(true));
-            Add(new Moves.Basic.Teleport(World.Arena.CENTER).Wait(3f));
+            Add(new Moves.Basic.Teleport(Constants.Positions.CENTER).Wait(3f));
             Add(new Moves.Basic.Invincible(false));
         }
     }
@@ -131,7 +134,7 @@ public class BossController : MonoBehaviour
         {
             queuedSequences.Enqueue(sequence);
         } else {
-            Debug.LogError("Refusing to add invalid sequence: " + sequence.Name);
+            Debug.LogError("Refusing to add invalid sequence: " + sequence == null ? "null" : sequence.Name);
         }
     }
 
@@ -194,9 +197,26 @@ public class BossController : MonoBehaviour
                     yield return new WaitForSecondsRealtime(0.05f);
                 }
 
+                stopWatch.Reset();
+                stopWatch.Start();
                 sequence.Events[i].action?.Invoke();
+                stopWatch.Stop();
+
+                long elapsedMillis = stopWatch.ElapsedMilliseconds;
+                float elapsedSeconds = stopWatch.ElapsedMilliseconds / 1000.0f;
+                if (elapsedMillis > 0) 
+                {
+                    Debug.Log("Elapsed time for execution: " + elapsedSeconds);
+                }
                 // TODO reduce the wait time if the above invocation takes too long 
-                yield return new WaitForSecondsRealtime(sequence.Events[i].duration);
+                if (Time.timeScale > 0)
+                {
+                    yield return new WaitForSecondsRealtime((sequence.Events[i].duration / Time.timeScale) - elapsedSeconds);
+                } 
+                else 
+                {
+                    Debug.LogError("Time scale was set to 0, but the game was not paused.");
+                }
             }
         }
         else
