@@ -174,6 +174,52 @@ Sequence = new AISequence(
 );
 ```
 
+But similar to imperative programming's for loops, we can write the following:
+
+```C#
+Sequence = new AISequence(
+  For(-30f, 30f, 1f, 
+    i => new Shoot1(new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = i }).Wait(0.1f)
+  )
+);
+```
+
+The `For` method can take up to four parameters, like so:
+
+```C#
+For(float start, float end, float step, ForBody body);
+For(float start, float end, ForBody body);
+For(float count, ForBody body);
+```
+
+The first one is the "full" method, and is almost identical to a standard for loop. It creates an iterator that begins at a starting value, `start`, and continuously increases the value of the iterator by the value of `step`. As soon as the iterator's value is `>= end`, the loop terminates. That is, the `For` method is (roughly) equivalent to:
+
+```C#
+for (float iterator = start; iterator < end; iterator += step) {
+  ForBody(iterator);
+}
+```
+
+The second version (without a `step` parameter) substitutes in a `step` value of `1`. The third version (with only a `count` parameter) starts at `start = 0` and increments with a `step = 1`, and thus is very similar to the `Times` method (albeit more powerful).
+
+The `ForBody` parameter is a method of type `(float => AISequence)`; that is, it takes a float representing the current value of the iterator, and returns an `AISequence`. As seen in the example, you can use the lambda notation to capture the iterator and use it freely in other `AISequences`; you also don't have to name the iterator variable `i`, and can any name that's useful (like `count` or `angle`). 
+
+There are a couple of limitations of the `For` method; most notably, it can only iterate by adding the `step` value to the iterator every loop. A true for loop would allow subtraction, multiplication, and division, and such things as `for (float i = 1; i <= 16; i *= 2)` would be possible. This is unfortunately beyond the scope of this method. Additionally, the `For` method will run every `AISequence` generated *in order*, and specifically, *not at the same time*. Using the example above, because the `AISequence` has a `Wait(0.1f)` in it, that means that every single `Shoot1` call will have a `Wait` after it. That's useful here, but what if we wanted to fire all 60 `Projectile`s at once?
+
+That's where `ForConcurrent` comes in. The `ForConcurrent` method has the same signatures as the `For` method, but will run all of the `AISequence`s it generates *at the exact same time*. Thus, changing the `For` to `ForConcurrent` in the example:
+
+```C#
+Sequence = new AISequence(
+  ForConcurrent(-30f, 30f, 1f, 
+    i => new Shoot1(new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = i }).Wait(0.1f)
+  )
+);
+```
+
+will result in a wave of 60 `Projectile`s fired at once in an unbroken arc. 
+
+Note: You'll notice that, even if you remove the `Wait(0.1f)` call in the original `For`, you'll still get a "sweeping" effect, rather than a single arc. That's because the way `AISequence`s are executed puts a small delay between adjacent events, even if there isn't a delay scheduled! `ForConcurrent` explicitly states "execute all of these events at the same time", which fixes this problem.
+
 #### If
 #### Either
 #### Merge
