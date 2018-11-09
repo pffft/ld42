@@ -7,7 +7,7 @@ namespace Moves.Basic
 {
     public class MoveCamera : InternalMove
     {
-        public MoveCamera(bool isFollow = false, Vector3? targetPosition = null) : base
+        public MoveCamera(bool isFollow, Vector3? targetPosition = null) : base
         (
             () =>
             {

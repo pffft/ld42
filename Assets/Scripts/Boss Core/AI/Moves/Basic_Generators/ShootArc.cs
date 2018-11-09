@@ -7,7 +7,11 @@ namespace Moves.Basic
     public class ShootArc : InternalMove
     {
 
-        public ShootArc(int density = 50, float from = 0, float to = 360, Projectile skeleton = null) : base
+        public ShootArc() : this(50, 0, 360, Projectile.DEFAULT) { }
+
+        public ShootArc(Projectile skeleton) : this(50, 0, 360, skeleton) { }
+
+        public ShootArc(int density, float from, float to, Projectile skeleton = null) : base
         (
             () =>
             {
@@ -33,7 +37,7 @@ namespace Moves.Basic
         )
         {
             Description = "Shot an arc (density=" + density + ", from=" + from + ", to=" + to + ") of " +
-              (skeleton == null ? "default projectiles at the player." : skeleton + ".");
+                (skeleton == Projectile.DEFAULT ? "default projectiles at the player." : skeleton + ".");
         }
     }
 }

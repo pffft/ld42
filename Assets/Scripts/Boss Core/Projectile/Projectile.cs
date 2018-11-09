@@ -8,10 +8,15 @@ using UnityEngine.Profiling;
 
 namespace Projectiles
 {
+    //using ProjectileCallback = System.Linq.Expressions.Expression<System.Func<ProjectileComponent, AI.AISequence>>;
+    using ProjectileCallbackExpression = System.Linq.Expressions.Expression<ProjectileCallback>;
+
     /*
     * Used for handling events for Projectiles. Currently death events are supported.
     */
     public delegate AI.AISequence ProjectileCallback(ProjectileComponent self);
+
+    //public System.Func<ProjectileComponent, AI.AISequence> ProjectileCallback2;
 
     public class Projectile
     {
@@ -33,22 +38,61 @@ namespace Projectiles
 
         public virtual Vector3 Velocity { get; set; } = Vector3.forward;
 
+        public ProjectileCallbackExpression OnDestroyTimeout { get; set; } = CallbackDictionary.NOTHING;
+
         /*
-         * Called after object is destroyed due to time limit.
-         */
-        // TODO find a way to remove public-facing delegate here.
-        // Maybe make this an AISequence? But then how to pass the (self) reference?
-        public ProjectileCallback OnDestroyTimeout { get; set; } = CallbackDictionary.NOTHING;
+        private ProjectileCallback _onDestroyTimeout;
+        public object OnDestroyTimeout { 
+            get {
+                return _onDestroyTimeout;
+            } 
+
+            set {
+                System.Linq.Expressions.Expression<ProjectileCallback> expression = value as System.Linq.Expressions.Expression<ProjectileCallback>;
+                if (expression == null) {
+                    Debug.LogError("Setting OnDestroyTimeout failed, found expression body");
+                    return;
+                }
+                _onDestroyTimeout = expression.Compile();
+                //_onDestroyTimeout = value;
+            } 
+        }
+        */
+
+        /*
+        private System.Func<ProjectileComponent, AI.AISequence> _onDestroyTimeout;
+        public ProjectileCallback OnDestroyTimeout {
+            get {
+                return x => _onDestroyTimeout(x);
+                //return null;
+            }
+            set {
+                //System.Linq.Expressions.Expression<ProjectileCallback> expression = value as System.Linq.Expressions.Expression<ProjectileCallback>;
+                _onDestroyTimeout = value.Compile();
+            }
+        }
+        */
+
+        // Works but doesn't allow for setting in the object initializer
+        /*
+        public void OnDestroyTimeout(System.Linq.Expressions.Expression<ProjectileCallback> expression) {
+            this._onDestroyTimeout = expression.Compile();
+        }
+
+        public ProjectileCallback OnDestroyTimeout() {
+            return this._onDestroyTimeout;
+        }
+        */
 
         /*
          * Called after object is destroyed due to hitting the arena.
          */
-        public ProjectileCallback OnDestroyOutOfBounds { get; set; } = CallbackDictionary.NOTHING;
+        public ProjectileCallbackExpression OnDestroyOutOfBounds { get; set; } = CallbackDictionary.NOTHING;
 
         /*
          * Called when the object hits the player
          */
-        public ProjectileCallback OnDestroyCollision { get; set; } = CallbackDictionary.NOTHING;
+        public ProjectileCallbackExpression OnDestroyCollision { get; set; } = CallbackDictionary.NOTHING;
 
         /// <summary>
         /// This method is called at the end of every Update() call. When overridden,

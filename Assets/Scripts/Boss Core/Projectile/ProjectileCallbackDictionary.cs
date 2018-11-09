@@ -8,11 +8,13 @@ using Moves.Basic;
 
 namespace Projectiles
 {
+    using ProjectileCallbackExpression = System.Linq.Expressions.Expression<ProjectileCallback>;
+
     public static class CallbackDictionary
     {
-        public static ProjectileCallback NOTHING = self => new Pause(0f);
+        public static ProjectileCallbackExpression NOTHING = self => new Pause(0f);
 
-        public static ProjectileCallback FREEZE = self =>
+        public static ProjectileCallbackExpression FREEZE = self =>
             new Shoot1(
                 new Projectile
                 {
@@ -22,7 +24,7 @@ namespace Projectiles
                 }
             );
 
-        public static ProjectileCallback SPAWN_6_CURVING = self =>
+        public static ProjectileCallbackExpression SPAWN_6_CURVING = self =>
             ForConcurrent(6, i => new Shoot1(
                 new ProjectileCurving((float)self.data.Speed * 2f, true)
                 {
@@ -33,7 +35,7 @@ namespace Projectiles
                 }
             ));
 
-        public static ProjectileCallback SPAWN_6 = self =>
+        public static ProjectileCallbackExpression SPAWN_6 = self =>
             ForConcurrent(6, i => new Shoot1(
                 new ProjectileCurving(0f, true)
                 {
@@ -45,10 +47,10 @@ namespace Projectiles
             ));
 
         // Spawns a wave at the death position.
-        public static ProjectileCallback SPAWN_WAVE = self =>
+        public static ProjectileCallbackExpression SPAWN_WAVE = self =>
             new ShootAOE(new AOEs.AOE { Start = self.transform.position }.On(0, 360f));
         
-        public static ProjectileCallback SPAWN_1_TOWARDS_PLAYER = self =>
+        public static ProjectileCallbackExpression SPAWN_1_TOWARDS_PLAYER = self =>
             new Shoot1(
                 new Projectile
                 {
@@ -58,9 +60,9 @@ namespace Projectiles
                 }
             );
 
-        public static ProjectileCallback SPAWN_1_HOMING_TOWARDS_PLAYER = self =>
+        public static ProjectileCallbackExpression SPAWN_1_HOMING_TOWARDS_PLAYER = self =>
             new Shoot1(
-                new ProjectileHoming
+                new ProjectileHoming(0)
                 {
                     Start = self.transform.position,
                     MaxTime = self.data.MaxTime,
@@ -69,7 +71,7 @@ namespace Projectiles
                 }
             );
 
-        public static ProjectileCallback REVERSE = (self) =>
+        public static ProjectileCallbackExpression REVERSE = (self) =>
             new Shoot1(
                 new Projectile
                 {
@@ -80,11 +82,12 @@ namespace Projectiles
                 }
             );
 
-        public static ProjectileCallback REVERSE_FASTER = (self) =>
+        /*
+        public static ProjectileCallbackExpression REVERSE_FASTER = (self) =>
         {
             if (self.data.Speed == Speed.LIGHTNING)
             {
-                return NOTHING(self);
+                return NOTHING.Compile().Invoke(self);
             }
 
             Speed currentSpeed = self.data.Speed;
@@ -102,5 +105,6 @@ namespace Projectiles
                 }
             );
         };
+        */
     }
 }

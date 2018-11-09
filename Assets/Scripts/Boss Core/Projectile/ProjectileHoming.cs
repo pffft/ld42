@@ -24,6 +24,8 @@ namespace Projectiles
 
         private int difficulty;
 
+        public ProjectileHoming() : this(0) { }
+
         public ProjectileHoming(int difficulty=0) {
             this.difficulty = difficulty;
             if (difficulty == 1) {
