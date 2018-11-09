@@ -38,51 +38,10 @@ namespace Projectiles
 
         public virtual Vector3 Velocity { get; set; } = Vector3.forward;
 
+        /*
+         * Called after MaxTime number of seconds have elapsed.
+         */
         public ProjectileCallbackExpression OnDestroyTimeout { get; set; } = CallbackDictionary.NOTHING;
-
-        /*
-        private ProjectileCallback _onDestroyTimeout;
-        public object OnDestroyTimeout { 
-            get {
-                return _onDestroyTimeout;
-            } 
-
-            set {
-                System.Linq.Expressions.Expression<ProjectileCallback> expression = value as System.Linq.Expressions.Expression<ProjectileCallback>;
-                if (expression == null) {
-                    Debug.LogError("Setting OnDestroyTimeout failed, found expression body");
-                    return;
-                }
-                _onDestroyTimeout = expression.Compile();
-                //_onDestroyTimeout = value;
-            } 
-        }
-        */
-
-        /*
-        private System.Func<ProjectileComponent, AI.AISequence> _onDestroyTimeout;
-        public ProjectileCallback OnDestroyTimeout {
-            get {
-                return x => _onDestroyTimeout(x);
-                //return null;
-            }
-            set {
-                //System.Linq.Expressions.Expression<ProjectileCallback> expression = value as System.Linq.Expressions.Expression<ProjectileCallback>;
-                _onDestroyTimeout = value.Compile();
-            }
-        }
-        */
-
-        // Works but doesn't allow for setting in the object initializer
-        /*
-        public void OnDestroyTimeout(System.Linq.Expressions.Expression<ProjectileCallback> expression) {
-            this._onDestroyTimeout = expression.Compile();
-        }
-
-        public ProjectileCallback OnDestroyTimeout() {
-            return this._onDestroyTimeout;
-        }
-        */
 
         /*
          * Called after object is destroyed due to hitting the arena.

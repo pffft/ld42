@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace AI
 {
+    using ForBodyExpression = System.Linq.Expressions.Expression<AISequence.ForBody>;
+
     public class AISequence
     {
         /// <summary>
@@ -437,22 +439,22 @@ namespace AI
         // A delegate that captures an iterator in a for loop
         public delegate AISequence ForBody(float iterator);
 
-        public static AISequence For(float count, ForBody body)
+        public static AISequence For(float count, ForBodyExpression body)
         {
             if (count <= 0)
             {
                 Debug.LogError("Found a for loop with negative count.");
-                return body(0);
+                return body.Compile().Invoke(0);
             }
             return For(0, count, 1, body);
         }
 
-        public static AISequence For(float start, float end, ForBody body)
+        public static AISequence For(float start, float end, ForBodyExpression body)
         {
             if (end < start)
             {
                 Debug.LogError("Found a for loop with end before start.");
-                return body(start);
+                return body.Compile().Invoke(start);
             }
             return For(start, end, 1, body);
         }
@@ -464,18 +466,18 @@ namespace AI
          * separate events; if the ForBody's AISequence has a delay, this will appear
          * between all the events produced.
          */
-        public static AISequence For(float start, float end, float step, ForBody body)
+        public static AISequence For(float start, float end, float step, ForBodyExpression body)
         {
             if (Mathf.Approximately(step, 0))
             {
                 Debug.LogError("Found for loop with step size 0.");
-                return body(start);
+                return body.Compile().Invoke(start);
             }
 
             if (Mathf.Abs(Mathf.Sign(end - start) - Mathf.Sign(step)) > 0.01f)
             {
                 Debug.LogError("Found for loop that will never terminate.");
-                return body(start);
+                return body.Compile().Invoke(start);
             }
 
             AISequence[] sequences = new AISequence[(int)Mathf.Abs((end - start) / step)];
@@ -484,25 +486,25 @@ namespace AI
             {
                 for (float i = start; i > end; i += step)
                 {
-                    sequences[count++] = body(i);
+                    sequences[count++] = body.Compile().Invoke(i);
                 }
             }
             else
             {
                 for (float i = start; i < end; i += step)
                 {
-                    sequences[count++] = body(i);
+                    sequences[count++] = body.Compile().Invoke(i);
                 }
             }
             return new AISequence(sequences);
         }
 
-        public static AISequence ForConcurrent(float count, ForBody body)
+        public static AISequence ForConcurrent(float count, ForBodyExpression body)
         {
             return ForConcurrent(0, count, 1, body);
         }
 
-        public static AISequence ForConcurrent(float start, float end, ForBody body)
+        public static AISequence ForConcurrent(float start, float end, ForBodyExpression body)
         {
             return ForConcurrent(start, end, 1, body);
         }
@@ -514,7 +516,7 @@ namespace AI
          * This means a wait returned by ForBody will happen at the end, rather than
          * between each sequence.
          */
-        public static AISequence ForConcurrent(float start, float end, float step, ForBody body)
+        public static AISequence ForConcurrent(float start, float end, float step, ForBodyExpression body)
         {
             return Merge(For(start, end, step, body).Children());
         }
