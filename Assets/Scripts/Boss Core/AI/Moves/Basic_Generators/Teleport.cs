@@ -8,6 +8,10 @@ namespace Moves.Basic
         // A reference to the BossController's entity. Assigned when teleport is called.
         private static CombatCore.Entity self = null;
 
+        public Teleport() : this(null, 25) { }
+
+        public Teleport(Vector3 target) : this(target, 25) { }
+
         public Teleport(Vector3? target = null, int speed = 25) : base
         (
             () =>

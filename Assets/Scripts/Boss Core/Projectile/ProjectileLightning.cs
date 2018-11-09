@@ -28,7 +28,7 @@ namespace Projectiles
             base.MaxTime = 0.05f;
 
             Speed = BossCore.Speed.LIGHTNING;
-            OnDestroyTimeout = LIGHTNING_RECUR;
+            //OnDestroyTimeout = LIGHTNING_RECUR;
         }
 
         public override float MaxTime
@@ -81,6 +81,8 @@ namespace Projectiles
         }
 
         // Recursively generates more lightning
+        // TODO move this into the CustomUpdate so this compiles
+        /*
         private static ProjectileCallback LIGHTNING_RECUR = (self) =>
         {
             ProjectileLightning lightningSelf = self.data as ProjectileLightning;
@@ -118,5 +120,6 @@ namespace Projectiles
                 )
             );
         };
+        */
     }
 }

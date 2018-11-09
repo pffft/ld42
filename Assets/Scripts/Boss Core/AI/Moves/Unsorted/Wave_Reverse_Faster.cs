@@ -28,7 +28,8 @@ namespace Moves.Unsorted
                         Size = Size.MEDIUM,
                         MaxTime = 1f,
                         AngleOffset = i * (360f / 50f),
-                        OnDestroyTimeout = CallbackDictionary.REVERSE_FASTER
+                        //OnDestroyTimeout = CallbackDictionary.REVERSE_FASTER
+                        //TODO reimplement above^^
                     }
                 )
             ).Wait(2f);

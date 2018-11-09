@@ -116,7 +116,7 @@ namespace AI
             get; protected set;
         }
 
-        public override string ToString()
+        public override sealed string ToString()
         {
             if (Description != null)
             {

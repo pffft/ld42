@@ -128,7 +128,7 @@ namespace Projectiles {
 
             if (currentTime >= maxTime)
             {
-                GameManager.Boss.ExecuteAsync(data.OnDestroyTimeout(this));
+                GameManager.Boss.ExecuteAsync(data.OnDestroyTimeout.Compile().Invoke(this));
                 //Destroy(this.gameObject);
                 Cleanup();
             }
@@ -143,7 +143,7 @@ namespace Projectiles {
                 Profiler.BeginSample("Bounds check");
                 if (trans.position.sqrMagnitude > 5625f)
                 {
-                    GameManager.Boss.ExecuteAsync(data.OnDestroyOutOfBounds(this));
+                    GameManager.Boss.ExecuteAsync(data.OnDestroyOutOfBounds.Compile().Invoke(this));
                     Cleanup();
 
                 }
@@ -180,7 +180,7 @@ namespace Projectiles {
                     //Debug.Log("Projectile collided, should apply damage");
                     // Note that the entity causing the damage is null; callbacks may fail.
                     Entity.DamageEntity(otherEntity, null, data.Damage);
-                    GameManager.Boss.ExecuteAsync(data.OnDestroyCollision(this));
+                    GameManager.Boss.ExecuteAsync(data.OnDestroyCollision.Compile().Invoke(this));
                     //Destroy(this.gameObject);
                     Cleanup();
                 }

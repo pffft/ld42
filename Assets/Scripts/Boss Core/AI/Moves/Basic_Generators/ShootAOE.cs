@@ -8,7 +8,10 @@ namespace Moves.Basic
 {
     public class ShootAOE : InternalMove
     {
-        public ShootAOE(AOE skeleton = null) : base
+        // TODO add default AOEs
+        public ShootAOE() : this(null) { }
+
+        public ShootAOE(AOE skeleton) : base
         (
             () => 
             {
