@@ -161,6 +161,7 @@ public class Controller : MonoBehaviour
 
     public void OnDrawGizmos()
     {
+#if UNITY_EDITOR
         UnityEditor.Handles.color = Color.green;
         UnityEditor.Handles.DrawWireArc(facePos, Vector3.up, Vector3.forward, 360f, 1f);
 
@@ -179,5 +180,6 @@ public class Controller : MonoBehaviour
             UnityEditor.Handles.color = Color.blue;
             UnityEditor.Handles.DrawWireArc(shield.transform.position, Vector3.up, Vector3.forward, 360f, 5f);
         }
+#endif
     }
 }

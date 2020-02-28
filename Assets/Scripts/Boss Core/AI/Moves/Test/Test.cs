@@ -45,8 +45,13 @@ namespace Moves.Test
             });
             */
 
+            //Sequence = new AISequence(
+            //    For(-30f, 30f, 1f,
+            //        i => new Shoot1(new ProjectileData { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = i })
+            //    )
+            //);
             Sequence = new AISequence(
-                For(-30f, 30f, 1f,
+                ForConcurrent(0, 360, 
                     i => new Shoot1(new ProjectileData { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = i })
                 )
             );
