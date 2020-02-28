@@ -4,7 +4,7 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 using static BossController;

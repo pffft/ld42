@@ -7,7 +7,7 @@ using static AI.AISequence;
 
 namespace Projectiles
 {
-    public class ProjectileLightning : Projectile
+    public class ProjectileLightning : ProjectileData
     {
         private readonly int level;
         private Vector3 initialTarget;
@@ -27,7 +27,7 @@ namespace Projectiles
 
             base.MaxTime = 0.05f;
 
-            Speed = BossCore.Speed.LIGHTNING;
+            Speed = Constants.Speed.LIGHTNING;
             //OnDestroyTimeout = LIGHTNING_RECUR;
         }
 
@@ -48,7 +48,7 @@ namespace Projectiles
             }
         }
 
-        public override void CustomCreate(ProjectileComponent component)
+        public override void CustomCreate(Projectile component)
         {
             // Make the target the player position, but at a radius of 100.
             // This prevents "bunching" around the true target.
@@ -60,7 +60,7 @@ namespace Projectiles
             return Resources.Load<Material>("Art/Materials/BlueTransparent");
         }
 
-        public override void CustomUpdate(ProjectileComponent component)
+        public override void CustomUpdate(Projectile component)
         {
             if ((component.transform.position - GameManager.Player.transform.position).magnitude < 5f)
             {
@@ -70,12 +70,12 @@ namespace Projectiles
             if (component.currentTime > count / numSpawners)
             {
                 count++;
-                new Projectile
+                new ProjectileData
                 {
                     Start = component.transform.position,
                     MaxTime = initialMaxTime - component.currentTime,
                     Size = Size.SMALL,
-                    Speed = BossCore.Speed.FROZEN
+                    Speed = Constants.Speed.FROZEN
                 }.Create();
             }
         }

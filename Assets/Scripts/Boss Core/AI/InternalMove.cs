@@ -26,7 +26,8 @@ namespace AI
         }
 
         // Used uniquely by Pause() to generate an AIEvent with a nonzero duration.
-        internal InternalMove(AIEvent a) {
+        internal InternalMove(AIEvent a) 
+        {
             this.Events = new AIEvent[] { a };
             this.Children = () => { return null; };
         }

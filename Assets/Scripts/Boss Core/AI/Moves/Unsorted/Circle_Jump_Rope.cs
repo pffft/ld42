@@ -4,11 +4,11 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 using static BossController;
-using static World.Arena;
+using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {
@@ -22,7 +22,7 @@ namespace Moves.Unsorted
                 new Teleport(CENTER).Wait(0.5f),
                 new Wave_Reverse_Faster().Wait(1f),
                 new Wave_Reverse_Faster(),
-                new Shoot1(new Projectile { Size = Size.TINY, Speed = Speed.FAST }).Wait(0.1f).Times(60) // This pushes it a bit over 8.
+                new Shoot1(new ProjectileData { Size = Size.TINY, Speed = Speed.FAST }).Wait(0.1f).Times(60) // This pushes it a bit over 8.
                 // Adding any of the below additional attacks makes it too hard for gameplay purposes.
                 //Shoot1(size: Size.TINY, speed: Speed.VERY_FAST, angleOffset: -20f).Wait(0.1f).Times(30)
                 //Shoot3(speed: Speed.FAST, size: Size.SMALL).Wait(0.1f).Times(60)

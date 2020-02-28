@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using AI;
-using AOEs;
-using BossCore;
 using Moves.Basic;
-using static World.Arena;
-using Projectiles;
+using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {

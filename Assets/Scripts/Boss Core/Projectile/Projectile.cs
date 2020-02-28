@@ -1,138 +1,196 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using BossCore;
-using CombatCore;
 using UnityEngine;
+
+using CombatCore;
 
 using UnityEngine.Profiling;
 
-namespace Projectiles
-{
-    //using ProjectileCallback = System.Linq.Expressions.Expression<System.Func<ProjectileComponent, AI.AISequence>>;
-    using ProjectileCallbackExpression = System.Linq.Expressions.Expression<ProjectileCallback>;
-
-    /*
-    * Used for handling events for Projectiles. Currently death events are supported.
-    */
-    public delegate AI.AISequence ProjectileCallback(ProjectileComponent self);
-
-    //public System.Func<ProjectileComponent, AI.AISequence> ProjectileCallback2;
-
-    public class Projectile
+namespace Projectiles {
+    public class Projectile : MonoBehaviour
     {
-        // Experimental. Static Projectiles that are commonly used (note: there don't tend to be duplicate projectiles)
-        public static Projectile DEFAULT = new Projectile();
-        public static Projectile DEFAULT_LARGE_SLOW = new Projectile { Size = Size.LARGE, Speed = Speed.SLOW };
-        public static Projectile DEFAULT_MEDIUM_MEDIUM = new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM };
-        public static Projectile DEFAULT_SMALL_FAST = new Projectile { Size = Size.SMALL, Speed = Speed.FAST };
+        // The data representing this component's specific appearance and behavior.
+        public ProjectileData data;
 
-        public virtual ProxyVector3 Start { get; set; } = AI.AISequence.BOSS_POSITION;
-        public virtual ProxyVector3 Target { get; set; } = AI.AISequence.DELAYED_PLAYER_POSITION;
-        public virtual float AngleOffset { get; set; } = 0f;
+        public Vector3 FixedStart;
+        public Vector3 FixedTarget;
 
-        public virtual Speed Speed { get; set; } = Speed.MEDIUM;
-        public virtual Size Size { get; set; } = Size.SMALL;
+        // Some cached GameObject values for increased performance.
+        private Transform trans;
+        private MeshRenderer rend;
+        public bool shouldUpdate = true;
 
-        public virtual float MaxTime { get; set; } = 10f;
-        public virtual float Damage { get; set; } = ((float)Size.SMALL + 0.5f) * 2f;
+        // Time is updated in the component rather than the Projectile for increased performance
+        public float currentTime;
+        private float maxTime;
 
-        public virtual Vector3 Velocity { get; set; } = Vector3.forward;
+        public static Material blueMaterial;
+        public static Material orangeMaterial;
+        public static Material orangeRedMaterial;
 
-        /*
-         * Called after MaxTime number of seconds have elapsed.
-         */
-        public ProjectileCallbackExpression OnDestroyTimeout { get; set; } = CallbackDictionary.NOTHING;
-
-        /*
-         * Called after object is destroyed due to hitting the arena.
-         */
-        public ProjectileCallbackExpression OnDestroyOutOfBounds { get; set; } = CallbackDictionary.NOTHING;
-
-        /*
-         * Called when the object hits the player
-         */
-        public ProjectileCallbackExpression OnDestroyCollision { get; set; } = CallbackDictionary.NOTHING;
-
-        /// <summary>
-        /// This method is called at the end of every Update() call. When overridden,
-        /// this can be used to specify custom movement.
-        /// </summary>
-        /// <param name="component">The ProjectileComponent of this active GameObject.</param>
-        public virtual void CustomUpdate(ProjectileComponent component) { }
-
-        /// <summary>
-        /// Provides a custom material. By default, material is chosen based on the size
-        /// of the Projectile.
-        /// </summary>
-        /// <returns>The material to render with.</returns>
-        public virtual Material CustomMaterial() { return null; }
-
-        /// <summary>
-        /// Clones this Projectile data object. 
-        /// 
-        /// This is mostly used internally by the ShootX() AISequences. If you try to
-        /// use Projectiles without first cloning them, then any time you reuse a reference,
-        /// you will be modifying the position of the same one every time. 
-        /// </summary>
-        /// <returns>The clone.</returns>
-        public Projectile Clone()
+        public void Awake()
         {
-            return MemberwiseClone() as Projectile;
+            if (blueMaterial == null)
+            {
+                blueMaterial = Resources.Load<Material>("Art/Materials/BlueTransparent");
+                orangeMaterial = Resources.Load<Material>("Art/Materials/OrangeTransparent");
+                orangeRedMaterial = Resources.Load<Material>("Art/Materials/OrangeRedTransparent");
+            }
+
+            trans = transform;
+            rend = GetComponent<MeshRenderer>();
         }
 
-        /// <summary>
-        /// Generates a new GameObject with a ProjectileComponent that references this
-        /// data object.
-        /// </summary>
-        /// <returns>The ProjectileComponent added to the new GameObject.</returns>
-        public ProjectileComponent Create()
+        public void Initialize()
         {
-            Profiler.BeginSample("Projectile.Create");
+            // Resolve the proxy variables for start and target
+            // This also "locks" them so they don't keep updating.
+            FixedStart = data.Start.GetValue();
+            FixedTarget = data.Target.GetValue();
 
-            Profiler.BeginSample("Projectile.Create GameObject Instantiate");
-            // Create new GameObject
-            //GameObject newObj = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Projectile"));
-            GameObject newObj = ProjectileManager.Checkout();
-            Profiler.EndSample();
+            // Sets size (and assigns default material, if none set)
+            gameObject.transform.localScale = SizeToScale(data.Size) * Vector3.one;
 
-            Profiler.BeginSample("Projectile.Create Component Instantiate");
-            // Create a new Projectile component
-            ProjectileComponent projectile = newObj.GetComponent<ProjectileComponent>();
-            Profiler.EndSample();
+            Material material = data.CustomMaterial();
+            if (material != null)
+            {
+                gameObject.GetComponent<MeshRenderer>().material = material;
+            }
+            else
+            {
+                switch (data.Size)
+                {
+                    case Size.TINY:
+                    case Size.SMALL:
+                        gameObject.GetComponent<MeshRenderer>().material = blueMaterial;
+                        break;
+                    case Size.MEDIUM:
+                        gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
+                        break;
+                    case Size.LARGE:
+                    case Size.HUGE:
+                        gameObject.GetComponent<MeshRenderer>().material = orangeRedMaterial;
+                        break;
+                    default:
+                        gameObject.GetComponent<MeshRenderer>().material = orangeMaterial;
+                        break;
+                }
+            }
 
-            Profiler.BeginSample("Projectile.Create data Clone()");
-            // Make a memberwise clone of the most derived type
-            projectile.data = Clone();
-            Profiler.EndSample();
+            // Computes the starting position, rotation, and velocity.
 
-            Profiler.BeginSample("Projectile.Create data Initialize()");
-            // Do the initialization (resolve null variables -> live variables)
-            projectile.Initialize();
-            Profiler.EndSample();
+            // Remove any height from the start and target vectors
+            Vector3 topDownSpawn = new Vector3(FixedStart.x, 0, FixedStart.z);
+            Vector3 topDownTarget = new Vector3(FixedTarget.x, 0, FixedTarget.z);
 
-            Profiler.BeginSample("Projectile.Create data CustomCreate()");
-            // Do any custom derived initialization logic (you can access the component now)
-            projectile.data.CustomCreate(projectile);
-            Profiler.EndSample();
+            // Add in rotation offset from the angleOffset parameter
+            Quaternion offset = Quaternion.AngleAxis(data.AngleOffset, Vector3.up);
 
-            Profiler.EndSample();
-            return projectile;
+            // Compute the final rotation
+            // TODO update this to be rotation around the up axis to fix 180 degree bug
+            Quaternion rotation = offset * Quaternion.FromToRotation(Vector3.forward, topDownTarget - topDownSpawn);
+
+            this.gameObject.transform.position = (Vector3)FixedStart;
+            this.gameObject.transform.rotation = rotation;
+            //this.gameObject.GetComponent<Rigidbody>().velocity = rotation * (Vector3.forward * (float)data.speed);
+            this.data.Velocity = rotation * (Vector3.forward * (float)data.Speed);
+
+            shouldUpdate = true;
+            rend.enabled = true;
+            currentTime = 0;
+            maxTime = data.MaxTime;
         }
 
         /*
-         * Allows for custom instantiation once the component is created and can
-         * be referenced. Things like accessing the RigidBody are done here, as well
-         * as being able to reference live variables, like the updated target value
-         * (via component.data.target).
+         * A helper function that retuns the local scale of a projectile, given
+         * its size. This corresponds to its diameter.
          */
-        public virtual void CustomCreate(ProjectileComponent component) { }
-
-        public override string ToString()
+        public static float SizeToScale(Size size)
         {
-            // TODO can make this more descriptive; i.e. if entity is boss and preTarget is null, then add "aimed at the player".
-            return "Projectile"
-                + " with speed " + Speed
-                + ", size " + Size;
+            return 1.0f + ((float)size / 2.0f);
         }
+
+        void Update()
+        {   
+            if (!shouldUpdate)
+            {
+                return;
+            }
+            Profiler.BeginSample("Projectile update loop");
+            Profiler.BeginSample("Time check");
+            //data.currentTime += Time.deltaTime;
+            currentTime += Time.deltaTime;
+
+            if (currentTime >= maxTime)
+            {
+                GameManager.Boss.ExecuteAsync(data.OnDestroyTimeout.Compile().Invoke(this));
+                //Destroy(this.gameObject);
+                Cleanup();
+            }
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Movement");
+            if (data.Speed != Constants.Speed.FROZEN)
+            {
+                trans.position += (Time.deltaTime * data.Velocity);
+                Profiler.EndSample();
+
+                Profiler.BeginSample("Bounds check");
+                if (trans.position.sqrMagnitude > 5625f)
+                {
+                    GameManager.Boss.ExecuteAsync(data.OnDestroyOutOfBounds.Compile().Invoke(this));
+                    Cleanup();
+
+                }
+            }
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Custom update");
+            data.CustomUpdate(this);
+            Profiler.EndSample();
+            Profiler.EndSample();
+        }
+
+        private void Cleanup() {
+            Profiler.BeginSample("Cleanup");
+            shouldUpdate = false;
+            rend.enabled = false;
+            ProjectileManager.Return(gameObject);
+            Profiler.EndSample();
+        }
+
+        /*
+         * Called on collision with player. Triggers collison death.
+         */
+        public virtual void OnTriggerEnter(Collider other)
+        {
+            Profiler.BeginSample("Projectile Collision");
+            GameObject otherObject = other.gameObject;
+            Entity otherEntity = otherObject.GetComponentInParent<Entity>();
+            if (otherEntity != null)
+            {
+                // All projectiles break if they do damage
+                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != Entity.Faction.enemy)
+                {
+                    //Debug.Log("Projectile collided, should apply damage");
+                    // Note that the entity causing the damage is null; callbacks may fail.
+                    Entity.DamageEntity(otherEntity, null, data.Damage);
+                    GameManager.Boss.ExecuteAsync(data.OnDestroyCollision.Compile().Invoke(this));
+                    //Destroy(this.gameObject);
+                    Cleanup();
+                }
+            }
+            Profiler.EndSample();
+        }
+
+        /*
+         * Get the preferred material for this projectile.
+         * The standard only sets material based on size; if you want your projectile
+         * to have its own material, override this method and return it here.
+         *
+         * If you want to use the standard projectile logic, simply return null here.
+         */
+        public virtual Material GetCustomMaterial() { return null; }
     }
+
 }

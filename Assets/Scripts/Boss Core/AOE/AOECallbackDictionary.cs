@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using static AOEs.AOE;
+using static AOEs.AOEData;
 
 namespace AOEs
 {

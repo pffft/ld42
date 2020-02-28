@@ -4,10 +4,9 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
-using Projectiles;
-using static World.Arena;
+using static Constants.Positions;
 
 namespace Moves.Unsorted
 {
@@ -20,7 +19,7 @@ namespace Moves.Unsorted
                 Description = "Fires a medium-slow AOE, and then strafes 60 degrees clockwise.";
                 Difficulty = 2f;
                 Sequence = new AISequence(
-                    new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM_SLOW, FixedWidth = 5f }.On(0, 360)),
+                    new ShootAOE(new AOEData { OuterSpeed = Speed.MEDIUM_SLOW, FixedWidth = 5f }.On(0, 360)),
                     new Strafe(true, 60f, 50).Wait(0.5f)
                 );
             }

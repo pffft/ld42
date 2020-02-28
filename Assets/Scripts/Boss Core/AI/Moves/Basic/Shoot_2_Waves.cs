@@ -1,6 +1,6 @@
 ﻿using AI;
 using Projectiles;
-using BossCore;
+using Constants;
 
 using static BossController;
 
@@ -14,8 +14,8 @@ namespace Moves.Basic
             Difficulty = 4f;
             Sequence = new AISequence(
                 new Teleport().Wait(0.5f),
-                new ShootArc(100, -45f, 45f, new Projectile { AngleOffset = -2.5f, Size = Size.MEDIUM, Speed = Speed.VERY_FAST }),
-                new ShootArc(100, -45f, 45f, new Projectile { AngleOffset = 2.5f, Size = Size.MEDIUM, Speed = Speed.VERY_FAST }),
+                new ShootArc(100, -45f, 45f, new ProjectileData { AngleOffset = -2.5f, Size = Size.MEDIUM, Speed = Speed.VERY_FAST }),
+                new ShootArc(100, -45f, 45f, new ProjectileData { AngleOffset = 2.5f, Size = Size.MEDIUM, Speed = Speed.VERY_FAST }),
                 new Pause(1f)
             );
         }

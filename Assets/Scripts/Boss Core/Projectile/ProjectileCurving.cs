@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Projectiles
 {
 
-    public class ProjectileCurving : Projectile
+    public class ProjectileCurving : ProjectileData
     {
 
         private readonly float curveAmount;
@@ -27,7 +27,7 @@ namespace Projectiles
             return Resources.Load<Material>("Art/Materials/GreenTransparent");
         }
 
-        public override void CustomUpdate(ProjectileComponent component)
+        public override void CustomUpdate(Projectile component)
         {
             Quaternion rot = Quaternion.AngleAxis(Time.deltaTime * curveAmount, Vector3.up);
             //body.velocity = rot * body.velocity;
@@ -38,12 +38,12 @@ namespace Projectiles
                 if (component.currentTime > count / numSpawners)
                 {
                     count++;
-                    new Projectile
+                    new ProjectileData
                     {
                         Start = component.transform.position,
                         MaxTime = MaxTime - component.currentTime,
                         Size = Size.SMALL,
-                        Speed = BossCore.Speed.FROZEN
+                        Speed = Constants.Speed.FROZEN
                     }.Create();
                 }
             }

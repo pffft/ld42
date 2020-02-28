@@ -4,7 +4,7 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 
@@ -17,7 +17,7 @@ namespace Moves.Unsorted
 			Description = "Aggressively tests dashing.";
 			Difficulty = 8f;
             Sequence = new AISequence(
-                new ShootAOE(new AOE { Start = GameManager.Player.transform.position, OuterSpeed = Speed.FAST, FixedWidth = 2f }.On(0, 360f)),
+                new ShootAOE(new AOEData { Start = GameManager.Player.transform.position, OuterSpeed = Speed.FAST, FixedWidth = 2f }.On(0, 360f)),
                 new Pause(0.75f)
             );
 		}

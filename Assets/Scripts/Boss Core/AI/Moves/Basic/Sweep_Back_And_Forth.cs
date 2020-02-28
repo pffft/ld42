@@ -18,9 +18,9 @@ namespace Moves.Basic
             Sequence = new AISequence(
                 new Teleport().Wait(0.25f),
                 new PlayerLock(true),
-                For(-30, 90, 5, i => new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f)),
+                For(-30, 90, 5, i => new Shoot1(new ProjectileData { AngleOffset = i }).Wait(0.05f)),
                 new Pause(0.25f),
-                For(30, -90, -5, i => new Shoot1(new Projectile { AngleOffset = i }).Wait(0.05f)),
+                For(30, -90, -5, i => new Shoot1(new ProjectileData { AngleOffset = i }).Wait(0.05f)),
                 new PlayerLock(false),
                 new Pause(0.5f)
             );

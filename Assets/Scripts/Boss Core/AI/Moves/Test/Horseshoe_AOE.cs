@@ -4,7 +4,7 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 
@@ -21,17 +21,17 @@ namespace Moves.Test
                 //Pause(1f),
                 For(10, i => 
                     Merge(
-                        new Shoot1(new Projectile { AngleOffset = 15 + (6 * i) }).Wait(0.05f), 
-                        new Shoot1(new Projectile { AngleOffset = -15 - (6 * i) }).Wait(0.05f)
+                        new Shoot1(new ProjectileData { AngleOffset = 15 + (6 * i) }).Wait(0.05f), 
+                        new Shoot1(new ProjectileData { AngleOffset = -15 - (6 * i) }).Wait(0.05f)
                     )
                 ),
                 For(10, i =>
                     Merge(
-                        new Shoot1(new Projectile { AngleOffset = 75 - (6 * i) }).Wait(0.05f),
-                        new Shoot1(new Projectile { AngleOffset = -75 + (6 * i) }).Wait(0.05f)
+                        new Shoot1(new ProjectileData { AngleOffset = 75 - (6 * i) }).Wait(0.05f),
+                        new Shoot1(new ProjectileData { AngleOffset = -75 + (6 * i) }).Wait(0.05f)
                     )
                 ),
-                new ShootAOE(new AOE { FixedWidth = 3f }.On(-60, 60))
+                new ShootAOE(new AOEData { FixedWidth = 3f }.On(-60, 60))
             );
 		}
 	}

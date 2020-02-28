@@ -1,6 +1,6 @@
 ﻿using AI;
 using AOEs;
-using BossCore;
+using Constants;
 
 using static BossController;
 
@@ -11,12 +11,12 @@ namespace Moves.Basic
         // TODO add default AOEs
         public ShootAOE() : this(null) { }
 
-        public ShootAOE(AOE skeleton) : base
+        public ShootAOE(AOEData skeleton) : base
         (
             () => 
             {
                 GameManager.Boss.Glare();
-                skeleton = skeleton != null ? skeleton.Clone() : new AOE();
+                skeleton = skeleton != null ? skeleton.Clone() : new AOEData();
                 skeleton.Create(); 
             }
         )

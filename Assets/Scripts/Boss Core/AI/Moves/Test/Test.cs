@@ -6,7 +6,7 @@ using AI;
 using Moves.Basic;
 using Projectiles;
 using AOEs;
-using BossCore;
+using Constants;
 using static BossController;
 
 namespace Moves.Test
@@ -47,7 +47,7 @@ namespace Moves.Test
 
             Sequence = new AISequence(
                 For(-30f, 30f, 1f,
-                    i => new Shoot1(new Projectile { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = i })
+                    i => new Shoot1(new ProjectileData { Size = Size.MEDIUM, Speed = Speed.MEDIUM, AngleOffset = i })
                 )
             );
         }

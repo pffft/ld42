@@ -17,7 +17,7 @@ public class KeepOnArena : MonoBehaviour {
 	void Update () {
         if (shouldReset)
         {
-            //if (transform.position.magnitude > World.Arena.RadiusInWorldUnits)
+            //if (transform.position.magnitude > Constants.Positions.RadiusInWorldUnits)
             if (transform.position.y < -1f)
             {
                 float randomDegrees = Random.Range(0f, 359f);

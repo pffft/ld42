@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BossCore
+namespace Constants
 {
     public class ProxyVector3 : ProxyVariable<Vector3>
     {

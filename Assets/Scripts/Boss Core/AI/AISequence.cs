@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using BossCore;
+using Constants;
 using UnityEngine;
 
 namespace AI
@@ -14,51 +14,6 @@ namespace AI
         /// functions into their base AISequences, or simply say there was a function there?
         /// </summary>
         public static bool ShouldTryExpandFunctions = false;
-
-        // TODO put these in a publically accessable location. Possibly in world or game manager.
-        public static ProxyVector3 PLAYER_POSITION = new ProxyVector3(() => { return GameManager.Player.transform.position + World.Arena.CENTER; });
-
-        /// <summary>
-        /// Grabs the delayed player position. If the "PlayerLock" move is locked on, then
-        /// this will return the player position at the time the move was run. Otherwise, this
-        /// returns the same value as PLAYER_POSITION.
-        /// <see cref="Moves.Basic.PlayerLock"/>
-        /// </summary>
-        public static ProxyVector3 DELAYED_PLAYER_POSITION = Moves.Basic.PlayerLock._delayed_player_position;
-
-        // Experimental. Leads ahead of the player based on their current velocity and distance from boss.
-        // This is quite realtime, but can be jittery as a result.
-        public static ProxyVector3 LEADING_PLAYER_POSITION = new ProxyVector3(() =>
-        {
-            float distance = (GameManager.Boss.transform.position - GameManager.Player.transform.position).magnitude;
-            //Vector3 offset = (distance / 2f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized);
-            Vector3 offset = 1f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized;
-
-            return PLAYER_POSITION.GetValue() + offset;
-        });
-
-        // Smooths the value of LEADING_PLAYER_POSITION using two samples over time.
-        // This is less "realtime", but provides a smoother tracking.
-        private static Vector3 last_lead = Vector3.zero;
-        private static Vector3 curr_lead = Vector3.zero;
-        public static ProxyVector3 SMOOTHED_LEADING_PLAYER_POSITION = new ProxyVector3(() =>
-        {
-            Vector3 raw_value = LEADING_PLAYER_POSITION.GetValue();
-
-            last_lead = curr_lead;
-            curr_lead = raw_value;
-
-            return (last_lead + curr_lead) / 2.0f;
-
-        });
-
-        public static ProxyVector3 BOSS_POSITION = new ProxyVector3(() => { return GameManager.Boss.transform.position; });
-        public static ProxyVector3 RANDOM_IN_ARENA = new ProxyVector3(() =>
-        {
-            float angle = Random.value * 360;
-            float distance = Random.Range(0, GameManager.Arena.RadiusInWorldUnits);
-            return distance * (Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward) + World.Arena.CENTER;
-        });
 
         // A list of events to execute. This is the data, or leaf, of the recursive structure.
         public AIEvent[] Events
@@ -158,8 +113,6 @@ namespace AI
         private AISequence(AIEvent[] events)
         {
             this.Events = events;
-            //this.Children = null;
-
             this.Children = () => { return null; };
         }
 
@@ -170,8 +123,6 @@ namespace AI
         public AISequence(params AISequence[] sequences)
         {
             this.Events = null;
-            //this.Children = sequences;
-
             this.Children = () => { return sequences; };
         }
 

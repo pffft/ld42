@@ -4,7 +4,7 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
 using Projectiles;
 using static BossController;
@@ -19,7 +19,7 @@ namespace Moves.Unsorted
 			Difficulty = 4f;
             Sequence = new AISequence(
                 new Teleport().Wait(0.25f),
-                new ShootArc(4, -45f, 45f, new Projectile { 
+                new ShootArc(4, -45f, 45f, new ProjectileData { 
                     Size = Size.LARGE, 
                     Speed = Speed.MEDIUM_SLOW, 
                     MaxTime = 1f, 

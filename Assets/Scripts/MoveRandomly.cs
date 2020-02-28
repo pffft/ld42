@@ -18,7 +18,7 @@ public class MoveRandomly : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (!moving) {
-            newPosition = AI.AISequence.RANDOM_IN_ARENA.GetValue();
+            newPosition = Constants.Positions.RANDOM_IN_ARENA.GetValue();
             moving = true;
         }
 

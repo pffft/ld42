@@ -65,8 +65,27 @@ namespace CombatCore
 			Controller c = subject.GetComponent<Controller> ();
 			c.StartCoroutine (c.Dashing (targetPos));
 
-            if (subject.HasStatus("ShieldRegen")) {
+            // If we're tied to the shield, first untie
+            if (subject.HasStatus("ShieldRegen")) 
+            {
                 subject.RemoveStatus(Status.Get("ShieldRegen"));
+            }
+
+            // If the shield is placed down, then drop it to the ground.
+            if (subject.HasStatus("Shield Placed")) 
+            {
+                subject.RemoveStatus(Status.Get("Shield Placed"));
+
+                // Throw it
+                Status shieldThrown = Status.Get("Shield Thrown");
+                shieldThrown.GetComponent<StatusComponents.ShieldThrown>().SetTarget(subject.transform.position);
+                subject.AddStatus(shieldThrown);
+
+                GameManager.HUD.shieldAvailable = false;
+
+                // But then also freeze it
+                GameManager.ThrownShield.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GameManager.ThrownShield.GetComponent<ThrownShield>().Unfreeze();
             }
 
 			return true;

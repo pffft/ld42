@@ -6,7 +6,7 @@ using AI;
 using AOEs;
 using Projectiles;
 using Moves.Basic;
-using static World.Arena;
+using static Constants.Positions;
 
 namespace Moves.Unsorted
 {
@@ -15,22 +15,22 @@ namespace Moves.Unsorted
         //// Lets the player know the cardinal directions will be dangerous soon.
         private static AISequence TELEGRAPH_CARDINAL = new AISequence(
             Merge(
-                new ShootArc(100, -7, 7, new Projectile { Target = SOUTH_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -7, 7, new Projectile { Target = WEST_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -7, 7, new Projectile { Target = NORTH_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -7, 7, new Projectile { Target = EAST_FAR }).Wait(0.2f).Times(3)
+                new ShootArc(100, -7, 7, new ProjectileData { Target = SOUTH_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -7, 7, new ProjectileData { Target = WEST_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -7, 7, new ProjectileData { Target = NORTH_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -7, 7, new ProjectileData { Target = EAST_FAR }).Wait(0.2f).Times(3)
             ),
             Merge(
-                new ShootArc(100, -15, 15, new Projectile { Target = SOUTH_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -15, 15, new Projectile { Target = WEST_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -15, 15, new Projectile { Target = NORTH_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -15, 15, new Projectile { Target = EAST_FAR }).Wait(0.2f).Times(3)
+                new ShootArc(100, -15, 15, new ProjectileData { Target = SOUTH_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -15, 15, new ProjectileData { Target = WEST_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -15, 15, new ProjectileData { Target = NORTH_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -15, 15, new ProjectileData { Target = EAST_FAR }).Wait(0.2f).Times(3)
             ),
             Merge(
-                new ShootArc(100, -25, 25, new Projectile { Target = SOUTH_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -25, 25, new Projectile { Target = WEST_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -25, 25, new Projectile { Target = NORTH_FAR }).Wait(0.2f).Times(3),
-                new ShootArc(100, -25, 25, new Projectile { Target = EAST_FAR }).Wait(0.2f).Times(3)
+                new ShootArc(100, -25, 25, new ProjectileData { Target = SOUTH_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -25, 25, new ProjectileData { Target = WEST_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -25, 25, new ProjectileData { Target = NORTH_FAR }).Wait(0.2f).Times(3),
+                new ShootArc(100, -25, 25, new ProjectileData { Target = EAST_FAR }).Wait(0.2f).Times(3)
             )
         );
 
@@ -42,9 +42,9 @@ namespace Moves.Unsorted
                 TELEGRAPH_CARDINAL,
 
                 new ShootAOE(
-                    new AOE {
-                    OuterSpeed = BossCore.Speed.MEDIUM,
-                    InnerSpeed = BossCore.Speed.SLOW,
+                    new AOEData {
+                    OuterSpeed = Constants.Speed.MEDIUM,
+                    InnerSpeed = Constants.Speed.SLOW,
                     Target = Vector3.forward,
                     MaxTime = 2f,
                     // TODO add ability to change values in callbacks like before
@@ -100,7 +100,7 @@ namespace Moves.Unsorted
             );
         }
 
-        void HandleAOECallbackDelegate(AOEComponent self)
+        void HandleAOECallbackDelegate(AOE self)
         {
         }
 

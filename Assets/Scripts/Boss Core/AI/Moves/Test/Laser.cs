@@ -4,7 +4,7 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using static BossController;
 
 using Moves.Basic;
@@ -18,7 +18,7 @@ namespace Moves.Test
             Description = "A laser that sweeps from " + startOffset + " to " + finalOffset + " with a beam width of " + width + " and speed " + angularSpeed;
             Difficulty = 5f;
             Sequence = new ShootAOE(
-                new AOE
+                new AOEData
                 {
                     InnerSpeed = Speed.FROZEN,
                     OuterSpeed = Speed.FROZEN,

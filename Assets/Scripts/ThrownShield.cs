@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using CombatCore;
+using Constants;
 
 public class ThrownShield : MonoBehaviour {
 
@@ -13,7 +14,7 @@ public class ThrownShield : MonoBehaviour {
     private KeepOnArena keepOnArenaScript;
 
     // How fast do we move?
-    private const BossCore.Speed speed = BossCore.Speed.LIGHTNING;
+    private const Speed speed = Speed.LIGHTNING;
 
     private float currentTime;
     private const float maxTime = 2f;
@@ -97,7 +98,7 @@ public class ThrownShield : MonoBehaviour {
     }
 
     // Makes the shield fall down due to gravity, and interact with objects in the world
-    private void Unfreeze()
+    public void Unfreeze()
     {
         // Unfreeze y position constraint; make it spin for fun
         body.constraints = RigidbodyConstraints.None;

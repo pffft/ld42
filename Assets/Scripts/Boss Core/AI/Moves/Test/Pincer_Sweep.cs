@@ -6,7 +6,7 @@ using AI;
 using Moves.Basic;
 using Projectiles;
 using AOEs;
-using BossCore;
+using Constants;
 using static BossController;
 
 namespace Moves.Test

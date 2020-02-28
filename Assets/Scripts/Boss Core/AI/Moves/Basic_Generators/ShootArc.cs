@@ -7,11 +7,11 @@ namespace Moves.Basic
     public class ShootArc : InternalMove
     {
 
-        public ShootArc() : this(50, 0, 360, Projectile.DEFAULT) { }
+        public ShootArc() : this(50, 0, 360, ProjectileData.DEFAULT) { }
 
-        public ShootArc(Projectile skeleton) : this(50, 0, 360, skeleton) { }
+        public ShootArc(ProjectileData skeleton) : this(50, 0, 360, skeleton) { }
 
-        public ShootArc(int density, float from, float to, Projectile skeleton = null) : base
+        public ShootArc(int density, float from, float to, ProjectileData skeleton = null) : base
         (
             () =>
             {
@@ -26,10 +26,10 @@ namespace Moves.Basic
                 }
 
                 float step = 360f / density;
-                Projectile clone = skeleton ?? new Projectile { Size = Size.MEDIUM };
+                ProjectileData clone = skeleton ?? new ProjectileData { Size = Size.MEDIUM };
                 for (float i = from; i <= to; i += step)
                 {
-                    Projectile newStruc = clone.Clone();
+                    ProjectileData newStruc = clone.Clone();
                     newStruc.AngleOffset = newStruc.AngleOffset + i;
                     newStruc.Create();
                 }
@@ -37,7 +37,7 @@ namespace Moves.Basic
         )
         {
             Description = "Shot an arc (density=" + density + ", from=" + from + ", to=" + to + ") of " +
-                (skeleton == Projectile.DEFAULT ? "default projectiles at the player." : skeleton + ".");
+                (skeleton == ProjectileData.DEFAULT ? "default projectiles at the player." : skeleton + ".");
         }
     }
 }

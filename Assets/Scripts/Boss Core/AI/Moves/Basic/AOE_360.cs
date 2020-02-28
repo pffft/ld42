@@ -14,7 +14,7 @@ namespace Moves.Basic
         {
             Description = "Shoots a 360 degree wide AOE.";
             Difficulty = 1f;
-            Sequence = new ShootAOE(new AOE { FixedWidth = 3f }.On(0, 360));
+            Sequence = new ShootAOE(new AOEData { FixedWidth = 3f }.On(0, 360));
         }
     }
 }

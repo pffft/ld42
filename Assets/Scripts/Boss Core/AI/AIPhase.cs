@@ -74,6 +74,7 @@ namespace AI
             foreach (AIPhaseScriptedComponent component in scriptedSequences) {
                 // Only run if the event is scheduled to run.
                 if (count == component.everyX) {
+                    Debug.Log("Returned scripted ai sequence");
                     return component.sequence;
                 }
             }
@@ -83,11 +84,13 @@ namespace AI
             {
                 if (count == 0 && component.everyX == 0)
                 {
+                    Debug.Log("Returned scheduled scripted ai sequence");
                     return component.sequence;
                 }
 
                 if (count % component.everyX == 0)
                 {
+                    Debug.Log("Returned scheduled scripted ai sequence");
                     return component.sequence;
                 }
             }
@@ -96,7 +99,9 @@ namespace AI
             int targetWeight = Random.Range(0, totalWeight);
             int currentWeight = 0;
             foreach (AIPhaseComponent component in phaseSequences) {
-                if (targetWeight < currentWeight + component.weight) {
+                if (targetWeight < currentWeight + component.weight)
+                {
+                    Debug.Log("Returned random ai sequence");
                     return component.sequence;
                 }
                 currentWeight += component.weight;

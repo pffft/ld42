@@ -167,7 +167,7 @@ public class Controller : MonoBehaviour
         UnityEditor.Handles.color = Color.red;
         UnityEditor.Handles.DrawWireArc(new Vector3(transform.position.x, 0f, transform.position.z), Vector3.up, Vector3.forward, 360f, dashRange);
 
-        UnityEditor.Handles.DrawWireArc(AI.AISequence.SMOOTHED_LEADING_PLAYER_POSITION.GetValue(), Vector3.up, Vector3.forward, 360f, 1f);
+        UnityEditor.Handles.DrawWireArc(Constants.Positions.SMOOTHED_LEADING_PLAYER_POSITION.GetValue(), Vector3.up, Vector3.forward, 360f, 1f);
 
         if (!UnityEditor.EditorApplication.isPlaying)
         {

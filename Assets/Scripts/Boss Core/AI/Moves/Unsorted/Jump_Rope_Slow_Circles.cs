@@ -4,11 +4,9 @@ using UnityEngine;
 
 using AI;
 using AOEs;
-using BossCore;
+using Constants;
 using Moves.Basic;
-using Projectiles;
-using static BossController;
-using static World.Arena;
+using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {
@@ -22,7 +20,7 @@ namespace Moves.Unsorted
         );
 
         private static AISequence Line_Circle_Strafe_60 = new AISequence(
-            new ShootAOE(new AOE { OuterSpeed = Speed.MEDIUM_SLOW, FixedWidth = 5f }.On(0, 360f)),
+            new ShootAOE(new AOEData { OuterSpeed = Speed.MEDIUM_SLOW, FixedWidth = 5f }.On(0, 360f)),
             new Pause(0.1f),
             new Strafe(true, 30f, 50),
             new Pause(0.3f),
