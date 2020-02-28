@@ -123,22 +123,29 @@ namespace Projectiles {
 
             if (currentTime >= maxTime)
             {
-                GameManager.Boss.ExecuteAsync(data.OnDestroyTimeout.Compile().Invoke(this));
-                //Destroy(this.gameObject);
+                if (data.OnDestroyTimeout != CallbackDictionary.NOTHING)
+                {
+                    GameManager.Boss.ExecuteAsync(data.OnDestroyTimeout.Compile().Invoke(this));
+                }
                 Cleanup();
             }
             Profiler.EndSample();
 
-            Profiler.BeginSample("Movement");
+            Profiler.BeginSample("Movement speed check");
             if (data.Speed != Constants.Speed.FROZEN)
             {
+                Profiler.EndSample();
+                Profiler.BeginSample("Movement update");
                 trans.position += (Time.deltaTime * data.Velocity);
                 Profiler.EndSample();
 
                 Profiler.BeginSample("Bounds check");
                 if (trans.position.sqrMagnitude > 5625f)
                 {
-                    GameManager.Boss.ExecuteAsync(data.OnDestroyOutOfBounds.Compile().Invoke(this));
+                    if (data.OnDestroyOutOfBounds != CallbackDictionary.NOTHING)
+                    {
+                        GameManager.Boss.ExecuteAsync(data.OnDestroyOutOfBounds.Compile().Invoke(this));
+                    }
                     Cleanup();
 
                 }
@@ -175,8 +182,10 @@ namespace Projectiles {
                     //Debug.Log("Projectile collided, should apply damage");
                     // Note that the entity causing the damage is null; callbacks may fail.
                     Entity.DamageEntity(otherEntity, null, data.Damage);
-                    GameManager.Boss.ExecuteAsync(data.OnDestroyCollision.Compile().Invoke(this));
-                    //Destroy(this.gameObject);
+                    if (data.OnDestroyCollision != CallbackDictionary.NOTHING)
+                    {
+                        GameManager.Boss.ExecuteAsync(data.OnDestroyCollision.Compile().Invoke(this));
+                    }
                     Cleanup();
                 }
             }

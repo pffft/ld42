@@ -204,14 +204,18 @@ public class BossController : MonoBehaviour
 
                 long elapsedMillis = stopWatch.ElapsedMilliseconds;
                 float elapsedSeconds = stopWatch.ElapsedMilliseconds / 1000.0f;
-                if (elapsedMillis > 0) 
-                {
-                    Debug.Log("Elapsed time for execution: " + elapsedSeconds);
-                }
+                //if (elapsedMillis > 0) 
+                //{
+                //Debug.Log("Elapsed time for execution: " + elapsedSeconds + ". Execution frame: " + Time.frameCount);
+                //Debug.Log($"Sequence name: {sequence.Name} event iteration: {i}. Elapsed time: {elapsedSeconds} at frame: {Time.frameCount}");
+                //}
                 // TODO reduce the wait time if the above invocation takes too long 
                 if (Time.timeScale > 0)
                 {
-                    yield return new WaitForSecondsRealtime((sequence.Events[i].duration / Time.timeScale) - elapsedSeconds);
+                    float waitTime = (sequence.Events[i].duration / Time.timeScale) - elapsedSeconds;
+                    //yield return new WaitForSecondsRealtime((sequence.Events[i].duration / Time.timeScale) - elapsedSeconds);
+                    //Debug.Log($"Waiting for: {waitTime} seconds.");
+                    yield return new WaitForSecondsRealtime(waitTime);
                 } 
                 else 
                 {
@@ -224,7 +228,13 @@ public class BossController : MonoBehaviour
             AISequence[] children = sequence.Children();
             for (int i = 0; i < children.Length; i++)
             {
+
+                //Debug.Log($"Sequence name: {sequence.Name} child sequence iteration: {i}. At frame: {Time.frameCount}");
                 yield return Execute(children[i]);
+                //yield return StartCoroutine(Execute(children[i]));
+                //IEnumerator ienum = Execute(children[i]);
+
+                //yield return ienum;
             }
         }
     }
