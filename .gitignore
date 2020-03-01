@@ -65,6 +65,9 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
-
 # End of https://www.gitignore.io/api/unity
+
+# Remove DS_Store
+**/.DS_Store
+ProjectSettings/ProjectVersion.txt
 

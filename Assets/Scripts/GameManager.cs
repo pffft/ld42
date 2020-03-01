@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
 	private GameObject thrownShield = null;
 
 	[SerializeField]
-	private HUD hud;
+	private HUD hud = null;
 	#endregion
 
 	#region STATIC_METHODS
@@ -80,8 +80,9 @@ public class GameManager : MonoBehaviour
 		Entity bossData = Player.GetComponent<Entity> ();
 		Entity.HealEntity (bossData, float.PositiveInfinity);
 		bossData.ClearStatuses ();
-		//TODO reset boss behavior
+        //TODO reset boss behavior
 
+        Boss.ResetBoss();
 		Debug.Log ("Reset boss");
 
 		//player

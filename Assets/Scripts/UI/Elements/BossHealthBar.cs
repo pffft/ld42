@@ -106,7 +106,7 @@ public class BossHealthBar : MonoBehaviour
 		activeBar = transform.GetChild (activeBarIndex).GetComponent<ResourceBar> ();
 		prevBar.Front.fillAmount = 0f;
 
-        BossController.NextPhase();
+        GameManager.Boss.NextPhase();
 
 		for (float dur = phaseTransitionDuration, initDur = dur; dur > 0f; dur -= Time.deltaTime)
 		{

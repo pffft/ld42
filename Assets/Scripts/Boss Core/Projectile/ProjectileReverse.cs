@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileReverse : Projectile
+    public class ProjectileReverse : ProjectileData
     {
         private Vector3 initialTarget;
 
-        public override void CustomCreate(ProjectileComponent component)
+        public override void CustomCreate(Projectile component)
         {
             component.currentTime = 0;
             initialTarget = (Target.GetValue() - Start.GetValue()).normalized;
         }
 
-        public override void CustomUpdate(ProjectileComponent component)
+        public override void CustomUpdate(Projectile component)
         {
             Velocity = (float)Speed * func(component.currentTime) * initialTarget;
         }

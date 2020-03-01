@@ -44,8 +44,10 @@ namespace Projectiles
 
             if (hotCache.Count > 0)
             {
+                GameObject obj = hotCache.Dequeue();
+                //obj.GetComponent<ProjectileComponent>().Poke();
                 Profiler.EndSample();
-                return hotCache.Dequeue();
+                return obj;
             }
 
             if (cache.Count > 0)
