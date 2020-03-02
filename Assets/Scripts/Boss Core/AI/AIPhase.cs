@@ -7,7 +7,7 @@ using UnityEngine;
 // randomly choose the next sequence to do, or check if player interrupts
 namespace AI
 {
-    public partial class AIPhase
+    public class AIPhase
     {
         /// <summary>
         /// What's the amount of health we have this phase?

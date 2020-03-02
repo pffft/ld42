@@ -94,7 +94,7 @@ public class BossController : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(ExecuteQueue());
 
-        routine.NextPhase();
+        routine.MoveNext();
 
         self.healthMax = routine.CurrentPhase.MaxHealth;
         GameManager.Arena.RadiusInWorldUnits = routine.CurrentPhase.MaxArenaRadius;

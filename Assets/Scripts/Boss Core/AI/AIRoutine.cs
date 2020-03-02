@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AI
 {
-    public class AIRoutine 
+    public class AIRoutine : IEnumerator
     {
         public List<AIPhase> Phases { get; protected set; }
         public AIPhase CurrentPhase
@@ -14,16 +14,27 @@ namespace AI
                 return phaseIndex > Phases.Count ? null : Phases[phaseIndex];
             }
         }
+
         private int phaseIndex = -1;
 
         public AIRoutine() {
             Phases = new List<AIPhase>();
-            //AISequence.ShouldAllowInstantiation = true;
         }
 
-        public AIPhase NextPhase() {
+        public bool MoveNext() 
+        {
             phaseIndex++;
-            return CurrentPhase;
+            return CurrentPhase != null;
+        }
+        
+        public object Current
+        {
+            get {
+                return CurrentPhase;
+            }
+            set {
+                throw new System.Exception("Can't explicitly set current phase. Use MoveNext().");
+            }
         }
 
         public void Reset() {
