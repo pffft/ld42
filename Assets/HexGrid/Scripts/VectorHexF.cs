@@ -32,7 +32,7 @@ namespace Hex
             return new VectorHexF(left.q * scalar, left.r * scalar);
         }
 
-        public static VectorHexF operator *(int scalar, VectorHexF right)
+        public static VectorHexF operator *(float scalar, VectorHexF right)
         {
             return right * scalar;
         }
