@@ -72,8 +72,8 @@ public class BossController : MonoBehaviour
         //phases.Add(AIPhase.PHASE_TUTORIAL_1);
         //phases.Add(AIPhase.PHASE_TUTORIAL_2);
         //phases.Add(AIPhase.PHASE_TUTORIAL_3);
-        //phases.Add(AIPhase.PHASE1);
-        phases.Add(AIPhase.PHASE_TEST);
+        phases.Add(AIPhase.PHASE1);
+        //phases.Add(AIPhase.PHASE_TEST);
         //phases.Add(AIPhase.PHASE_UNIT_TEST);
 
         StartCoroutine(ExecuteQueue());
