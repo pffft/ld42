@@ -61,7 +61,6 @@ namespace CombatCore.StatusComponents
 
 
             int shieldStatus = Mathf.Min(4, (int)(shieldEntity.ShieldPerc * 5));
-            Debug.Log(shieldStatus);
             oldShieldStatus = shieldStatus;
             _shield = shield.transform.GetChild(shieldStatus).gameObject;
 

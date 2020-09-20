@@ -5,12 +5,9 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileDeathHex : Projectile
+    public class ProjectileDeathHex : ProjectileData
     {
-
-        public ProjectileDeathHex() : this(BossController.self) { }
-
-        public ProjectileDeathHex(Entity self) : base(self) {
+        public ProjectileDeathHex() {
             MaxTime = 1f;
             Damage = 25f;
             OnDestroyTimeout = CallbackDictionary.SPAWN_6_CURVING;

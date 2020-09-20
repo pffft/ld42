@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BossCore
+namespace Constants
 {
     /// <summary>
     /// For referencing values that cannot be directly saved

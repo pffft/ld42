@@ -59,14 +59,33 @@ namespace CombatCore
 		private static bool PlayerDash(Entity subject, Vector3 targetPosition, params object[] args)
 		{
 			float range = (float)args[0];
-			Debug.Log ("PlayerDash: " + range);
+			//Debug.Log ("PlayerDash: " + range);
 			Vector3 dir = targetPosition - subject.transform.position;
 			Vector3 targetPos = subject.transform.position + dir.normalized * Mathf.Min (range, dir.magnitude);
 			Controller c = subject.GetComponent<Controller> ();
 			c.StartCoroutine (c.Dashing (targetPos));
 
-            if (subject.HasStatus("ShieldRegen")) {
+            // If we're tied to the shield, first untie
+            if (subject.HasStatus("ShieldRegen")) 
+            {
                 subject.RemoveStatus(Status.Get("ShieldRegen"));
+            }
+
+            // If the shield is placed down, then drop it to the ground.
+            if (subject.HasStatus("Shield Placed")) 
+            {
+                subject.RemoveStatus(Status.Get("Shield Placed"));
+
+                // Throw it
+                Status shieldThrown = Status.Get("Shield Thrown");
+                shieldThrown.GetComponent<StatusComponents.ShieldThrown>().SetTarget(subject.transform.position);
+                subject.AddStatus(shieldThrown);
+
+                GameManager.HUD.shieldAvailable = false;
+
+                // But then also freeze it
+                GameManager.ThrownShield.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GameManager.ThrownShield.GetComponent<ThrownShield>().Unfreeze();
             }
 
 			return true;
@@ -76,7 +95,7 @@ namespace CombatCore
         // this needs to throw the shield model (+animation)
         private static bool PlayerThrow(Entity subject, Vector3 targetPosition, params object[] args) 
         {
-            Debug.Log("Player shield throw");
+            //Debug.Log("Player shield throw");
             bool? shouldReturn = CheckValidity(subject);
             if (shouldReturn.HasValue)
             {
@@ -100,7 +119,7 @@ namespace CombatCore
         // this needs a better model for the blocking shield
         private static bool PlayerBlock(Entity subject, Vector3 targetPosition, params object[] args)
         {
-            Debug.Log("Player Block");
+            //Debug.Log("Player Block");
             bool? shouldReturn = CheckValidity(subject);
             if (shouldReturn.HasValue)
             {
@@ -125,7 +144,7 @@ namespace CombatCore
                 // If we're tied to the shield, then reclaim it
                 if (subject.HasStatus("ShieldRegen"))
                 {
-                    Debug.Log("Tied to shield, reclaiming it");
+                    //Debug.Log("Tied to shield, reclaiming it");
                     subject.RemoveStatus("Shield Placed");
                     subject.RemoveStatus("ShieldRegen");
                     return true;
@@ -133,14 +152,14 @@ namespace CombatCore
                 // If we're not tied, but close to the shield, also reclaim it.
                 else if ((GameManager.PlacedShield.transform.position - subject.transform.position).magnitude < 5f)
                 {
-                    Debug.Log("Close to shield, reclaiming it");
+                    //Debug.Log("Close to shield, reclaiming it");
                     subject.RemoveStatus("Shield Placed");
                     return true;
                 }
                 // Too far away.
                 else
                 {
-                    Debug.Log("Too far to reclaim shield");
+                    //Debug.Log("Too far to reclaim shield");
                     return false;
                 }
             }
@@ -150,11 +169,11 @@ namespace CombatCore
             {
                 if ((GameManager.ThrownShield.transform.position - subject.transform.position).magnitude < 5f)
                 {
-                    Debug.Log("Close to thrown shield, reclaiming it");
+                    //Debug.Log("Close to thrown shield, reclaiming it");
                     subject.RemoveStatus("Shield Thrown");
                     return true;
                 }
-                Debug.Log("Shield is currently thrown. Go pick it up!");
+                //Debug.Log("Shield is currently thrown. Go pick it up!");
                 return false;
             }
 

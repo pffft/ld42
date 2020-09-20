@@ -7,13 +7,28 @@ using UnityEngine;
 // randomly choose the next sequence to do, or check if player interrupts
 namespace AI
 {
-    public partial class AIPhase
+    public class AIPhase
     {
-        // What's the amount of health we have this phase?
-        public int maxHealth = 100;
+        /// <summary>
+        /// What's the amount of health we have this phase?
+        /// </summary>
+        /// <value>The max health.</value>
+        public int MaxHealth { get; set; } = 100;
 
-        // How big is the arena this phase?
-        public float maxArenaRadius = 50f;
+        /// <summary>
+        /// How big is the arena this phase?
+        /// </summary>
+        /// <value>The max arena radius.</value>
+        public float MaxArenaRadius { get; set; } = 50f;
+
+        /// <summary>
+        /// If this value is true, we adjust the probability weights of the moves to be
+        /// closer to the global difficulty parameter. This parameter is based on how
+        /// aggressive the player is + how much damage they've taken recently (indicating
+        /// their proficiency at this difficulty). 
+        /// </summary>
+        /// <value><c>true</c> if dynamic difficulty; otherwise, <c>false</c>.</value>
+        public bool DynamicDifficulty { get; set; } = false;
 
         private List<AIPhaseComponent> phaseSequences;
         private List<AIPhaseScriptedComponent> scriptedSequences;
@@ -27,16 +42,6 @@ namespace AI
             phaseSequences = new List<AIPhaseComponent>();
             scriptedSequences = new List<AIPhaseScriptedComponent>();
             repeatingScriptedSequences = new List<AIPhaseScriptedComponent>();
-        }
-
-        public AIPhase SetMaxHealth(int health) {
-            this.maxHealth = health;
-            return this;
-        }
-
-        public AIPhase SetMaxArenaRadius(float width) {
-            this.maxArenaRadius = width;
-            return this;
         }
 
         public AIPhase AddSequence(int weight, AISequence sequence) {
@@ -69,6 +74,7 @@ namespace AI
             foreach (AIPhaseScriptedComponent component in scriptedSequences) {
                 // Only run if the event is scheduled to run.
                 if (count == component.everyX) {
+                    //Debug.Log("Returned scripted ai sequence");
                     return component.sequence;
                 }
             }
@@ -78,11 +84,13 @@ namespace AI
             {
                 if (count == 0 && component.everyX == 0)
                 {
+                    //Debug.Log("Returned scheduled scripted ai sequence");
                     return component.sequence;
                 }
 
                 if (count % component.everyX == 0)
                 {
+                    //Debug.Log("Returned scheduled scripted ai sequence");
                     return component.sequence;
                 }
             }
@@ -91,7 +99,9 @@ namespace AI
             int targetWeight = Random.Range(0, totalWeight);
             int currentWeight = 0;
             foreach (AIPhaseComponent component in phaseSequences) {
-                if (targetWeight < currentWeight + component.weight) {
+                if (targetWeight < currentWeight + component.weight)
+                {
+                    //Debug.Log("Returned random ai sequence");
                     return component.sequence;
                 }
                 currentWeight += component.weight;

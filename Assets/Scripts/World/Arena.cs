@@ -6,29 +6,6 @@ namespace World
 {
 	public class Arena : MonoBehaviour
 	{
-        #region Arena Location constants
-        public static readonly float BOSS_HEIGHT = 1.31f;
-        private static readonly float FAR = 45f;
-        private static readonly float MED = 30f;
-        private static readonly float CLOSE = 15f;
-
-        public static readonly Vector3 CENTER = new Vector3(0, BOSS_HEIGHT, 0);
-
-        public static readonly Vector3 NORTH_FAR = new Vector3(0f, BOSS_HEIGHT, FAR);
-        public static readonly Vector3 SOUTH_FAR = new Vector3(0f, BOSS_HEIGHT, -FAR);
-        public static readonly Vector3 EAST_FAR = new Vector3(45f, BOSS_HEIGHT, 0);
-        public static readonly Vector3 WEST_FAR = new Vector3(-45f, BOSS_HEIGHT, 0);
-
-        public static readonly Vector3 NORTH_MED = new Vector3(0f, BOSS_HEIGHT, MED);
-        public static readonly Vector3 SOUTH_MED = new Vector3(0f, BOSS_HEIGHT, -MED);
-        public static readonly Vector3 EAST_MED = new Vector3(30f, BOSS_HEIGHT, 0);
-        public static readonly Vector3 WEST_MED = new Vector3(-30f, BOSS_HEIGHT, 0);
-
-        public static readonly Vector3 NORTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, CLOSE);
-        public static readonly Vector3 SOUTH_CLOSE = new Vector3(0f, BOSS_HEIGHT, -CLOSE);
-        public static readonly Vector3 EAST_CLOSE = new Vector3(15f, BOSS_HEIGHT, 0);
-        public static readonly Vector3 WEST_CLOSE = new Vector3(-15f, BOSS_HEIGHT, 0);
-        #endregion
 
 		[SerializeField]
 		private float adjustSpeed = 3f;
@@ -50,10 +27,14 @@ namespace World
         {
             get { return transform.localScale.x * DEFAULT_ARENA_SCALE; }
             set
-			{
+            {
                 ARENA_SCALE = value;
                 maxArea = ARENA_SCALE * ARENA_SCALE / DEFAULT_ARENA_SCALE / DEFAULT_ARENA_SCALE * Mathf.PI;
-                StartCoroutine(ChangeArenaSize(GameManager.Player.GetComponent<Entity>().HealthPerc * maxArea));
+                if (GameManager.Player.GetComponent<Entity>())
+                {
+                    StartCoroutine(ChangeArenaSize(GameManager.Player.GetComponent<Entity>().HealthPerc * maxArea));
+                }
+
 			}
         }
 
@@ -63,14 +44,23 @@ namespace World
 			transform.localScale = Vector3.one * maxRadius;
 			maxArea = Mathf.PI * maxRadius * maxRadius;
 
-            if(GameManager.Player != null)
-                GameManager.Player.GetComponent<Entity>().tookDamage += OnPlayerDamageTaken;
+            if (GameManager.Player != null)
+            {
+                if (GameManager.Player.GetComponent<Entity>() != null)
+                {
+                    GameManager.Player.GetComponent<Entity>().tookDamage += OnPlayerDamageTaken;
+                }
+            }
 		}
 
 		public void OnDestroy()
 		{
-			if (GameManager.Player != null)
-                GameManager.Player.GetComponent<Entity>().tookDamage -= OnPlayerDamageTaken;
+            if (GameManager.Player != null)
+            {
+                if (GameManager.Player.GetComponent<Entity>() != null) {
+                    GameManager.Player.GetComponent<Entity>().tookDamage -= OnPlayerDamageTaken;
+                }
+            }
 		}
 
 		public void Update()
@@ -81,7 +71,6 @@ namespace World
 			//drop the player if they're outside the arena
 			if (Vector3.Distance (transform.position, GameManager.Player.transform.position) > RadiusInWorldUnits)
 			{
-                Debug.Log("Player distance is greater than " + RadiusInWorldUnits);
 				//swap out a dummy and blow it up
 				GameManager.Player.gameObject.SetActive (false);
 				GameObject dummyPlayer = Instantiate(
@@ -128,15 +117,19 @@ namespace World
 			StartCoroutine (ChangeArenaSize (maxArea * victim.HealthPerc));
 		}
 
-		private IEnumerator ChangeArenaSize(float targetArea)
-		{
-			while (Mathf.Abs(CurrentArea - targetArea) > threshold)
-			{
-                float newRadius = Mathf.Lerp (transform.localScale.x, (ARENA_SCALE / 50f) * Mathf.Sqrt (targetArea / Mathf.PI), Time.deltaTime * adjustSpeed);
-				transform.localScale = Vector3.one * newRadius;
+        private IEnumerator ChangeArenaSize(float targetArea)
+        {
+            float idealRadius = Mathf.Sqrt((ARENA_SCALE / DEFAULT_ARENA_SCALE) * Mathf.Sqrt(targetArea / Mathf.PI));
+            while (Mathf.Abs(CurrentArea - targetArea) > threshold)
+            {
+                float newRadius = Mathf.Lerp(transform.localScale.x, idealRadius, Time.deltaTime * adjustSpeed);
+                transform.localScale = Vector3.one * newRadius;
 
-				yield return null;
-			}
-		}
+                yield return null;
+            }
+
+            // Set to the ideal value
+            transform.localScale = Vector3.one * idealRadius;
+        }
 	}
 }

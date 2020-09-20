@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace Projectiles
 {
-    public class ProjectileHoming : Projectile
+    public class ProjectileHoming : ProjectileData
     {
+
+        public static new ProjectileHoming DEFAULT = new ProjectileHoming { Size = Size.MEDIUM };
 
         private GameObject targetObject;
 
@@ -20,27 +22,41 @@ namespace Projectiles
         // Was this projectile once close to the player?
         private bool wasClose;
 
-        public ProjectileHoming() : this(BossController.self) { }
+        private int difficulty;
 
-        public ProjectileHoming(Entity self) : base(self) { }
+        public ProjectileHoming() : this(0) { }
 
-        public override void CustomCreate(ProjectileComponent component)
+        public ProjectileHoming(int difficulty=0) {
+            this.difficulty = difficulty;
+            if (difficulty == 1) {
+                Target = Constants.Positions.SMOOTHED_LEADING_PLAYER_POSITION;
+            }
+        }
+
+        public override void CustomCreate(Projectile component)
         {
-            targetObject = component.data.Entity.GetFaction() == Entity.Faction.enemy ? GameManager.Player.gameObject : GameManager.Boss.gameObject;
+            targetObject = GameManager.Player.gameObject; // TODO maybe make me a customizable parameter?
             wasClose = false;
             curDivergence = 0f;
-            homingScale = (float)component.data.Speed / 7f;
+            homingScale = (float)component.data.Speed / 7f; // maybe make this one customizable too
         }
 
         public override Material CustomMaterial() {
             return Resources.Load<Material>("Art/Materials/PurpleTransparent");
         }
         
-        public override void CustomUpdate(ProjectileComponent component) {
-            Vector3 idealVelocity = ((float)Speed) * (targetObject.transform.position - component.transform.position).normalized;
+        public override void CustomUpdate(Projectile component) {
+            switch (difficulty) {
+                case 0: HomingLevel0(component); break;
+                case 1: HomingLevel0(component); break;
+            }
+        }
+
+        private void HomingLevel0(Projectile component) {
+            Vector3 idealVelocity = ((float)Speed) * (Target.GetValue() - component.transform.position).normalized;
             float idealRotation = Vector3.SignedAngle(idealVelocity, Velocity, Vector3.up);
 
-            float distance = Vector3.Distance(targetObject.transform.position, component.transform.position);
+            float distance = Vector3.Distance(Target.GetValue(), component.transform.position);
 
             if (!wasClose && distance < 10f)
             {
