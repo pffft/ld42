@@ -11,12 +11,12 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Sweep_Wall : Move
+    public class Sweep_Wall : Move
     {
-		public Sweep_Wall(bool clockwise=true)
+        public Sweep_Wall(bool clockwise=true)
         {
             Description = "Shoots a sweeping wall " + (clockwise ? "clockwise" : "counterclockwise") + ".";
-			Difficulty = 5f;
+            Difficulty = 5f;
 
             int start1 = 0;
             int end1 = clockwise ? 72 : -72;
@@ -29,6 +29,6 @@ namespace Moves.Unsorted
                 For(start1, end1, step1, angle => new ShootWall(angle).Wait(0.1f)),
                 For(start2, end2, step2, angle => new ShootWall(angle).Wait(0.1f))
             );
-		}
-	}
+        }
+    }
 }

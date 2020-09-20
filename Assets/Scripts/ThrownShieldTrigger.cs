@@ -12,10 +12,10 @@ public class ThrownShieldTrigger : MonoBehaviour {
 
     private ThrownShield shield;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         shield = GetComponentInParent<ThrownShield>();
-	}
+    }
 
     private void OnTriggerEnter(Collider other)
     {

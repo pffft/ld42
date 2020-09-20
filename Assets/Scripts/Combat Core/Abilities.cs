@@ -4,66 +4,66 @@ using Projectiles;
 
 namespace CombatCore
 {
-	public partial class Ability
-	{
-		static Ability()
-		{
-			latestID = 0;
+    public partial class Ability
+    {
+        static Ability()
+        {
+            latestID = 0;
 
-			repository = new Dictionary<string, Ability> ();
+            repository = new Dictionary<string, Ability> ();
 
-			Put (new Ability (
-				"DEBUG",
-				"Does nothing",
-				null,
-				0.3f,
-				0,
-				DebugAbil)
-			);
+            Put (new Ability (
+                "DEBUG",
+                "Does nothing",
+                null,
+                0.3f,
+                0,
+                DebugAbil)
+            );
 
-			Put (new Ability (
-				"Dash",
-				"Dashes to a place",
-				null,
-				0.3f,
-				0,
-				PlayerDash)
-			);
+            Put (new Ability (
+                "Dash",
+                "Dashes to a place",
+                null,
+                0.3f,
+                0,
+                PlayerDash)
+            );
 
-			Put (new Ability (
-				"Throw",
-				"Throws a shield",
-				null,
-				0.5f,
-				0,
+            Put (new Ability (
+                "Throw",
+                "Throws a shield",
+                null,
+                0.5f,
+                0,
                 PlayerThrow)
-			);
+            );
 
-			Put (new Ability (
-				"Block",
-				"Drops a protective shield",
-				null,
+            Put (new Ability (
+                "Block",
+                "Drops a protective shield",
+                null,
                 cooldownMax: 1f,
-				chargesMax: 0,
+                chargesMax: 0,
                 effect: PlayerBlock)
-			);
-		}
+            );
+        }
 
-		private static bool DebugAbil(Entity subject, Vector3 targetPosition, params object[] args)
-		{
-			Debug.Log ("BANG");
-			return true;
-		}
+        private static bool DebugAbil(Entity subject, Vector3 targetPosition, params object[] args)
+        {
+            Debug.Log ("BANG");
+            return true;
+        }
 
-		#region PLAYER_ABILITIES
-		private static bool PlayerDash(Entity subject, Vector3 targetPosition, params object[] args)
-		{
-			float range = (float)args[0];
-			//Debug.Log ("PlayerDash: " + range);
-			Vector3 dir = targetPosition - subject.transform.position;
-			Vector3 targetPos = subject.transform.position + dir.normalized * Mathf.Min (range, dir.magnitude);
-			Controller c = subject.GetComponent<Controller> ();
-			c.StartCoroutine (c.Dashing (targetPos));
+        #region PLAYER_ABILITIES
+        private static bool PlayerDash(Entity subject, Vector3 targetPosition, params object[] args)
+        {
+            float range = (float)args[0];
+            //Debug.Log ("PlayerDash: " + range);
+            Vector3 dir = targetPosition - subject.transform.position;
+            Vector3 targetPos = subject.transform.position + dir.normalized * Mathf.Min (range, dir.magnitude);
+            Controller c = subject.GetComponent<Controller> ();
+            c.StartCoroutine (c.Dashing (targetPos));
 
             // If we're tied to the shield, first untie
             if (subject.HasStatus("ShieldRegen")) 
@@ -88,8 +88,8 @@ namespace CombatCore
                 GameManager.ThrownShield.GetComponent<ThrownShield>().Unfreeze();
             }
 
-			return true;
-		}
+            return true;
+        }
 
         // TODO: this is a basic stub for testing
         // this needs to throw the shield model (+animation)
@@ -181,6 +181,6 @@ namespace CombatCore
         }
 
 
-		#endregion
-	}
+        #endregion
+    }
 }

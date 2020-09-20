@@ -12,12 +12,12 @@ using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {
-	public class Double_Hex_Curve_Hard : Move
+    public class Double_Hex_Curve_Hard : Move
     {
-		public Double_Hex_Curve_Hard()
+        public Double_Hex_Curve_Hard()
         {
-			Description = "A harder variant of the double hex curve.";
-			Difficulty = 10f;
+            Description = "A harder variant of the double hex curve.";
+            Difficulty = 10f;
             Sequence = new AISequence(
                 new Teleport(CENTER).Wait(0.5f),
                 new Shoot_Hex_Curve(false, 0f),
@@ -31,6 +31,6 @@ namespace Moves.Unsorted
                 new AOE_360().Wait(0.5f),
                 new AOE_360().Wait(0.5f)
             );
-		}
-	}
+        }
+    }
 }

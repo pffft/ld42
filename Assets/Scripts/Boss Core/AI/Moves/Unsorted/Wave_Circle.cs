@@ -10,7 +10,7 @@ using static Constants.Positions;
 
 namespace Moves.Unsorted
 {
-	public class Wave_Circle : Move
+    public class Wave_Circle : Move
     {
 
         private class Slow_Wave_Circle : Move {
@@ -25,9 +25,9 @@ namespace Moves.Unsorted
             }
         }
 
-		public Wave_Circle()
-		{
-			Description = "Fires six slow circles around the arena in a circular pattern. Then repeats twice, with lines appearing on the left and right sides.";
+        public Wave_Circle()
+        {
+            Description = "Fires six slow circles around the arena in a circular pattern. Then repeats twice, with lines appearing on the left and right sides.";
             Difficulty = 5f;
             Sequence = new AISequence(
                 new Teleport(WEST_MED),
@@ -41,6 +41,6 @@ namespace Moves.Unsorted
                 new Slow_Wave_Circle().Times(3),
                 new ShootLine(50, 75f, Vector3.right, Speed.MEDIUM_SLOW)
             );
-		}
-	}
+        }
+    }
 }

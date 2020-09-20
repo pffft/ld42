@@ -46,8 +46,8 @@ namespace Constants
         public static ProxyVector3 LEADING_PLAYER_POSITION = new ProxyVector3(() =>
         {
             float distance = (GameManager.Boss.transform.position - GameManager.Player.transform.position).magnitude;
-        //Vector3 offset = (distance / 2f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized);
-        Vector3 offset = 1f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized;
+            //Vector3 offset = (distance / 2f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized);
+            Vector3 offset = 1f * GameManager.Player.GetComponent<Rigidbody>().velocity.normalized;
 
             return PLAYER_POSITION.GetValue() + offset;
         });

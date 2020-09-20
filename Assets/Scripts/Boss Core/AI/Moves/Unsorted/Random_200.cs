@@ -11,12 +11,12 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Random_200 : Move
+    public class Random_200 : Move
     {
-		public Random_200()
-		{
-			Description = "Spawns 200 random projectiles.";
-			Difficulty = 8f;
+        public Random_200()
+        {
+            Description = "Spawns 200 random projectiles.";
+            Difficulty = 8f;
 
             Sequence = new AISequence(
                 For(200, i => Either(
@@ -50,6 +50,6 @@ namespace Moves.Unsorted
                     new Pause(0.05f)
                 ))
             );
-		}
+        }
     }
 }

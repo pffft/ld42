@@ -10,13 +10,13 @@ public class MoveRandomly : MonoBehaviour {
     private bool moving = false;
     private Vector3 newPosition;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    // Use this for initialization
+    void Start () {
+        
+    }
+    
+    // Update is called once per frame
+    void Update () {
         if (!moving) {
             newPosition = Constants.Positions.RANDOM_IN_ARENA.GetValue();
             moving = true;
@@ -26,5 +26,5 @@ public class MoveRandomly : MonoBehaviour {
         if ((transform.position - newPosition).sqrMagnitude < 1f) {
             moving = false;
         }
-	}
+    }
 }

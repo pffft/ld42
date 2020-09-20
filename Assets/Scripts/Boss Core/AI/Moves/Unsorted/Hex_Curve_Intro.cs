@@ -10,12 +10,12 @@ using Projectiles;
 
 namespace Moves.Unsorted 
 {
-	public class Hex_Curve_Intro : Move
+    public class Hex_Curve_Intro : Move
     {
         public Hex_Curve_Intro()
         {
-			Description = "Introduces the player to the hex curve attack";
-			Difficulty = 4f;
+            Description = "Introduces the player to the hex curve attack";
+            Difficulty = 4f;
             Sequence = new AISequence(
                 new Shoot_Hex_Curve(true),
                 new AOE_360().Wait(2.5f),
@@ -28,6 +28,6 @@ namespace Moves.Unsorted
                 new AOE_360().Wait(1.5f),
                 new Teleport().Wait(0.5f)
             );
-		}
-	}
+        }
+    }
 }

@@ -11,12 +11,12 @@ using Projectiles;
 // TODO unfinished
 namespace Moves.Test 
 {
-	public class Horseshoe_AOE : Move 
-	{
-		public Horseshoe_AOE()
-		{
-			Description = "Your description here";
-			Difficulty = 1f;
+    public class Horseshoe_AOE : Move 
+    {
+        public Horseshoe_AOE()
+        {
+            Description = "Your description here";
+            Difficulty = 1f;
             Sequence = new AISequence(
                 //Pause(1f),
                 For(10, i => 
@@ -33,6 +33,6 @@ namespace Moves.Test
                 ),
                 new ShootAOE(new AOEData { FixedWidth = 3f }.On(-60, 60))
             );
-		}
-	}
+        }
+    }
 }

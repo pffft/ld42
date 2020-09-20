@@ -11,11 +11,11 @@ using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {
-	public class Double_Hex_Curve : Move
+    public class Double_Hex_Curve : Move
     {
-		public Double_Hex_Curve()
+        public Double_Hex_Curve()
         {
-			Description = "Fires two hex curves, the second offset 30 degrees from the first.";
+            Description = "Fires two hex curves, the second offset 30 degrees from the first.";
             Difficulty = 5f;
             Sequence = new AISequence(
                 new Teleport(CENTER).Wait(1.5f),
@@ -27,6 +27,6 @@ namespace Moves.Unsorted
                 new AOE_360().Wait(1f),
                 new PlayerLock(false)
             );
-		}
-	}
+        }
+    }
 }

@@ -10,8 +10,8 @@ using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {
-	public class Jump_Rope_Slow_Circles : Move 
-	{
+    public class Jump_Rope_Slow_Circles : Move 
+    {
 
         private static AISequence Line_Strafe_60 = new AISequence(
             new ShootLine(50, 75f, speed: Speed.SNIPE),
@@ -30,15 +30,15 @@ namespace Moves.Unsorted
         );
 
         public Jump_Rope_Slow_Circles()
-		{
+        {
             Description = "Dashes 6 times around shooting lines; then dashes 6 times shooting lines and AOE waves.";
-			Difficulty = 5.5f;
+            Difficulty = 5.5f;
             Sequence = new AISequence(
 
                 new Teleport(WEST_FAR),
                 Line_Strafe_60.Times(6),
                 Line_Circle_Strafe_60.Times(6)
             );
-		}
-	}
+        }
+    }
 }

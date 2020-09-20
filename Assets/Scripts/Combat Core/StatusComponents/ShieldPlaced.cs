@@ -86,7 +86,7 @@ namespace CombatCore.StatusComponents
             }
         }
 
-		public override void OnUpdate(Entity subject, float time)
+        public override void OnUpdate(Entity subject, float time)
         {
 
             bool wasAttached = isAttached;
