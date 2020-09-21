@@ -23,12 +23,7 @@ namespace Combat.AbilityBehaviors
         public override IEnumerator Update()
         {
             // TODO implement dashing
-			// float range = (float)args[0];
-			// //Debug.Log ("PlayerDash: " + range);
-			// Vector3 dir = targetPosition - subject.transform.position;
-			// Vector3 targetPos = subject.transform.position + dir.normalized * Mathf.Min (range, dir.magnitude);
-			// Controller c = subject.GetComponent<Controller> ();
-			// c.StartCoroutine (c.Dashing (targetPos));
+            yield return null;
         }
         public override void Finish(Result result)
         {
