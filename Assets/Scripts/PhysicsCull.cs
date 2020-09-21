@@ -17,7 +17,7 @@ public class PhysicsCull : MonoBehaviour {
 	
 	// Update is called once per frame
 	public void Update () {
-        col.enabled = (playerTrans.position - trans.position).sqrMagnitude < 10 * 10;
+        //col.enabled = (playerTrans.position - trans.position).sqrMagnitude < 10 * 10;
         /*
         if ((GameManager.Player.transform.position - transform.position).sqrMagnitude < 10 * 10)
         {

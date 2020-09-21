@@ -41,6 +41,8 @@ namespace Projectiles
 
         public virtual Vector3 Velocity { get; set; } = Vector3.forward;
 
+        public virtual CombatCore.Entity.Faction Faction { get; set; } = CombatCore.Entity.Faction.enemy;
+
         /*
          * Called after MaxTime number of seconds have elapsed.
          */

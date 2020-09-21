@@ -1,6 +1,7 @@
 ﻿using CombatCore;
 using System.Collections;
 using UnityEngine;
+using static Combat.AbilityCaster;
 
 public class Controller : MonoBehaviour
 {
@@ -58,13 +59,13 @@ public class Controller : MonoBehaviour
                 //TODO play failed to use ability sound
             }
         }
-        if (Input.GetButtonDown("Fire1"))
-        {
-            if (!self.GetAbility(ABILITY_2).Use(self, facePos))
-            {
-                //TODO play failed to use ability sound
-            }
-        }
+        //if (Input.GetButtonDown("Fire1"))
+        //{
+        //    if (!self.GetAbility(ABILITY_2).Use(self, facePos))
+        //    {
+        //        //TODO play failed to use ability sound
+        //    }
+        //}
         if (Input.GetButtonDown("Fire2"))
         {
             if (!self.GetAbility(ABILITY_3).Use(self, facePos))
@@ -182,4 +183,6 @@ public class Controller : MonoBehaviour
         }
 #endif
     }
+
+    public void PlayerShoot(BoolRef br) => br.Value = Input.GetButton("Fire1");
 }

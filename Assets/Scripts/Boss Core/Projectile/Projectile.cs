@@ -177,9 +177,9 @@ namespace Projectiles {
             if (otherEntity != null)
             {
                 // All projectiles break if they do damage
-                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != Entity.Faction.enemy)
+                if (!otherEntity.IsInvincible() && otherEntity.GetFaction() != data.Faction)
                 {
-                    //Debug.Log("Projectile collided, should apply damage");
+                    Debug.Log($"Projectile collided with {otherEntity.GetFaction()}, should apply damage");
                     // Note that the entity causing the damage is null; callbacks may fail.
                     Entity.DamageEntity(otherEntity, null, data.Damage);
                     if (data.OnDestroyCollision != CallbackDictionary.NOTHING)
