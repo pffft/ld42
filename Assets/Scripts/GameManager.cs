@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
 	#region INSTANCE_METHODS
 	public void Awake()
     {
+		Cursor.visible = false;
 		if (instance == null)
 		{
 			instance = this;

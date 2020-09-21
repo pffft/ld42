@@ -41,6 +41,8 @@ namespace Combat.AbilityBehaviors
             // While the trigger is held, decrement duration and yield return
             while (ShootTriggerPressed())
             {
+                GameManager.Player.GetComponent<CombatCore.Entity>().movespeed.LockTo(10f);
+
                 duration -= Time.deltaTime;
                 
                 percent = (CHARGE_TIME - duration) / CHARGE_TIME;
@@ -50,6 +52,7 @@ namespace Combat.AbilityBehaviors
 
                 yield return null;
             }
+                GameManager.Player.GetComponent<CombatCore.Entity>().movespeed.Unlock();
 
             // Trigger was released. Check duration to see what we should shoot.
             if (duration <= 0f) 
@@ -81,16 +84,27 @@ namespace Combat.AbilityBehaviors
 
             for (int i = 0; i < 7; i++)
             {
-                float bulletAngle = Random.Range(-actualAngle / 2.0f, actualAngle / 2.0f);
+                // float bulletAngle = Random.Range(-actualAngle / 2.0f, actualAngle / 2.0f);
+                float bulletAngle = ApproxGaussian(-actualAngle / 2.0f, actualAngle / 2.0f);
+                float shotThickness = Mathf.Lerp(0.5f, 5f, percent);
 
                 // Quaternion.AngleAxis(-actualAngle / 2.0f, Vector3.up) * target
                 Vector3 idealDir = GetMousePos() - GameManager.Player.transform.position + (Vector3.up * Constants.Positions.BOSS_HEIGHT);
                 Vector3 actualDir = Quaternion.AngleAxis(bulletAngle, Vector3.up) * idealDir;
 
+                // Bullet trail particle effects
+                ParticleSpawner.CreateGunTrail(
+                    20f, 
+                    shotThickness,
+                    GameManager.Player.transform.position, 
+                    GameManager.Player.transform.position + actualDir
+                ).Play();
+
+                // Thick raycast towards boss
                 RaycastHit hit;
                 if (Physics.SphereCast(
                     GameManager.Player.transform.position,
-                    Mathf.Lerp(0.1f, 5f, percent),
+                    shotThickness,
                     actualDir,
                     out hit,
                     GameManager.Arena.RadiusInWorldUnits * 2,
@@ -110,6 +124,26 @@ namespace Combat.AbilityBehaviors
                 }
             }
 
+        }
+
+        // An approximation to a Gaussian random variable.
+        // 
+        // The sum of random variables with a given spread, S, will converge to
+        // a gaussian random variable with spread S/Sqrt(S). So we take the 
+        // average of the random variables, and multiply it by Sqrt(S) to 
+        // correct for the smaller spread.
+        // 
+        // You can adjust the number of iterations, but the approximation gets
+        // pretty good even at small values. This method converges at the peak
+        // first, and the tails are much slower to converge.
+        private float ApproxGaussian(float min, float max, int iterations=5) 
+        {
+            float sum = 0;
+            for (int i = 0; i < iterations; i++) 
+            {
+                sum += Random.Range(min, max);
+            }
+            return sum / Mathf.Sqrt(iterations);
         }
 
         public Vector3 GetMousePos() 

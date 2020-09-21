@@ -31,7 +31,7 @@ namespace CombatCore
 		public float shieldDelayMax = 2f;
 
 		// The speed at which this Entity can move through the world
-		public Stat movespeed = new Stat (0, 0, 25);
+		public Stat movespeed = new Stat (0);
 
 		// If > 0, this Entity is in combat
 		private float combatTimer;
