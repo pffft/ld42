@@ -15,7 +15,7 @@ MonoBehaviour:
   abilityName: PlayerShoot
   description: Ability to shoot a shotgun
   icon: {fileID: 0}
-  baseMaxCooldown: 2
-  baseMaxCharges: 1
+  baseMaxCooldown: 0.6
+  baseMaxCharges: -2
   interruptable: 1
   behaviourName: Combat.AbilityBehaviors.PlayerShootBehavior

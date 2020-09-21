@@ -33,6 +33,10 @@ namespace Combat
             if (!IsRunning && IsReady && (behavior?.Start(blackboard, this) ?? false))
             {
                 currentExecution = behavior.Update();
+                if (Charges > 0) 
+                {
+                    Charges--;
+                }
                 return true;
             }
             else
