@@ -28,9 +28,10 @@ namespace Combat
             if (behavior == null)
             {
                 behavior = ArcheType?.GetBehaviorInstance();
+                behavior.Initialize(blackboard, this);
             }
 
-            if (!IsRunning && IsReady && (behavior?.Start(blackboard, this) ?? false))
+            if (!IsRunning && IsReady && (behavior?.Start() ?? false))
             {
                 currentExecution = behavior.Update();
                 return true;
@@ -48,26 +49,30 @@ namespace Combat
                 bool finished = !currentExecution.MoveNext();
                 if (finished)
                 {
-                    Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
+                    ResetCooldown();
                     behavior.Finish(AbilityBehavior.Result.FINISHED);
                     currentExecution = null;
                 }
             }
-            else if (Cooldown > 0f)
+            else if (Cooldown > 0f && Charges < (ArcheType?.BaseMaxCharges ?? 1))
             {
                 Cooldown -= Time.deltaTime;
                 if (Cooldown <= 0f)
                 {
-                    if (Charges < (ArcheType?.BaseMaxCharges ?? 0))
+                    if (ArcheType?.FillAllChargesOnCooldown ?? false)
                     {
-                        Charges++;
-                        Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
+                        Charges = ArcheType.BaseMaxCharges;
                     }
                     else
                     {
-                        Cooldown = 0;
+                        Charges += ArcheType?.BaseChargeFillRate ?? 1;
                     }
+                    Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
                 }
+            }
+            else
+            {
+                Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
             }
         }
 
@@ -75,7 +80,7 @@ namespace Combat
         {
             if (IsRunning)
             {
-                Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
+                ResetCooldown();
                 behavior.Finish(AbilityBehavior.Result.STOPPED);
             }
             
@@ -84,9 +89,9 @@ namespace Combat
 
         public void Interrupt()
         {
-            if (IsRunning)
+            if (ArcheType?.IsInterruptable ?? true && IsRunning)
             {
-                Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
+                ResetCooldown();
                 behavior.Finish(AbilityBehavior.Result.INTERRUPTED);
             }
 
@@ -106,6 +111,18 @@ namespace Combat
         {
             ArcheType = archetype;
             Reset();
+        }
+
+        private void ResetCooldown()
+        {
+            if (Charges > 0)
+            {
+                Charges--;
+            }
+            else
+            {
+                Cooldown = ArcheType?.BaseMaxCooldown ?? 0f;
+            }
         }
     }
 }
