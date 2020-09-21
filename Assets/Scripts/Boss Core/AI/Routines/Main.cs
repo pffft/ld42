@@ -12,6 +12,7 @@ namespace Routines
         {
             // TODO finish me (tutorial + main phase)
             Phases = new List<AIPhase> {
+                new Phases.Phase_1()
             };
         }
     }

@@ -38,6 +38,8 @@ public class BossController : MonoBehaviour
         TestLatest,
         //UnitTest
         Unsorted,
+
+        Main,
     }
     [SerializeField]
     private _Routine Routine = _Routine.Tutorial;
@@ -75,6 +77,9 @@ public class BossController : MonoBehaviour
                 break;
             case _Routine.Unsorted:
                 routine = new Routines.Unsorted();
+                break;
+            case _Routine.Main:
+                routine = new Routines.Main();
                 break;
         }
         //AISequence.ShouldAllowInstantiation = false;

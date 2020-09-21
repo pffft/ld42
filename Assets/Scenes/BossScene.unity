@@ -8339,7 +8339,7 @@ PrefabInstance:
     - target: {fileID: 114648287774763342, guid: f22ec206bc95d4d40953aa691a44ebd2,
         type: 3}
       propertyPath: Routine
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f22ec206bc95d4d40953aa691a44ebd2, type: 3}
@@ -8926,6 +8926,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configuration:
   - archetype: {fileID: 11400000, guid: aef7fd6287d0d4d809f9c328b78f8f91, type: 2}
+    trigger:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 943402145}
+          m_TargetAssemblyTypeName: Controller, Assembly-CSharp
+          m_MethodName: PlayerShoot
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - archetype: {fileID: 11400000, guid: b08b727570e7b6e48b27eb9bae21a20e, type: 2}
     trigger:
       m_PersistentCalls:
         m_Calls:

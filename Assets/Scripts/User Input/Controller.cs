@@ -52,13 +52,13 @@ public class Controller : MonoBehaviour
         if (dashing || self.IsRooted())
             return;
 
-        if (Input.GetKey(KeyCode.Space))
-        {
-            if (!self.GetAbility(ABILITY_1).Use(self, facePos, dashRange))
-            {
-                //TODO play failed to use ability sound
-            }
-        }
+        // if (Input.GetKey(KeyCode.Space))
+        // {
+        //     if (!self.GetAbility(ABILITY_1).Use(self, facePos, dashRange))
+        //     {
+        //         //TODO play failed to use ability sound
+        //     }
+        // }
         //if (Input.GetButtonDown("Fire1"))
         //{
         //    if (!self.GetAbility(ABILITY_2).Use(self, facePos))
@@ -185,4 +185,6 @@ public class Controller : MonoBehaviour
     }
 
     public void PlayerShoot(BoolRef br) => br.Value = Input.GetButton("Fire1");
+
+    public void PlayerDash(BoolRef br) => br.Value = Input.GetKey(KeyCode.Space);
 }
