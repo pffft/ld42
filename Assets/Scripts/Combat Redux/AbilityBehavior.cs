@@ -7,13 +7,20 @@ namespace Combat
     {
         public enum Result { FINISHED, STOPPED, INTERRUPTED }
 
+        public GameObject Blackboard { get; private set; }
+        public Ability Ability { get; private set; }
+
+        public void Initialize(GameObject blackboard, Ability ability)
+        {
+            Blackboard = blackboard;
+            Ability = ability;
+        }
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="blackboard"></param>
-        /// <param name="ability"></param>
         /// <returns></returns>
-        public abstract bool Start(GameObject blackboard, Ability ability);
+        public abstract bool Start();
 
         /// <summary>
         /// 

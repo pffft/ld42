@@ -6,18 +6,16 @@ namespace Combat.AbilityBehaviors
 {
     public class Example : AbilityBehavior
     {
-        Func<bool> trigger;
-        public override bool Start(GameObject blackboard, Ability ability)
+        public override bool Start()
         {
-            Debug.Log($"Starting {nameof(Example)} behavior for {ability.ArcheType?.Name} on {blackboard.name}");
-            trigger = ability.Trigger;
+            Debug.Log($"Starting {nameof(Example)} behavior for {Ability.ArcheType?.Name} on {Blackboard.name}");
             return true;
         }
 
         public override IEnumerator Update()
         {
             float duration = 2f;
-            while (trigger() && (duration -= Time.deltaTime) > 0f)
+            while (Ability.Trigger() && (duration -= Time.deltaTime) > 0f)
             {
                 Debug.Log($"Running {nameof(Example)}; {duration}s remaining");
                 yield return null;
