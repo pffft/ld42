@@ -14,16 +14,16 @@ public class MainMenuCamera : MonoBehaviour {
 
     private static Vector3 cameraPos;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         Quaternion angle = Quaternion.AngleAxis(angleUp, Vector3.right);
         Quaternion angle2 = Quaternion.AngleAxis(angleAround, Vector3.up);
 
         cameraPos = angle * (Vector3.back * magnitude);
-	}
-	
-	// Update is called once per frame
-	void Update ()
+    }
+    
+    // Update is called once per frame
+    void Update ()
     {
         angleAround = Mathf.Repeat(angleAround + (Time.deltaTime * aroundScale), 360f);
         angleUpRaw = Mathf.Repeat(angleUpRaw + (Time.deltaTime * upScale), Mathf.PI * 2);

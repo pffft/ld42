@@ -12,16 +12,16 @@ using static Constants.Positions;
 
 namespace Moves.Unsorted 
 {
-	public class Circle_In_Out : Move 
-	{
-		public Circle_In_Out()
-		{
-			Description = "Shoots a circle in and out five times.";
-			Difficulty = 6f; 
+    public class Circle_In_Out : Move 
+    {
+        public Circle_In_Out()
+        {
+            Description = "Shoots a circle in and out five times.";
+            Difficulty = 6f; 
             Sequence = new AISequence(
                 new Teleport(CENTER).Wait(0.5f),
                 new Wave_Reverse().Wait(1.5f).Times(5).Wait(3f)
-			);
-		}
-	}
+            );
+        }
+    }
 }

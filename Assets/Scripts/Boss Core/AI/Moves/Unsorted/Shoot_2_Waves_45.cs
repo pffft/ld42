@@ -11,12 +11,12 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Shoot_2_Waves_45 : Move 
-	{
-		public Shoot_2_Waves_45()
-		{
-			Description = "Shoots two projectiles at a 45 degree angle that turn into AOE waves on death.";
-			Difficulty = 4f;
+    public class Shoot_2_Waves_45 : Move 
+    {
+        public Shoot_2_Waves_45()
+        {
+            Description = "Shoots two projectiles at a 45 degree angle that turn into AOE waves on death.";
+            Difficulty = 4f;
             Sequence = new AISequence(
                 new Teleport().Wait(0.25f),
                 new ShootArc(4, -45f, 45f, new ProjectileData { 

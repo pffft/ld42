@@ -8,13 +8,13 @@ public class KeepOnArena : MonoBehaviour {
     public bool shouldReset = false;
     private Rigidbody body;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         this.body = GetComponent<Rigidbody>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+    
+    // Update is called once per frame
+    void Update () {
         if (shouldReset)
         {
             //if (transform.position.magnitude > Constants.Positions.RadiusInWorldUnits)
@@ -33,5 +33,5 @@ public class KeepOnArena : MonoBehaviour {
                 }
             }
         }
-	}
+    }
 }

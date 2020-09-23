@@ -24,8 +24,8 @@ public class ThrownShield : MonoBehaviour {
 
     private bool shouldDoDamage = true;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         entity = GetComponent<Entity>();
         bossTransform = GameManager.Boss.transform;
 
@@ -44,9 +44,9 @@ public class ThrownShield : MonoBehaviour {
         // Grab the initial distance between the player and boss; used for computing curvature
         distance = idealPosition.magnitude;
     }
-	
-	// Update is called once per frame
-	void Update () {
+    
+    // Update is called once per frame
+    void Update () {
         // Out of time; fall down and don't home anymore (disable this script)
         currentTime += Time.deltaTime;
         if (currentTime > maxTime) {

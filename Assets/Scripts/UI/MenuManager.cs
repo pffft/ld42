@@ -4,134 +4,134 @@ using UnityEngine;
 
 namespace GameUI
 {
-	/// <summary>
-	/// Manages transitioning between active menus
-	/// </summary>
-	public sealed class MenuManager : MonoBehaviour
-	{
-		#region STATIC_VARS
+    /// <summary>
+    /// Manages transitioning between active menus
+    /// </summary>
+    public sealed class MenuManager : MonoBehaviour
+    {
+        #region STATIC_VARS
 
-		private const string PATH_SEP = "/";
+        private const string PATH_SEP = "/";
 
-		private static MenuManager instance;
+        private static MenuManager instance;
 
-		/// <summary>
-		/// Get the path from the root menu to the current menu
-		/// </summary>
-		public static string CurrentMenuPath
-		{
-			get
-			{
-				if (instance == null)
-					return "";
+        /// <summary>
+        /// Get the path from the root menu to the current menu
+        /// </summary>
+        public static string CurrentMenuPath
+        {
+            get
+            {
+                if (instance == null)
+                    return "";
 
-				string path = "";
-				foreach(Menu m in instance.menuStack)
-				{
-					path = m.Name + PATH_SEP + path;
-				}
+                string path = "";
+                foreach(Menu m in instance.menuStack)
+                {
+                    path = m.Name + PATH_SEP + path;
+                }
 
-				return PATH_SEP + path;
-			}
-		}
-		#endregion
+                return PATH_SEP + path;
+            }
+        }
+        #endregion
 
-		#region INSTANCE_VARS
+        #region INSTANCE_VARS
 
-		[SerializeField]
-		private Menu currentMenu;
-		private Stack<Menu> menuStack;
+        [SerializeField]
+        private Menu currentMenu;
+        private Stack<Menu> menuStack;
 
-		private bool transitioning;
+        private bool transitioning;
 
-		public int HistoryDepth
-		{
-			get { return menuStack.Count; }
-		}
-		#endregion
+        public int HistoryDepth
+        {
+            get { return menuStack.Count; }
+        }
+        #endregion
 
-		#region STATIC_METHODS
+        #region STATIC_METHODS
 
-		public static MenuManager GetInstance()
-		{
-			if (instance == null)
-			{
-				Debug.LogWarning ("No MenuManager currently active!");
-			}
+        public static MenuManager GetInstance()
+        {
+            if (instance == null)
+            {
+                Debug.LogWarning ("No MenuManager currently active!");
+            }
 
-			return instance;
-		}
-		#endregion
+            return instance;
+        }
+        #endregion
 
-		#region INSTANCE_METHODS
+        #region INSTANCE_METHODS
 
-		public void Awake()
-		{
-			if (instance == null)
-			{
-				instance = this;
-				menuStack = new Stack<Menu> ();
-				currentMenu?.OpenImmediate ();
-				transitioning = false;
-			}
-			else
-			{
-				Debug.LogWarning ("Multiple MenuManagers currently active!");
-			}
-		}
+        public void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+                menuStack = new Stack<Menu> ();
+                currentMenu?.OpenImmediate ();
+                transitioning = false;
+            }
+            else
+            {
+                Debug.LogWarning ("Multiple MenuManagers currently active!");
+            }
+        }
 
-		/// <summary>
-		/// Closes the currently open menu, then opens the inidcated menu.
-		/// </summary>
-		/// <param name="menu"></param>
-		/// <returns></returns>
-		public void NavigateTo(Menu menu)
-		{
-			if (!transitioning)
-			{
-				if(currentMenu != null)
-					menuStack.Push (currentMenu);
-				StartCoroutine (DoMenuTransition (currentMenu, menu));
-			}
-		}
+        /// <summary>
+        /// Closes the currently open menu, then opens the inidcated menu.
+        /// </summary>
+        /// <param name="menu"></param>
+        /// <returns></returns>
+        public void NavigateTo(Menu menu)
+        {
+            if (!transitioning)
+            {
+                if(currentMenu != null)
+                    menuStack.Push (currentMenu);
+                StartCoroutine (DoMenuTransition (currentMenu, menu));
+            }
+        }
 
-		/// <summary>
-		/// Traverses down the previous menu stack one entry, closing the current menu.
-		/// </summary>
-		/// <returns></returns>
-		public void NavigateBack()
-		{
-			if (!transitioning && menuStack.Count > 0)
-			{
-				StartCoroutine (DoMenuTransition (currentMenu, menuStack.Pop ()));
-			}
-		}
+        /// <summary>
+        /// Traverses down the previous menu stack one entry, closing the current menu.
+        /// </summary>
+        /// <returns></returns>
+        public void NavigateBack()
+        {
+            if (!transitioning && menuStack.Count > 0)
+            {
+                StartCoroutine (DoMenuTransition (currentMenu, menuStack.Pop ()));
+            }
+        }
 
-		private IEnumerator DoMenuTransition(Menu prev, Menu next)
-		{
-			Debug.Log ("Beginning transition from " + prev?.Name + " to " + next?.Name); //DEBUG
-			transitioning = true;
+        private IEnumerator DoMenuTransition(Menu prev, Menu next)
+        {
+            Debug.Log ("Beginning transition from " + prev?.Name + " to " + next?.Name); //DEBUG
+            transitioning = true;
 
-			prev?.Close ();
-			while (prev != null && prev.IsOpen)
-			{
-				yield return null;
-			}
+            prev?.Close ();
+            while (prev != null && prev.IsOpen)
+            {
+                yield return null;
+            }
 
-			next?.Open ();
-			currentMenu = next;
-			while (next != null && !next.IsOpen)
-			{
-				yield return null;
-			}
+            next?.Open ();
+            currentMenu = next;
+            while (next != null && !next.IsOpen)
+            {
+                yield return null;
+            }
 
-			transitioning = false;
-			Debug.Log ("Finshed transition from " + prev?.Name + " to " + next?.Name); //DEBUG
-		}
-		#endregion
+            transitioning = false;
+            Debug.Log ("Finshed transition from " + prev?.Name + " to " + next?.Name); //DEBUG
+        }
+        #endregion
 
-		#region INTERNAL_TYPES
+        #region INTERNAL_TYPES
 
-		#endregion
-	}
+        #endregion
+    }
 }

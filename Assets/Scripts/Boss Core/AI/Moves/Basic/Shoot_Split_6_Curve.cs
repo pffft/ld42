@@ -11,8 +11,8 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Shoot_Split_6_Curve : Move 
-	{
+    public class Shoot_Split_6_Curve : Move 
+    {
         public Shoot_Split_6_Curve()
         {
             Description = "Shoots a projectile that splits into 6 curving projectiles.";
@@ -28,6 +28,6 @@ namespace Moves.Unsorted
                 ),
                 new Pause(0.5f)
             );
-		}
-	}
+        }
+    }
 }

@@ -19,7 +19,7 @@ namespace Moves.Unsorted
      * ** This might have changed due to the way ShootDeathHex was implemented.
      */
     public class Death_Hex : Move 
-	{
+    {
         public Death_Hex()
         {
             Description = "Fires 6 projectiles that explode into 6 more projectiles, repeated twice to form a lattice.";
@@ -32,6 +32,6 @@ namespace Moves.Unsorted
                 new ShootArc(50, 0, 360, new ProjectileData { MaxTime = 0.25f }).Wait(1f),
                 new ShootArc(50, 0, 360, new ProjectileData { MaxTime = 0.25f }).Wait(0.75f)
             );
-		}
-	}
+        }
+    }
 }

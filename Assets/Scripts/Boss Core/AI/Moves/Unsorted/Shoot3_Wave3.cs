@@ -11,12 +11,12 @@ using static BossController;
 
 namespace Moves.Unsorted 
 {
-	public class Shoot3_Wave3 : Move
+    public class Shoot3_Wave3 : Move
     {
-		public Shoot3_Wave3()
-		{
-			Description = "40 basic bullets, with a 360 wave at the start, middle, and end.";
-			Difficulty = 3f;
+        public Shoot3_Wave3()
+        {
+            Description = "40 basic bullets, with a 360 wave at the start, middle, and end.";
+            Difficulty = 3f;
             Sequence = new AISequence(
                 new Teleport().Wait(0.5f),
                 new AOE_360(),
@@ -25,6 +25,6 @@ namespace Moves.Unsorted
                 new Shoot3().Wait(0.1f).Times(20),
                 new AOE_360().Wait(0.5f)
             );
-		}
-	}
+        }
+    }
 }
