@@ -15,6 +15,7 @@ namespace Combat.AbilityBehaviors
         private static readonly float MIN_ANGLE = 2f;
 
         PlayerGizmos gizmos;
+        Controller playerController;
 
         private float baseMaxCooldown;
 
@@ -27,6 +28,10 @@ namespace Combat.AbilityBehaviors
             if (gizmos == null) 
             {
                 gizmos = blackboard.GetComponent<PlayerGizmos>();
+            }
+            if (playerController == null)
+            {
+                playerController = blackboard.GetComponent<Controller>();
             }
             return true;
         }
@@ -89,21 +94,21 @@ namespace Combat.AbilityBehaviors
                 float shotThickness = Mathf.Lerp(0.5f, 5f, percent);
 
                 // Quaternion.AngleAxis(-actualAngle / 2.0f, Vector3.up) * target
-                Vector3 idealDir = GetMousePos() - GameManager.Player.transform.position + (Vector3.up * Constants.Positions.BOSS_HEIGHT);
+                Vector3 idealDir = GetMousePos() - GameManager.Player.transform.position + (Vector3.up * Constants.Positions.BOSS_HEIGHT / 2);
                 Vector3 actualDir = Quaternion.AngleAxis(bulletAngle, Vector3.up) * idealDir;
 
                 // Bullet trail particle effects
                 ParticleSpawner.CreateGunTrail(
-                    20f, 
+                    GameManager.Arena.RadiusInWorldUnits, 
                     shotThickness,
-                    GameManager.Player.transform.position, 
+                    GameManager.Player.transform.position + (Vector3.up * Constants.Positions.BOSS_HEIGHT / 2), 
                     GameManager.Player.transform.position + actualDir
                 ).Play();
 
                 // Thick raycast towards boss
                 RaycastHit hit;
                 if (Physics.SphereCast(
-                    GameManager.Player.transform.position,
+                    GameManager.Player.transform.position + (Vector3.up * Constants.Positions.BOSS_HEIGHT / 2),
                     shotThickness,
                     actualDir,
                     out hit,
@@ -136,7 +141,7 @@ namespace Combat.AbilityBehaviors
         // You can adjust the number of iterations, but the approximation gets
         // pretty good even at small values. This method converges at the peak
         // first, and the tails are much slower to converge.
-        private float ApproxGaussian(float min, float max, int iterations=5) 
+        private float ApproxGaussian(float min, float max, int iterations = 5) 
         {
             float sum = 0;
             for (int i = 0; i < iterations; i++) 
@@ -146,25 +151,7 @@ namespace Combat.AbilityBehaviors
             return sum / Mathf.Sqrt(iterations);
         }
 
-        public Vector3 GetMousePos() 
-        {
-            Vector3 facePos = Vector3.zero;
-
-            Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane plane = new Plane(Vector3.up, Vector3.zero);
-            float dist;
-            if (plane.Raycast(camRay, out dist))
-            {
-                facePos = camRay.origin + (dist * camRay.direction);
-                Vector3 dir;
-                if ((dir = (facePos - GameManager.Player.transform.position)).magnitude > 15f)
-                {
-                    facePos = GameManager.Player.transform.position + (dir.normalized * 15f);
-                }
-            }
-
-            return facePos;
-        }
+        public Vector3 GetMousePos() => playerController.GetDashTargetPoint();
 
         // Called when the ability ends.
         public override void Finish(Result result)

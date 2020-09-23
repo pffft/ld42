@@ -52,6 +52,13 @@ public class Controller : MonoBehaviour
         if (dashing || self.IsRooted())
             return;
 
+        facePos += new Vector3(Input.GetAxisRaw("Mouse X"), 0f, Input.GetAxisRaw("Mouse Y"));
+        Vector3 dir;
+        if ((dir = facePos - transform.position).magnitude > dashRange)
+        {
+            facePos = transform.position + (dir.normalized * dashRange);
+        }
+
         if (Input.GetKey(KeyCode.Space))
         {
             if (!self.GetAbility(ABILITY_1).Use(self, facePos, dashRange))
@@ -119,19 +126,6 @@ public class Controller : MonoBehaviour
     {
         if (dashing || self.IsRooted())
             return;
-
-        Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane plane = new Plane(Vector3.up, Vector3.zero);
-        float dist;
-        if (plane.Raycast(camRay, out dist))
-        {
-            facePos = camRay.origin + (dist * camRay.direction);
-            Vector3 dir;
-            if ((dir = (facePos - transform.position)).magnitude > dashRange)
-            {
-                facePos = transform.position + (dir.normalized * dashRange);
-            }
-        }
 
         //movement
         Vector3 movementVector = new Vector3(0f, physbody.velocity.y, 0f);

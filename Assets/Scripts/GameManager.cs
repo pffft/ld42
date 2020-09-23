@@ -105,7 +105,12 @@ public class GameManager : MonoBehaviour
 	#region INSTANCE_METHODS
 	public void Awake()
     {
-		Cursor.visible = false;
+        if (Application.isPlaying)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
 		if (instance == null)
 		{
 			instance = this;
