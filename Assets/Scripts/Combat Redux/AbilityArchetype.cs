@@ -43,7 +43,7 @@ namespace Combat
         [Tooltip("The fully-qualified class name of the AbilityBehavior associated with this type")]
         private string behaviourName = "Example";
 
-        public string Name => name;
+        public string Name => abilityName;
 
         public string Description => description;
 

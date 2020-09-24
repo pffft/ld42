@@ -6,8 +6,30 @@ namespace Combat
         public delegate void Delegate(T data);
     }
 
-    public class OnDamageTakenEvent : CombatEvent<OnDamageTakenEvent>
+    public class OnDamageEvent : CombatEvent<OnDamageEvent>
     {
-        public float 
+        public Combatant Attacker { get; set; }
+        public Combatant Victim { get; set; }
+
+        public int HealthBefore { get; set; }
+        public int HealthAfter { get; set; }
+        public int Damage => HealthBefore - HealthAfter;
+    }
+
+    public class OnDeathEvent : CombatEvent<OnDeathEvent>
+    {
+        public Combatant Attacker { get; set; }
+        public Combatant Victim { get; set; }
+    }
+
+    public class OnAbilityCast : CombatEvent<OnAbilityCast>
+    {
+        public Ability Ability { get; set; }
+    }
+
+    public class OnAbilityFinish : CombatEvent<OnAbilityFinish>
+    {
+        public Ability Ability { get; set; }
+        public AbilityBehavior.Result Result { get; set; }
     }
 }

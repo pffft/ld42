@@ -12,15 +12,9 @@ namespace Combat
         {
             public bool Value { get; set; }
 
-            public static implicit operator bool(BoolRef br)
-            {
-                return br != null ? br.Value : false;
-            }
+            public static implicit operator bool(BoolRef br) => br?.Value ?? false;
 
-            public static implicit operator BoolRef(bool br)
-            {
-                return new BoolRef { Value = br };
-            }
+            public static implicit operator BoolRef(bool br) => new BoolRef { Value = br };
         }
 
         [Serializable]
@@ -66,5 +60,11 @@ namespace Combat
                 }
             }
         }
+
+        public Ability this[string name] => GetAbility(name);
+        public Ability GetAbility(string name) => abilities.Find((Ability a) => a.ArcheType?.Name == name);
+
+        public Ability this[int index] => GetAbility(index);
+        public Ability GetAbility(int index) => abilities[index];
     }
 }
