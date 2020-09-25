@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Combat
 {
-    [CreateAssetMenu(fileName = "DefaultArchetype", menuName = "AbilityArchetype")]
+    [CreateAssetMenu(fileName = "DefaultArchetype", menuName = "Combat/Ability Archetype")]
     public class AbilityArchetype : ScriptableObject
     {
         [SerializeField]

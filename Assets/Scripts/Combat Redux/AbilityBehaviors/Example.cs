@@ -8,7 +8,7 @@ namespace Combat.AbilityBehaviors
     {
         public override bool Start()
         {
-            Debug.Log($"Starting {nameof(Example)} behavior for {Ability.ArcheType?.Name} on {Blackboard.name}");
+            Debug.Log($"Starting {nameof(Example)} behavior for {Ability.Archetype?.Name} on {Blackboard.name}");
             return true;
         }
 

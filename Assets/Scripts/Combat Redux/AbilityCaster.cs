@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 namespace Combat
 {
+    [AddComponentMenu("Combat/Ability Caster")]
     public class AbilityCaster : MonoBehaviour
     {
         [Serializable]
@@ -39,7 +40,7 @@ namespace Combat
             {
                 abilities.Add(new Ability
                 {
-                    ArcheType = slot.archetype,
+                    Archetype = slot.archetype,
                     Trigger = () => {
                         BoolRef status = new BoolRef();
                         slot.trigger?.Invoke(status);
@@ -62,7 +63,7 @@ namespace Combat
         }
 
         public Ability this[string name] => GetAbility(name);
-        public Ability GetAbility(string name) => abilities.Find((Ability a) => a.ArcheType?.Name == name);
+        public Ability GetAbility(string name) => abilities.Find((Ability a) => a.Archetype?.Name == name);
 
         public Ability this[int index] => GetAbility(index);
         public Ability GetAbility(int index) => abilities[index];
