@@ -28,6 +28,10 @@ namespace Combat
             public TriggerEvent trigger;
         }
 
+        public event OnAbilityCast.Delegate onCast;
+
+        public event OnAbilityFinish.Delegate onFinish;
+
         [SerializeField]
         private List<ConfigurationSlot> configuration = new List<ConfigurationSlot>();
 
@@ -38,7 +42,7 @@ namespace Combat
             abilities = new List<Ability>();
             foreach (ConfigurationSlot slot in configuration)
             {
-                abilities.Add(new Ability
+                var ability = new Ability
                 {
                     Archetype = slot.archetype,
                     Trigger = () => {
@@ -46,7 +50,12 @@ namespace Combat
                         slot.trigger?.Invoke(status);
                         return status.Value;
                     }
-                });
+                };
+
+                ability.onCast += BroadcastOnCast;
+                ability.onFinish += BroadcastOnFinish;
+
+                abilities.Add(ability);
             }
         }
 
@@ -67,5 +76,25 @@ namespace Combat
 
         public Ability this[int index] => GetAbility(index);
         public Ability GetAbility(int index) => abilities[index];
+
+        private void BroadcastOnCast(OnAbilityCast eventData)
+        {
+            onCast?.Invoke(eventData);
+
+            if (TryGetComponent(out Combatant combatant))
+            {
+                combatant.OnAbilityCast(eventData);
+            }
+        }
+
+        private void BroadcastOnFinish(OnAbilityFinish eventData)
+        {
+            onFinish?.Invoke(eventData);
+
+            if (TryGetComponent(out Combatant combatant))
+            {
+                combatant.OnAbilityFinish(eventData);
+            }
+        }
     }
 }

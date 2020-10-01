@@ -32,4 +32,12 @@ namespace Combat
         public Ability Ability { get; set; }
         public AbilityBehavior.Result Result { get; set; }
     }
+
+    public class OnStatusApplied : CombatEvent<OnStatusApplied>
+    {
+        public Combatant Attacker { get; set; }
+        public Combatant Victim { get; set; }
+        public StatusArchetype Archetype { get; set; }
+        public int InitialStacks { get; set; }
+    }
 }

@@ -54,20 +54,18 @@ namespace Combat
 
         public bool DecayAllStacks => decayAllStacks;
 
-        public StatusComponent[] GetComponents()
+        public StatusBehavior GetInstance()
         {
-            StatusComponent[] components = new StatusComponent[componentNames.Length];
-            for (int i = 0; i < components.Length; i++)
-            {
-                Type t = Type.GetType(name, throwOnError: true, ignoreCase: false);
+            Type t = Type.GetType(name, throwOnError: true, ignoreCase: false);
 
-                if (t.IsSubclassOf(typeof(StatusComponent)))
-                {
-                    components[i] = Activator.CreateInstance(t) as StatusComponent;
-                }
+            if (t.IsSubclassOf(typeof(StatusBehavior)))
+            {
+                var behavior = Activator.CreateInstance(t) as StatusBehavior;
+                behavior.Archetype = this;
+                return behavior;
             }
 
-            return components;
+            return null;
         }
     }
 }
